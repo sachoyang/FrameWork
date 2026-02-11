@@ -62,7 +62,6 @@ void Game::Update(double frame)
 
 		a = GetTickCount64();
 	}
-	
 
 }
 
@@ -78,6 +77,13 @@ void Game::OnMessage( MSG* msg )
 		case VK_ESCAPE:
 			// 메뉴로 돌아가기 예시
 			g_Mng.n_Chap = MENU;
+			break;
+
+		case '1':
+			mapMng.ChangeMap(1);
+			break;
+		case '2':
+			mapMng.ChangeMap(2);
 			break;
 		}
 		break;
