@@ -23,7 +23,7 @@ public :
 	MapChunk* m_pCurrentMapChunk;
 
 	// std::map<int, MapChunk*> m_MapList;
-	MapChunk m_MapList[10];
+	MapChunk m_MapList[11];
 
 	/*Sprite test;
 	bool tests;*/
@@ -42,6 +42,7 @@ public :
 	void Update(double frame);
 	void Draw();
 
+	void CreateRandomMap();
 	void ChangeMap(int mapID);
 };
 

@@ -1,4 +1,4 @@
-#include "Include.h"
+ï»¿#include "Include.h"
 
 MapManager mapMng;
 
@@ -15,6 +15,7 @@ MapManager::~MapManager()
 
 void MapManager::Init()
 {
+	srand((unsigned int)time(NULL)); // ëœë¤ ì‹œë“œ ì´ˆê¸°í™”
 	/*int i,j;
 	char FileName[256];
 	
@@ -33,60 +34,163 @@ void MapManager::Init()
 		j+=2;
 		
 	}*/
+#pragma region MapData_Init
 	char FileName[256];
 	// -------------------------------------------------------
-	// [1¹ø ¸Ê] - °íÁ¤ ½ÃÀÛ ¸Ê (±âÁ¸¿¡ ¾²´ø ±× ¸Ê)
+	// [1ë²ˆ ë§µ] - ê³ ì • ì‹œì‘ ë§µ (ê¸°ì¡´ì— ì“°ë˜ ê·¸ ë§µ)
 	// -------------------------------------------------------
 	m_MapList[1].id = 1;
-	m_MapList[1].layerCount = 2; // ¹è°æ 2Àå ¾´´Ù°í °¡Á¤
+	m_MapList[1].layerCount = 2; // ë°°ê²½ 2ì¥ ì“´ë‹¤ê³  ê°€ì •
 
-	// ¹è°æ 1 (°¡Àå µÚ)
+	// ë°°ê²½ 1 (ê°€ì¥ ë’¤)
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0001.tga");
 	m_MapList[1].bgLayer[0].Create(FileName, false, 0);
 
-	// ¹è°æ 2 (±× ¾Õ)
+	// ë°°ê²½ 2 (ê·¸ ì•)
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0002.tga");
 	m_MapList[1].bgLayer[1].Create(FileName, false, 0);
 
 	// -------------------------------------------------------
-	// [2¹ø ¸Ê] - Å×½ºÆ®¿ë ´Ù¸¥ ¸Ê (¹è°æ »öÀÌ³ª ÀÌ¹ÌÁö¸¦ ´Ù¸£°Ô)
+	// [2ë²ˆ ë§µ] - í…ŒìŠ¤íŠ¸ìš© ë‹¤ë¥¸ ë§µ (ë°°ê²½ ìƒ‰ì´ë‚˜ ì´ë¯¸ì§€ë¥¼ ë‹¤ë¥´ê²Œ)
 	// -------------------------------------------------------
 	m_MapList[2].id = 2;
 	m_MapList[2].layerCount = 1;
 
-	// 2¹ø ¸ÊÀº ±×³É ´Ù¸¥ ÀÌ¹ÌÁö ÇÏ³ª¸¸ ¶ç¿öº¾½Ã´Ù.
-	// (ÀÌ¹ÌÁö°¡ ¾ø´Ù¸é ±âÁ¸ °Å ÀçÈ°¿ëÇÏ°Å³ª »ö±ò¸¸ ¹Ù²ã¼­ Create)
+	// 2ë²ˆ ë§µì€ ê·¸ëƒ¥ ë‹¤ë¥¸ ì´ë¯¸ì§€ í•˜ë‚˜ë§Œ ë„ì›Œë´…ì‹œë‹¤.
+	// (ì´ë¯¸ì§€ê°€ ì—†ë‹¤ë©´ ê¸°ì¡´ ê±° ì¬í™œìš©í•˜ê±°ë‚˜ ìƒ‰ê¹”ë§Œ ë°”ê¿”ì„œ Create)
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0003.tga");
 	m_MapList[2].bgLayer[0].Create(FileName, false, 0);
 
 	// -------------------------------------------------------
-	// [¸Ê ¿¬°á ¼³Á¤] (³ªÁß¿¡´Â ¿©±â°¡ ·£´ı ¾Ë°í¸®ÁòÀ¸·Î ´ëÃ¼µÊ)
+	// [3ë²ˆ ë§µ] 
 	// -------------------------------------------------------
-	// 1¹ø ¸Ê ÃÊ±âÈ­ (ÀÏ´Ü ´Ù 0À¸·Î ¸·À½)
-	for (int i = 0; i < 4; i++) m_MapList[1].nextMapID[i] = 0;
+	m_MapList[3].id = 3;
+	m_MapList[3].layerCount = 1;
+	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map01.png");
+	m_MapList[3].bgLayer[0].Create(FileName, false, 0);
+	// -------------------------------------------------------
+	// [4ë²ˆ ë§µ] 
+	// -------------------------------------------------------
+	m_MapList[4].id = 2;
+	m_MapList[4].layerCount = 1;
+	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map02.png");
+	m_MapList[4].bgLayer[0].Create(FileName, false, 0);
 
-	// 1¹ø ¸ÊÀÇ [¿À¸¥ÂÊ] -> 2¹ø ¸Ê
-	m_MapList[1].nextMapID[DIR_RIGHT] = 2;
+#pragma endregion
 
-	// 2¹ø ¸Ê ÃÊ±âÈ­
-	for (int i = 0; i < 4; i++) m_MapList[2].nextMapID[i] = 0;
+//#pragma region MapData ì—°ê²°	ì„¤ì •
+//	// -------------------------------------------------------
+//	// [ë§µ ì—°ê²° ì„¤ì •] (ë‚˜ì¤‘ì—ëŠ” ì—¬ê¸°ê°€ ëœë¤ ì•Œê³ ë¦¬ì¦˜ìœ¼ë¡œ ëŒ€ì²´ë¨)
+//	// -------------------------------------------------------
+//	// 1ë²ˆ ë§µ ì´ˆê¸°í™” (ì¼ë‹¨ ë‹¤ 0ìœ¼ë¡œ ë§‰ìŒ)
+//	for (int i = 0; i < 4; i++) m_MapList[1].nextMapID[i] = 0;
+//
+//	// 1ë²ˆ ë§µì˜ [ì˜¤ë¥¸ìª½] -> 2ë²ˆ ë§µ
+//	m_MapList[1].nextMapID[DIR_RIGHT] = 2;
+//
+//	// 2ë²ˆ ë§µ ì´ˆê¸°í™”
+//	for (int i = 0; i < 4; i++) m_MapList[2].nextMapID[i] = 0;
+//
+//	// 2ë²ˆ ë§µì˜ [ì™¼ìª½] -> 1ë²ˆ ë§µ (ë‹¤ì‹œ ëŒì•„ì˜¬ ìˆ˜ ìˆê²Œ)
+//	m_MapList[2].nextMapID[DIR_LEFT] = 1;
+//
+////#pragma endregion
 
-	// 2¹ø ¸ÊÀÇ [¿ŞÂÊ] -> 1¹ø ¸Ê (´Ù½Ã µ¹¾Æ¿Ã ¼ö ÀÖ°Ô)
-	m_MapList[2].nextMapID[DIR_LEFT] = 1;
+	// [ëœë¤ ë§µ ìƒì„±] 
+	CreateRandomMap();
 
-	// [ÃÊ±â ½ÃÀÛ] 1¹ø ¸ÊÀ¸·Î ½ÃÀÛ!
+	// [ì´ˆê¸° ì‹œì‘] 1ë²ˆ ë§µìœ¼ë¡œ ì‹œì‘!
 	ChangeMap(1);
+}
+
+void MapManager::CreateRandomMap()
+{
+	// [1] ì´ˆê¸°í™”: ëª¨ë“  ë§µì˜ ì—°ê²° ì •ë³´ë¥¼ 0(ë§‰í˜)ìœ¼ë¡œ ë¦¬ì…‹
+	for (int i = 1; i <= 10; i++)
+	{
+		for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
+	}
+
+	// [2] ê°€ìƒì˜ ê²©ìíŒ ë§Œë“¤ê¸° (20x20 í¬ê¸°)
+	// 0ì´ë©´ ë¹ˆì¹¸, 1ì´ìƒì´ë©´ ë§µ ID
+	int grid[20][20] = { 0, };
+
+	// [3] 1ë²ˆ ë§µì„ ì •ì¤‘ì•™ì— ë°°ì¹˜
+	int startX = 10;
+	int startY = 10;
+	grid[startY][startX] = 1;
+
+	// [4] 2ë²ˆ ë§µë¶€í„° 10ë²ˆ ë§µê¹Œì§€ ìˆœì„œëŒ€ë¡œ ë¶™ì´ê¸° (Random Walk ë³€í˜•)
+	int currentMapCount = 1;
+	int maxMapCount = 4; // ì¼ë‹¨ 5ê°œë§Œ ë§Œë“¤ì–´ë´…ì‹œë‹¤ (ìµœëŒ€ 10ê°œ)
+
+	while (currentMapCount < maxMapCount)
+	{
+		// ì´ë¯¸ ë°°ì¹˜ëœ ë§µ ì¤‘ í•˜ë‚˜ë¥¼ ëœë¤ìœ¼ë¡œ ê³ ë¦„ (ê±°ê¸°ì„œ ê°€ì§€ë¥¼ ë»—ê¸° ìœ„í•´)
+		int targetX = startX;
+		int targetY = startY;
+
+		// (ê°„ë‹¨í•˜ê²Œ 1ë²ˆ ë°© ê·¼ì²˜ì—ì„œ ê³„ì† ë»—ì–´ë‚˜ê°€ëŠ” ë°©ì‹)
+		// ë” ë³µì¡í•œ ë¯¸ë¡œë¥¼ ì›í•˜ë©´ 'ë°°ì¹˜ëœ ë°© ëª©ë¡'ì„ ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬í•´ì„œ ë½‘ì•„ì•¼ í•¨.
+		// ì—¬ê¸°ì„œëŠ” "ëœë¤ ì›Œí¬" ë°©ì‹ìœ¼ë¡œ ë¹ˆ ê³µê°„ ì°¾ì„ ë•Œê¹Œì§€ ì´ë™
+
+		int dir = rand() % 4 + 1; // 1~4 ëœë¤ ë°©í–¥
+		int nextX = targetX;
+		int nextY = targetY;
+
+		if (dir == DIR_UP)    nextY--;
+		else if (dir == DIR_DOWN)  nextY++;
+		else if (dir == DIR_LEFT)  nextX--;
+		else if (dir == DIR_RIGHT) nextX++;
+
+		// ê·¸ ìë¦¬ê°€ ë¹„ì–´ìˆìœ¼ë©´ ìƒˆ ë§µ ë°°ì¹˜!
+		if (grid[nextY][nextX] == 0)
+		{
+			currentMapCount++;
+			grid[nextY][nextX] = currentMapCount; // 2ë²ˆ, 3ë²ˆ... ë§µ ID í• ë‹¹
+
+			// ì—¬ê¸°ì„œ íƒìƒ‰ ìœ„ì¹˜ë¥¼ ê°±ì‹ í•´ì¤Œ (ë‹¤ìŒ ë§µì€ ì´ ë§µ ì˜†ì— ë¶™ì„ ìˆ˜ë„ ìˆê²Œ)
+			startX = nextX;
+			startY = nextY;
+		}
+	}
+
+	// [5] ê²©ìíŒì„ ë³´ê³  ì‹¤ì œ ì—°ê²°(Link) ì •ë³´ ì…ë ¥
+	for (int y = 1; y < 19; y++)
+	{
+		for (int x = 1; x < 19; x++)
+		{
+			int myID = grid[y][x];
+			if (myID == 0) continue; // ë§µ ì—†ìŒ
+
+			// ìƒ(Up) í™•ì¸ -> grid[y-1][x]
+			if (grid[y - 1][x] != 0)
+				m_MapList[myID].nextMapID[DIR_UP] = grid[y - 1][x];
+
+			// í•˜(Down) í™•ì¸ -> grid[y+1][x]
+			if (grid[y + 1][x] != 0)
+				m_MapList[myID].nextMapID[DIR_DOWN] = grid[y + 1][x];
+
+			// ì¢Œ(Left) í™•ì¸ -> grid[y][x-1]
+			if (grid[y][x - 1] != 0)
+				m_MapList[myID].nextMapID[DIR_LEFT] = grid[y][x - 1];
+
+			// ìš°(Right) í™•ì¸ -> grid[y][x+1]
+			if (grid[y][x + 1] != 0)
+				m_MapList[myID].nextMapID[DIR_RIGHT] = grid[y][x + 1];
+		}
+	}
 }
 
 void MapManager::ChangeMap(int mapID)
 {
-	// ¹üÀ§ Ã¼Å©
+	// ë²”ìœ„ ì²´í¬
 	if (mapID < 1 || mapID > 9) return;
 
-	// ÇöÀç ¸Ê Æ÷ÀÎÅÍ ±³Ã¼
+	// í˜„ì¬ ë§µ í¬ì¸í„° êµì²´
 	m_pCurrentMapChunk = &m_MapList[mapID];
 
-	// (³ªÁß¿¡ ¿©±â¼­ ÇÃ·¹ÀÌ¾î À§Ä¡ Àç¼³Á¤ÀÌ³ª ¸ó½ºÅÍ ¸®Á¨ µî Ã³¸®)
+	// (ë‚˜ì¤‘ì— ì—¬ê¸°ì„œ í”Œë ˆì´ì–´ ìœ„ì¹˜ ì¬ì„¤ì •ì´ë‚˜ ëª¬ìŠ¤í„° ë¦¬ì   ë“± ì²˜ë¦¬)
 }
 
 void MapManager::Update(double frame)
@@ -103,24 +207,24 @@ void MapManager::Update(double frame)
 	}*/
 	if (m_pCurrentMapChunk == nullptr) return;
 
-	// 1. ¿À¸¥ÂÊÀ¸·Î ³ª°¥ ¶§ (ÇÃ·¹ÀÌ¾î x > È­¸é³Êºñ)
+	// 1. ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë‚˜ê°ˆ ë•Œ (í”Œë ˆì´ì–´ x > í™”ë©´ë„ˆë¹„)
 	if (knight.pos.x > SCREEN_WITH)
 	{
-		// °¥ °÷ÀÌ ÀÖ´ÂÁö È®ÀÎ
+		// ê°ˆ ê³³ì´ ìˆëŠ”ì§€ í™•ì¸
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_RIGHT];
 
-		if (nextMap != 0) // ¿¬°áµÈ ¸ÊÀÌ ÀÖ´Ù!
+		if (nextMap != 0) // ì—°ê²°ëœ ë§µì´ ìˆë‹¤!
 		{
-			ChangeMap(nextMap);     // ¸Ê ±³Ã¼
-			knight.pos.x = 50.0f;   // ÇÃ·¹ÀÌ¾î¸¦ ¿ŞÂÊ ³¡À¸·Î ÀÌµ¿ (ÀÔÀå ¿¬Ãâ)
+			ChangeMap(nextMap);     // ë§µ êµì²´
+			knight.pos.x = 50.0f;   // í”Œë ˆì´ì–´ë¥¼ ì™¼ìª½ ëìœ¼ë¡œ ì´ë™ (ì…ì¥ ì—°ì¶œ)
 		}
-		else // ¸·Èù ±æÀÌ´Ù!
+		else // ë§‰íŒ ê¸¸ì´ë‹¤!
 		{
-			knight.pos.x = SCREEN_WITH; // ¸ø ³ª°¡°Ô ¸·À½
+			knight.pos.x = SCREEN_WITH; // ëª» ë‚˜ê°€ê²Œ ë§‰ìŒ
 		}
 	}
 
-	// 2. ¿ŞÂÊÀ¸·Î ³ª°¥ ¶§ (ÇÃ·¹ÀÌ¾î x < 0)
+	// 2. ì™¼ìª½ìœ¼ë¡œ ë‚˜ê°ˆ ë•Œ (í”Œë ˆì´ì–´ x < 0)
 	else if (knight.pos.x < 0)
 	{
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_LEFT];
@@ -128,11 +232,46 @@ void MapManager::Update(double frame)
 		if (nextMap != 0)
 		{
 			ChangeMap(nextMap);
-			knight.pos.x = SCREEN_WITH - 50.0f; // ¿À¸¥ÂÊ ³¡¿¡¼­ µîÀå
+			knight.pos.x = SCREEN_WITH - 50.0f; // ì˜¤ë¥¸ìª½ ëì—ì„œ ë“±ì¥
 		}
 		else
 		{
-			knight.pos.x = 0; // ¸·Èû
+			knight.pos.x = 0; // ë§‰í˜
+		}
+	}
+
+	// [ì¶”ê°€] 3. ìœ„ë¡œ ì˜¬ë¼ê°ˆ ë•Œ (í”Œë ˆì´ì–´ y < 0)
+	if (knight.pos.y < 0)
+	{
+		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_UP];
+		if (nextMap != 0)
+		{
+			ChangeMap(nextMap);
+			// ì•„ë˜ìª½ ëì—ì„œ ì†Ÿì•„ì˜¤ë¦„
+			knight.pos.y = SCREEN_HEIGHT - 100.0f;
+		}
+		else
+		{
+			knight.pos.y = 0; // ì²œì¥ì— ë¨¸ë¦¬ ì¿µ
+		}
+	}
+
+	// [ì¶”ê°€] 4. ì•„ë˜ë¡œ ë–¨ì–´ì§ˆ ë•Œ (í”Œë ˆì´ì–´ y > í™”ë©´ë†’ì´)
+	else if (knight.pos.y > SCREEN_HEIGHT)
+	{
+		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_DOWN];
+		if (nextMap != 0)
+		{
+			ChangeMap(nextMap);
+			// ìœ„ìª½ ëì—ì„œ ë–¨ì–´ì§
+			knight.pos.y = 50.0f;
+		}
+		else
+		{
+			// ë‚­ë– ëŸ¬ì§€? (ê²Œì„ ì˜¤ë²„ ì²˜ë¦¬í•˜ê±°ë‚˜ ëª» ê°€ê²Œ ë§‰ìŒ)
+			// ì—¬ê¸°ì„œëŠ” ì¼ë‹¨ ë°”ë‹¥ì— ê±¸ì¹˜ê²Œ
+			knight.pos.y = SCREEN_HEIGHT;
+			knight.grounded = true; // ë•… ë°Ÿì€ íŒì •
 		}
 	}
 }
@@ -153,10 +292,10 @@ void MapManager::Draw()
 
 	if (m_pCurrentMapChunk == nullptr) return;
 
-	// ÇöÀç ¸ÊÀÇ ¸ğµç ·¹ÀÌ¾î ±×¸®±â
+	// í˜„ì¬ ë§µì˜ ëª¨ë“  ë ˆì´ì–´ ê·¸ë¦¬ê¸°
 	for (int i = 0; i < m_pCurrentMapChunk->layerCount; i++)
 	{
-		// ÁÂÇ¥´Â (0,0)¿¡ ±×¸³´Ï´Ù. (Ä«¸Ş¶ó Àû¿ë Àü)
+		// ì¢Œí‘œëŠ” (0,0)ì— ê·¸ë¦½ë‹ˆë‹¤. (ì¹´ë©”ë¼ ì ìš© ì „)
 		m_pCurrentMapChunk->bgLayer[i].Render(0, 0, 0, 1, 1);
 	}
 }

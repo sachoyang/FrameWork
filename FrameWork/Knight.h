@@ -3,6 +3,7 @@
 
 class Knight
 {
+public:
 	Sprite Knightimg[6];
 
 	float gravity;
