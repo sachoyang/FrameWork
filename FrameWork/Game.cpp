@@ -11,9 +11,9 @@ Game::~Game()
 void Game::Init()
 {
 	map.Init();
-	bird.Init();
+	//bird.Init();
 	knight.Init();
-	player.Init();
+	//player.Init();
 	coll.Init();
 	sound.Init();
 	Gmanager.Init();
@@ -24,9 +24,9 @@ void Game::Init()
 void Game::Draw()
 {
 	map.Draw();
-	bird.Draw();
+	//bird.Draw();
 	knight.Draw();
-	player.Draw();
+	//player.Draw();
 	coll.Draw();
 	Gmanager.Draw();
 	// 데이타 베이스///////////////////
@@ -49,9 +49,9 @@ void Game::Update(double frame)
 		// 공부용
 		Camera::GetInstance()->Update();
 		key.Update();
-		bird.Update();
+		//bird.Update();
 		knight.Update();
-		player.Update();
+		//player.Update();
 		coll.Update();
 		// 입 맛에 맞게
 		map.Update(130);
@@ -69,5 +69,17 @@ void Game::Update(double frame)
 
 void Game::OnMessage( MSG* msg )
 {
-
+	// 게임 씬에서 특수 키 처리 (ESC로 일시정지 등)
+	switch (msg->message)
+	{
+	case WM_KEYDOWN:
+		switch (msg->wParam)
+		{
+		case VK_ESCAPE:
+			// 메뉴로 돌아가기 예시
+			g_Mng.n_Chap = MENU;
+			break;
+		}
+		break;
+	}
 }

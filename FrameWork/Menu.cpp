@@ -28,13 +28,13 @@ void Menu::Init()
 	// 예: 시작 버튼은 (300, 300) 위치, 크기 200x80
 	m_rtStart.left = (SCREEN_WITH - imagesinfo[1].Width * menuScale)/2;
 	m_rtStart.top = 450;
-	m_rtStart.right = 50 + imagesinfo[1].Width* menuScale;  // 너비
+	m_rtStart.right = m_rtStart.left + imagesinfo[1].Width* menuScale;  // 너비
 	m_rtStart.bottom = 450 + imagesinfo[1].Height* menuScale;  // 높이
 
 	// 예: 종료 버튼은 (300, 450) 위치, 크기 200x80
 	m_rtExit.left = (SCREEN_WITH - imagesinfo[2].Width * menuScale) / 2;
 	m_rtExit.top = 600;
-	m_rtExit.right = 300 + imagesinfo[2].Width* menuScale;
+	m_rtExit.right = m_rtStart.left + imagesinfo[2].Width* menuScale;
 	m_rtExit.bottom = 600 + imagesinfo[2].Height* menuScale;
 }
 
@@ -94,40 +94,46 @@ void Menu::OnMessage(MSG* msg)
 
 	switch (msg->message)
 	{
-	case WM_KEYDOWN:
-		switch (msg->wParam) {
-		case VK_F12:
-			//MessageBox(NULL, "", "", 0);
-			if (g_Mng.n_Chap == MENU) {
+		case WM_KEYDOWN:
+		{
+			switch (msg->wParam) 
+			{
+			case VK_F12:
+				//MessageBox(NULL, "", "", 0);
+				if (g_Mng.n_Chap == MENU) {
 
-				g_Mng.n_Chap = GAME;
-				sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
+					g_Mng.n_Chap = GAME;
+					sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
 
+				}
+				break;
 			}
 			break;
 		}
 
 
-
-	case WM_LBUTTONDOWN:
-		POINT pt;
-		pt.x = LOWORD(msg->lParam);
-		pt.y = HIWORD(msg->lParam);
-		// 시작 버튼 클릭 여부 확인
-		if (PtInRect(&m_rtStart, pt))
+		case WM_LBUTTONDOWN:
 		{
-			if (g_Mng.n_Chap == MENU) 
+			POINT pt;
+			pt.x = LOWORD(msg->lParam);
+			pt.y = HIWORD(msg->lParam);
+			// 시작 버튼 클릭 여부 확인
+			if (PtInRect(&m_rtStart, pt))
 			{
-				g_Mng.n_Chap = GAME;
-				sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
+				if (g_Mng.n_Chap == MENU)
+				{
+					g_Mng.n_Chap = GAME;
+					sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
+				}
 			}
+			// 종료 버튼 클릭 여부 확인
+			else if (PtInRect(&m_rtExit, pt))
+			{
+				// 종료 버튼 클릭 시 처리
+				PostQuitMessage(0);
+			}
+			break;
 		}
-		// 종료 버튼 클릭 여부 확인
-		else if (PtInRect(&m_rtExit, pt))
-		{
-			// 종료 버튼 클릭 시 처리
-			PostQuitMessage(0);
-		}
-		break;
+		
 	}
 }

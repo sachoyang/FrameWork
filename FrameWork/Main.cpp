@@ -1,4 +1,4 @@
-//#include <windows.h>
+ï»¿//#include <windows.h>
 //#include <mmsystem.h>
 #include "Include.h" 
 const int TICKS_PER_SECOND = 60;
@@ -6,9 +6,9 @@ const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
 const int MAX_FRAMESKIP = 5;
 int loops;
 float interpolation;
-// ¹öÆÛ Ãß°¡
+// ë²„í¼ ì¶”ê°€
 char buffer[128] = {0,0,0,0};
-char ch[3] = {0,0,0}; //D  strcat »ç¿ë¹ý Æ²¸² ÃÖ¼Ò ³ÎÀÌ µé¾î°¥¼ö ÀÖµµ·Ï ÇØÁà¾ßÇÔ
+char ch[3] = {0,0,0}; //D  strcat ì‚¬ìš©ë²• í‹€ë¦¼ ìµœì†Œ ë„ì´ ë“¤ì–´ê°ˆìˆ˜ ìžˆë„ë¡ í•´ì¤˜ì•¼í•¨
 ////////////////////////////////////
 LRESULT CALLBACK WndProc( HWND g_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
@@ -32,36 +32,36 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	RegisterClassEx( &wc ) ;
 
 	/* ---------------------------------------------------
-	/////////////////// Á¤°¡¿îµ¥ Ãâ·Â ////////////////////
+	/////////////////// ì •ê°€ìš´ë° ì¶œë ¥ ////////////////////
 
-				ÇÁ·Î±×·¥À» ¸ð´ÏÅÍÀÇ Á¤°¡¿îµ¥
-				Ãâ·ÂÇÏ°Ô ÇØ ÁÖ´Â ÄÚµåÀÔ´Ï´Ù.
+				í”„ë¡œê·¸ëž¨ì„ ëª¨ë‹ˆí„°ì˜ ì •ê°€ìš´ë°
+				ì¶œë ¥í•˜ê²Œ í•´ ì£¼ëŠ” ì½”ë“œìž…ë‹ˆë‹¤.
 
 	//////////////////////////////////////////////////////
-	----------------------¿ä-±â-¼­-ºÎ-ÅÍ-----------------*/
+	----------------------ìš”-ê¸°-ì„œ-ë¶€-í„°-----------------*/
 	RECT rt = {0, 0, SCREEN_WITH, SCREEN_HEIGHT};
 	int W = rt.right - rt.left;
 	int H = rt.bottom - rt.top;
 	int X = (GetSystemMetrics(SM_CXSCREEN)/2) - SCREEN_WITH/2;
 	int Y = ( (GetSystemMetrics(SM_CYSCREEN)/2) - SCREEN_HEIGHT/2 );
-	/*---------------------¿ä-±â-±î-Áö-------------------*/
+	/*---------------------ìš”-ê¸°-ê¹Œ-ì§€-------------------*/
 
 	/*
 		int WINAPI GetSystemMetrics(
 			int nIndex
 		);
 
-		<ÀÎÀÚ°ª>
-		SM_CXSCREEN : È­¸éÀÇ ³ÐÀÌ¸¦ ±¸ÇÒ ¼ö ÀÖ´Ù.
-		SM_CYSCREEN : È­¸éÀÇ ³ôÀÌ¸¦ ±¸ÇÒ ¼ö ÀÖ´Ù.
+		<ì¸ìžê°’>
+		SM_CXSCREEN : í™”ë©´ì˜ ë„“ì´ë¥¼ êµ¬í•  ìˆ˜ ìžˆë‹¤.
+		SM_CYSCREEN : í™”ë©´ì˜ ë†’ì´ë¥¼ êµ¬í•  ìˆ˜ ìžˆë‹¤.
 
-		ÇöÀç È­¸éÀÇ ÇØ»óµµ¸¦ ±¸ÇÒ ¼ö ÀÖ´Ù. ÀÌ ¿Ü¿¡µµ ÀÎÀÚ°ª¿¡µû¶ó ´Ù¾çÇÑ °ªÀ» ±¸ÇÒ ¼ö ÀÖ´Ù.
-		ÀÚ¼¼ÇÑ »çÇ×Àº MSDN ÀÇ GetSystemMetrics ¸¦ Âü°íÇÏ±æ ¹Ù¶÷
-		´Ü, ´ÙÁß ¸ð´ÏÅÍ¿¡¼­ °ªÀ» ±¸ÇÒ °æ¿ì ¸ÞÀÎ ¸ð´ÏÅÍ¿¡ ´ëÇØ¼­¸¸ °ªÀ» ±¸ÇÏ±â¶§¹®¿¡ ÀÌ ÇÔ¼ö¸¦ »ç¿ëÇÏ¸é ¾ÈµÈ´Ù.
-		´ÙÁß ¸ð´ÏÅÍ¿¡¼­ ÀüÃ¼ ÇØ»óµµ¸¦ ±¸ÇÏ±æ ¿øÇÒ°æ¿ì GetMonitorInfo ÇÔ¼ö¸¦ ÀÌ¿ëÇÏÀÚ
+		í˜„ìž¬ í™”ë©´ì˜ í•´ìƒë„ë¥¼ êµ¬í•  ìˆ˜ ìžˆë‹¤. ì´ ì™¸ì—ë„ ì¸ìžê°’ì—ë”°ë¼ ë‹¤ì–‘í•œ ê°’ì„ êµ¬í•  ìˆ˜ ìžˆë‹¤.
+		ìžì„¸í•œ ì‚¬í•­ì€ MSDN ì˜ GetSystemMetrics ë¥¼ ì°¸ê³ í•˜ê¸¸ ë°”ëžŒ
+		ë‹¨, ë‹¤ì¤‘ ëª¨ë‹ˆí„°ì—ì„œ ê°’ì„ êµ¬í•  ê²½ìš° ë©”ì¸ ëª¨ë‹ˆí„°ì— ëŒ€í•´ì„œë§Œ ê°’ì„ êµ¬í•˜ê¸°ë•Œë¬¸ì— ì´ í•¨ìˆ˜ë¥¼ ì‚¬ìš©í•˜ë©´ ì•ˆëœë‹¤.
+		ë‹¤ì¤‘ ëª¨ë‹ˆí„°ì—ì„œ ì „ì²´ í•´ìƒë„ë¥¼ êµ¬í•˜ê¸¸ ì›í• ê²½ìš° GetMonitorInfo í•¨ìˆ˜ë¥¼ ì´ìš©í•˜ìž
 	*/
 
-	// WS_POPUP »©¸é Å×Åõ¸®°¡ »ý±ä´Ù~
+	// WS_POPUP ë¹¼ë©´ í…Œíˆ¬ë¦¬ê°€ ìƒê¸´ë‹¤~
 	g_hWnd = CreateWindowEx( NULL, wc.lpszClassName, 
 		"Game", 
 		WS_EX_TOPMOST|WS_POPUP, 
@@ -79,13 +79,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
 	ShowWindow( g_hWnd, SW_SHOW ) ;
 	UpdateWindow( g_hWnd ) ;
-	// ¸¶¿ì½º ¾Èº¸ÀÌ°Ô~
+	// ë§ˆìš°ìŠ¤ ì•ˆë³´ì´ê²Œ~
 	//ShowCursor(FALSE);
 
 	///////////////////////////////////////////////////////////////////
 	ZeroMemory(&msg, sizeof(MSG));
 	//TRACE("REV ====== %s ========= \n\n", buffer);
-	/////////// Ã©ÅÍ ÃÊ±âÈ­ /////////////////
+	/////////// ì±•í„° ì´ˆê¸°í™” /////////////////
 	g_Mng.chap[LOGO] = new Logo;
 	g_Mng.chap[MENU] = new Menu;
 	g_Mng.chap[GAME] = new Game;
@@ -95,74 +95,101 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	for(int i=0; i<TOTALCHAP; i++)
 		g_Mng.chap[i]->Init();
 
-	while( msg.message != WM_QUIT )
+	// Replace the main message loop with this
+	while (msg.message != WM_QUIT)
 	{
-		if(PeekMessage(&msg,NULL,0,0,PM_NOREMOVE))
+		// process all pending Windows messages
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			if(GetMessage(&msg, NULL, 0, 0))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-		else
-		{
-			
-			static DWORD next_game_tick = GetTickCount();
-			//static DWORD next_game_tick1 = GetTickCount();
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 
-
-			
-			loops = 0;
-		
-			//static int aa;
-			//bool b = false;
-
-			while( GetTickCount64() > next_game_tick && loops < MAX_FRAMESKIP) 
-			{
-				interpolation = float(GetTickCount64() + SKIP_TICKS - next_game_tick ) / float( SKIP_TICKS );
-				if(Gmanager.m_Pause == false) g_Mng.chap[g_Mng.n_Chap]->Update(interpolation);
-				//if(b == false)
-				//{
-				//	aa = interpolation;
-				//	b = true;
-				//}
+			// í¬ì›Œë”©: í˜„ìž¬ ìž¥ë©´ì— ë©”ì‹œì§€ ì „ë‹¬ (null ê²€ì‚¬)
+			if (g_Mng.chap[g_Mng.n_Chap])
 				g_Mng.chap[g_Mng.n_Chap]->OnMessage(&msg);
-				next_game_tick += SKIP_TICKS;
-				loops++;
-			}
-
-			
-
-			dv_font.Device9->BeginScene();
-			dv_font.Device9->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 0, 0);
-
-
-			g_Mng.chap[g_Mng.n_Chap]->Draw();
-
-			dv_font.Device9->EndScene();
-			dv_font.Device9->Present(NULL, NULL, NULL, NULL);
-			
 		}
+
+		// fixed timestep update
+		static ULONGLONG next_game_tick = GetTickCount64();
+		loops = 0;
+		while (GetTickCount64() > next_game_tick && loops < MAX_FRAMESKIP)
+		{
+			interpolation = float(GetTickCount64() + SKIP_TICKS - next_game_tick) / float(SKIP_TICKS);
+			if (Gmanager.m_Pause == false)
+				g_Mng.chap[g_Mng.n_Chap]->Update(interpolation);
+
+			next_game_tick += SKIP_TICKS;
+			loops++;
+		}
+
+		// render...
+		dv_font.Device9->BeginScene();
+		dv_font.Device9->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 0, 0);
+		g_Mng.chap[g_Mng.n_Chap]->Draw();
+		dv_font.Device9->EndScene();
+		dv_font.Device9->Present(NULL, NULL, NULL, NULL);
 	}
 
 	return msg.wParam;
 
+	//while( msg.message != WM_QUIT )
+	//{
+	//	if(PeekMessage(&msg,NULL,0,0,PM_NOREMOVE))
+	//	{
+	//		if(GetMessage(&msg, NULL, 0, 0))
+	//		{
+	//			TranslateMessage(&msg);
+	//			DispatchMessage(&msg);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		
+	//		static DWORD next_game_tick = GetTickCount();
+	//		//static DWORD next_game_tick1 = GetTickCount();
+	//		
+	//		loops = 0;
+	//	
+	//		//static int aa;
+	//		//bool b = false;
+	//		while( GetTickCount64() > next_game_tick && loops < MAX_FRAMESKIP) 
+	//		{
+	//			interpolation = float(GetTickCount64() + SKIP_TICKS - next_game_tick ) / float( SKIP_TICKS );
+	//			if(Gmanager.m_Pause == false) g_Mng.chap[g_Mng.n_Chap]->Update(interpolation);
+	//			//if(b == false)
+	//			//{
+	//			//	aa = interpolation;
+	//			//	b = true;
+	//			//}
+	//			g_Mng.chap[g_Mng.n_Chap]->OnMessage(&msg);
+	//			next_game_tick += SKIP_TICKS;
+	//			loops++;
+	//		}
+	//		
+	//		dv_font.Device9->BeginScene();
+	//		dv_font.Device9->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 0, 0);
+	//		g_Mng.chap[g_Mng.n_Chap]->Draw();
+	//		dv_font.Device9->EndScene();
+	//		dv_font.Device9->Present(NULL, NULL, NULL, NULL);
+	//		
+	//	}
+	//}
+	//return msg.wParam;
+
 }
 
-// Å° ÇÑ¹ø¸¸ ¸ÔÀ»°Å´Â ¿©±â°¡ ¾ÈÀü...¾Æ´Ï¸é ±ÍÂú´Ù.(key.cpp ¿¡¼­ ¿¬¼ÓÅ° ¾È¸Ô°Ô ÇÏ±â À§ÇØ ·ÎÁ÷ÀÌ ´õ·¯¿öÁü)
+// í‚¤ í•œë²ˆë§Œ ë¨¹ì„ê±°ëŠ” ì—¬ê¸°ê°€ ì•ˆì „...ì•„ë‹ˆë©´ ê·€ì°®ë‹¤.(key.cpp ì—ì„œ ì—°ì†í‚¤ ì•ˆë¨¹ê²Œ í•˜ê¸° ìœ„í•´ ë¡œì§ì´ ë”ëŸ¬ì›Œì§)
 LRESULT CALLBACK WndProc( HWND g_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	switch( uMsg )
 	{
-
 	case WM_DESTROY:
          PostQuitMessage( 0 );
          return 0;
 	case WM_CHAR:
 		 ch[0] = wParam;
 		 strcat( buffer,ch);
-		 // ¹®ÀÚ¿­ À§Ä¡ °¡Á®¿È...
+		 // ë¬¸ìžì—´ ìœ„ì¹˜ ê°€ì ¸ì˜´...
 		 if (strstr(buffer, "p") != NULL)
 		 {
 
@@ -175,7 +202,7 @@ LRESULT CALLBACK WndProc( HWND g_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 		 }
 		 else if (strstr(buffer, "s") != NULL) 
 		 {
-			 // µ¥ÀÌÅ¸ º£ÀÌ½º ÀúÀå
+			 // ë°ì´íƒ€ ë² ì´ìŠ¤ ì €ìž¥
 			 sql.save();
 		 }
 
@@ -183,7 +210,7 @@ LRESULT CALLBACK WndProc( HWND g_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 		break;
 
 
-	//case WM_COMM_RXCHAR:  //½Ã¸®¾ó¿¡¼­ ¹Þ´Â ¸Þ¼¼Áö´Â ¿©±â¸¦ 
+	//case WM_COMM_RXCHAR:  //ì‹œë¦¬ì–¼ì—ì„œ ë°›ëŠ” ë©”ì„¸ì§€ëŠ” ì—¬ê¸°ë¥¼ 
 	//	 ch[0] = wParam;
 	//	 strcat( buffer,ch);	
 	//     TRACE("REV ====== %s ========= \n\n", buffer);
@@ -197,17 +224,17 @@ LRESULT CALLBACK WndProc( HWND g_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 /*
 
-ÇÔ¼ö¿øÇü : char* strstr(char* str1, const char* str2);
+í•¨ìˆ˜ì›í˜• : char* strstr(char* str1, const char* str2);
 
-0) Çì´õÆÄÀÏ : C¾ð¾î : <string.h> / C++ : <cstring>
+0) í—¤ë”íŒŒì¼ : Cì–¸ì–´ : <string.h> / C++ : <cstring>
 
-1) str1¿¡¼­ str2¿Í ÀÏÄ¡ÇÏ´Â ¹®ÀÚ¿­ÀÌ ÀÖ´ÂÁö È®ÀÎÀ» ÇÏ´Â ÇÔ¼ö.
+1) str1ì—ì„œ str2ì™€ ì¼ì¹˜í•˜ëŠ” ë¬¸ìžì—´ì´ ìžˆëŠ”ì§€ í™•ì¸ì„ í•˜ëŠ” í•¨ìˆ˜.
 
-2) str1¿¡ str2ÀÇ ¹®ÀÚ¿­°ú ÀÏÄ¡ÇÏ´Â ¹®ÀÚ¿­ÀÌ ÀÖÀ¸¸é ÇØ´ç À§Ä¡ÀÇ Æ÷ÀÎÅÍ(char* Å¸ÀÔ)¸¦ ¹ÝÈ¯.
+2) str1ì— str2ì˜ ë¬¸ìžì—´ê³¼ ì¼ì¹˜í•˜ëŠ” ë¬¸ìžì—´ì´ ìžˆìœ¼ë©´ í•´ë‹¹ ìœ„ì¹˜ì˜ í¬ì¸í„°(char* íƒ€ìž…)ë¥¼ ë°˜í™˜.
 
-3) ´ç¿¬ÇÏ°Ôµµ ÀÏÄ¡ÇÏ´Â ¹®ÀÚ¿­À» Ã£Áö ¸øÇÏ¸é null pointer¸¦ ¹ÝÈ¯. (±×·¸±â ¶§¹®¿¡ ³ÎÃ¼Å©¸¦ ²À! ÇØÁÖ¾î¾ß ÇÔ.)
+3) ë‹¹ì—°í•˜ê²Œë„ ì¼ì¹˜í•˜ëŠ” ë¬¸ìžì—´ì„ ì°¾ì§€ ëª»í•˜ë©´ null pointerë¥¼ ë°˜í™˜. (ê·¸ë ‡ê¸° ë•Œë¬¸ì— ë„ì²´í¬ë¥¼ ê¼­! í•´ì£¼ì–´ì•¼ í•¨.)
 
-4) ¹®ÀÚ¿­À» Ã£¾Æ¼­, ¹®ÀÚ¿­À» ¹Ù²Ù´Â °æ¿ì¿¡´Â ¿øº» ¹®ÀÚ¿­ str1ÀÇ ¹è¿­ÀÇ ±æÀÌ¸¦ ¹Ýµå½Ã »ý°¢ÇØ¾ßÇÔ. ¹è¿­ÀÇ ¹üÀ§¸¦ ³ÑÀ¸¸é, Å«ÀÏÀÌ´Ï±ñ.
+4) ë¬¸ìžì—´ì„ ì°¾ì•„ì„œ, ë¬¸ìžì—´ì„ ë°”ê¾¸ëŠ” ê²½ìš°ì—ëŠ” ì›ë³¸ ë¬¸ìžì—´ str1ì˜ ë°°ì—´ì˜ ê¸¸ì´ë¥¼ ë°˜ë“œì‹œ ìƒê°í•´ì•¼í•¨. ë°°ì—´ì˜ ë²”ìœ„ë¥¼ ë„˜ìœ¼ë©´, í°ì¼ì´ë‹ˆê¹.
 
 
 */
