@@ -98,15 +98,36 @@ void Menu::OnMessage(MSG* msg)
 		switch (msg->wParam) {
 		case VK_F12:
 			//MessageBox(NULL, "", "", 0);
-			if (g_Mng.n_Chap = MENU) {
+			if (g_Mng.n_Chap == MENU) {
 
-				g_Mng.n_Chap = GAME; 
+				g_Mng.n_Chap = GAME;
 				sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
 
 			}
 			break;
 		}
-		
-	}
 
+
+
+	case WM_LBUTTONDOWN:
+		POINT pt;
+		pt.x = LOWORD(msg->lParam);
+		pt.y = HIWORD(msg->lParam);
+		// 시작 버튼 클릭 여부 확인
+		if (PtInRect(&m_rtStart, pt))
+		{
+			if (g_Mng.n_Chap == MENU) 
+			{
+				g_Mng.n_Chap = GAME;
+				sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
+			}
+		}
+		// 종료 버튼 클릭 여부 확인
+		else if (PtInRect(&m_rtExit, pt))
+		{
+			// 종료 버튼 클릭 시 처리
+			PostQuitMessage(0);
+		}
+		break;
+	}
 }

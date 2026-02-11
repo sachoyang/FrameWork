@@ -268,7 +268,7 @@ void Key::Update()
 		if(GetTickCount64() - KeyTime1 > 10)
 		{
 			knight.isMove = TRUE;
-			knight.pos.x -= 1.5f;
+			knight.pos.x -= 2.0f;
 			knight.dir = 1;
 
 			KeyTime1 = GetTickCount64();
@@ -281,7 +281,7 @@ void Key::Update()
 		if(GetTickCount64() - KeyTime1 > 10)
 		{
 			knight.isMove = TRUE;
-			knight.pos.x += 1.5f;
+			knight.pos.x += 2.0f;
 			knight.dir = -1;
 
 			KeyTime1 = GetTickCount64();

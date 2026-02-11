@@ -174,8 +174,12 @@ void Logo::OnMessage( MSG* msg )
 	switch(msg->message)
 	{
 	case WM_LBUTTONDOWN :
-		MessageBox(NULL, "","",0);
-		break;
+		if (g_Mng.n_Chap == LOGO)
+		{
+			g_Mng.n_Chap = MENU;
+			break;
+		}
+		
 	}
 
 }
