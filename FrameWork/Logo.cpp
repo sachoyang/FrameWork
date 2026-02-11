@@ -16,10 +16,11 @@ Logo::~Logo()
 
 void Logo::Init()
 {
-	speed = 400;
+	speed = 800;
 	alpha = 0;
 
-	loadimg.Create("./resource/Img/Load/tree.png", false, D3DCOLOR_XRGB(0, 0, 0));
+	//loadimg.Create("./resource/Img/Load/tree.png", false, D3DCOLOR_XRGB(0, 0, 0));
+	loadimg.Create("./resource/Img/Load/logo1.png", false, D3DCOLOR_XRGB(0, 0, 0));
 	//g_SoundManager.Create(&Sound1, (LPWSTR)L"sound/hatnim.wav", 0, GUID_NULL);
 
 	//// 데이타 베이스//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +143,7 @@ void Logo::Update(double frame)
 void Logo::Draw()
 {
 	loadimg.SetColor(255,255,255, alpha);  // 색상 변경
-	loadimg.Draw( 350 , 100 ) ;  //이미지출력
+	loadimg.Draw( 0 , 0 ) ;  //이미지출력
 	dv_font.DrawString( "로고" , 200 , 210 ) ;   //글자출력
 
 

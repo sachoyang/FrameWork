@@ -20,6 +20,7 @@ GameManager::GameManager(void)
 
 GameManager::~GameManager(void)
 {
+
 }
 
 void GameManager::Init()
@@ -47,6 +48,7 @@ void GameManager::Init()
 
 	fclose(fp);
 	
+	g_Mng.n_Chap = LOGO;
 }
 
 void GameManager::Update()

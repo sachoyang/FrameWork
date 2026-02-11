@@ -14,6 +14,9 @@ public:
 	float speed;
 	float alpha;
 
+	float m_fX;
+	float m_fY;
+
 	// 데이타 베이스 테스트
 	int count = 0;
 	char cnt[256];
