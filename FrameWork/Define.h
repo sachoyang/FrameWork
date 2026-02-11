@@ -1,5 +1,5 @@
 #define SCREEN_WITH 1280	// 화면 가로 픽셀크기
-#define SCREEN_HEIGHT 768	// 화면 세로 픽셀크기
+#define SCREEN_HEIGHT 800	// 화면 세로 픽셀크기
 
 #define FRAME 1000
 #define LEFT 0

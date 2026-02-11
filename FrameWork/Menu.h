@@ -3,14 +3,20 @@
 
 class Menu : public Chap
 {
+public:
+
 	Sprite menuimg;
 
-public:
+	Sprite m_BtnStart;
+	Sprite m_BtnExit;
+
+	RECT m_rtStart;
+	RECT m_rtExit;
+
+	D3DXIMAGE_INFO imagesinfo[3];
+
 	Menu();
 	~Menu();
-
-	int count, alpha;
-
 
 	virtual void Init();
 	virtual void Update(double frame);
