@@ -60,7 +60,7 @@
 
 #include "Camera.h"
 
-#include "Map.h"
+#include "MapManager.h"
 
 #include "Key.h"
 #include "Sound.h"

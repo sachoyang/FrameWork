@@ -108,7 +108,7 @@
     <ClInclude Include="Player2.h">
       <Filter>소스 파일\플레이어2</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
+    <ClInclude Include="MapManager.h">
       <Filter>소스 파일\Map</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
@@ -173,7 +173,7 @@
     <ClCompile Include="Player2.cpp">
       <Filter>소스 파일\플레이어2</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
+    <ClCompile Include="MapManager.cpp">
       <Filter>소스 파일\Map</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">

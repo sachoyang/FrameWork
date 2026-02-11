@@ -10,7 +10,7 @@ Game::~Game()
 
 void Game::Init()
 {
-	map.Init();
+	mapMng.Init();
 	//bird.Init();
 	knight.Init();
 	//player.Init();
@@ -23,7 +23,7 @@ void Game::Init()
 
 void Game::Draw()
 {
-	map.Draw();
+	mapMng.Draw();
 	//bird.Draw();
 	knight.Draw();
 	//player.Draw();
@@ -54,7 +54,7 @@ void Game::Update(double frame)
 		//player.Update();
 		coll.Update();
 		// 입 맛에 맞게
-		map.Update(130);
+		mapMng.Update(130);
 		Gmanager.Update();
 		// 데이타 베이스///////////////////
 		// 입 맛에 맞게 (여기선 안쓰임..프레임 값이 필요 할때만.. 그냥 방법만...)

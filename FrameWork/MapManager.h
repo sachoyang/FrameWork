@@ -1,12 +1,12 @@
 #pragma once
 #include "Include.h"
 
-class Map
+class MapManager
 {
 
 public :
-	Map();
-	~Map();
+	MapManager();
+	~MapManager();
 	Sprite test;
 	bool tests;
 	Sprite m_MapImg1_1[6];
@@ -25,4 +25,4 @@ public :
 	void Draw();
 };
 
-extern Map map;
+extern MapManager mapMng;

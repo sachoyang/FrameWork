@@ -1,18 +1,18 @@
 #include "Include.h"
 
-Map map;
+MapManager mapMng;
 
 
-Map::Map()
+MapManager::MapManager()
 {
 	m_Stage = 1;
 }
 
-Map::~Map()
+MapManager::~MapManager()
 {
 }
 
-void Map::Init()
+void MapManager::Init()
 {
 	int i,j;
 	char FileName[256];
@@ -35,7 +35,7 @@ void Map::Init()
 
 }
 
-void Map::Update(double frame)
+void MapManager::Update(double frame)
 {
 	if(GetTickCount64() - m_MapImg1_1_ani1 > frame)
 	{
@@ -49,7 +49,7 @@ void Map::Update(double frame)
 	}
 }
 
-void Map::Draw()
+void MapManager::Draw()
 {
 	if(m_Stage==1)
 	{

@@ -32,8 +32,8 @@ Camera::~Camera()
 void Camera::Update() // 원래는 모든 클래스를 다형성으로 배열로 참조하여 값을 전부 변경(리스트?)
 {
 	// 일단 맵 처리...
-	map.posX = camPos.posX;
-	map.posY = camPos.posY;
+	mapMng.posX = camPos.posX;
+	mapMng.posY = camPos.posY;
 }
 
 void Camera::SetXCam(double x)
