@@ -26,7 +26,7 @@ void Player2::Init()
 
 void Player2::Update()
 {
-	if (GetTickCount() - m_PlayerTime > 10)
+	/*if (GetTickCount() - m_PlayerTime > 10)
 	{
 		if (!grounded) pos.y += gravity;
 
@@ -43,7 +43,7 @@ void Player2::Update()
 		m_rc.bottom = pos.y + imagesinfo.Height + 30;
 
 		m_PlayerTime = GetTickCount();
-	}
+	}*/
 }
 
 void Player2::Draw()

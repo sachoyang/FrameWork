@@ -56,8 +56,7 @@ void MapManager::Init()
 	m_MapList[2].id = 2;
 	m_MapList[2].layerCount = 1;
 
-	// 2번 맵은 그냥 다른 이미지 하나만 띄워봅시다.
-	// (이미지가 없다면 기존 거 재활용하거나 색깔만 바꿔서 Create)
+	// 2번 맵은 그냥 다른 이미지 하나
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0003.tga");
 	m_MapList[2].bgLayer[0].Create(FileName, false, 0);
 
@@ -184,13 +183,99 @@ void MapManager::CreateRandomMap()
 
 void MapManager::ChangeMap(int mapID)
 {
-	// 범위 체크
-	if (mapID < 1 || mapID > 9) return;
+	if (mapID < 1 || mapID > 10) return;
 
-	// 현재 맵 포인터 교체
 	m_pCurrentMapChunk = &m_MapList[mapID];
 
-	// (나중에 여기서 플레이어 위치 재설정이나 몬스터 리젠 등 처리)
+	// 1. 기존 벽 싹 지우기 (초기화)
+	coll.ClearWalls();
+
+	RECT rc;
+	int thickness = 50; // 콜라이더 두께 100 설정
+
+	// =============================================================
+	// 1. 바닥 (아래쪽) 처리
+	// =============================================================
+	if (m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0)
+	{
+		// [길 없음] 바닥을 꽉 막음 (화면 아래쪽 50픽셀 영역)
+		SetRect(&rc, 0, SCREEN_HEIGHT - thickness, SCREEN_WITH, SCREEN_HEIGHT);
+		coll.AddWall(rc);
+	}
+	else
+	{
+		// [길 있음] 가운데 구멍 뚫기 (왼쪽 덩어리 + 오른쪽 덩어리)
+		int holeSize = 200; // 구멍 크기
+		int midX = SCREEN_WITH / 2;
+
+		// 왼쪽 바닥
+		SetRect(&rc, 0, SCREEN_HEIGHT - thickness, midX - (holeSize / 2), SCREEN_HEIGHT);
+		coll.AddWall(rc);
+
+		// 오른쪽 바닥
+		SetRect(&rc, midX + (holeSize / 2), SCREEN_HEIGHT - thickness, SCREEN_WITH, SCREEN_HEIGHT);
+		coll.AddWall(rc);
+	}
+
+	// =============================================================
+	// 2. 천장 (위쪽) 처리
+	// =============================================================
+	if (m_pCurrentMapChunk->nextMapID[DIR_UP] == 0)
+	{
+		// [길 없음] 천장을 꽉 막음 (화면 위쪽 100픽셀 영역)
+		SetRect(&rc, 0, 0, SCREEN_WITH, thickness);
+		coll.AddWall(rc);
+	}
+	else
+	{
+		// [길 있음] 구멍 뚫기 (왼쪽 천장 + 오른쪽 천장)
+		int holeSize = 200;
+		int midX = SCREEN_WITH / 2;
+
+		SetRect(&rc, 0, 0, midX - (holeSize / 2), thickness);
+		coll.AddWall(rc);
+
+		SetRect(&rc, midX + (holeSize / 2), 0, SCREEN_WITH, thickness);
+		coll.AddWall(rc);
+	}
+
+	// =============================================================
+	// 3. 왼쪽 벽 처리
+	// =============================================================
+	if (m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0)
+	{
+		// [길 없음] 왼쪽 꽉 막음 (화면 왼쪽 100픽셀)
+		SetRect(&rc, 0, 0, thickness, SCREEN_HEIGHT);
+		coll.AddWall(rc);
+	}
+	else
+	{
+		// [길 있음] 문 구멍 뚫기 (위쪽 벽 + 아래쪽 벽)
+		// 사람이 지나갈 높이(바닥에서 250 정도)는 남겨둠
+
+		// 위쪽 덩어리 (천장부터 바닥 300지점 전까지)
+		SetRect(&rc, 0, 0, thickness, SCREEN_HEIGHT - 300);
+		coll.AddWall(rc);
+
+		// 아래쪽 덩어리는 보통 바닥이 있어서 안 만들어도 되지만, 
+		// 공중 부양 문이라면 아래도 막아야 함. 여기선 뚫어둠.
+	}
+
+	// =============================================================
+	// 4. 오른쪽 벽 처리
+	// =============================================================
+	if (m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0)
+	{
+		// [길 없음] 오른쪽 꽉 막음
+		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH, SCREEN_HEIGHT);
+		coll.AddWall(rc);
+	}
+	else
+	{
+		// [길 있음] 위쪽 벽만 생성 (문 만듦)
+		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH, SCREEN_HEIGHT - 300);
+		coll.AddWall(rc);
+	}
 }
 
 void MapManager::Update(double frame)

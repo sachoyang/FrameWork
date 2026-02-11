@@ -51,7 +51,31 @@ void Knight::Update()
     {
         if (!grounded) pos.y += gravity;
 
-        if (m_rc.left < coll.m_rc.right && coll.m_rc.left < m_rc.right && m_rc.top < coll.m_rc.bottom && coll.m_rc.top < m_rc.bottom) grounded = true;
+        //if (m_rc.left < coll.m_Walls[].right && coll.m_rc.left < m_rc.right && m_rc.top < coll.m_rc.bottom && coll.m_rc.top < m_rc.bottom) grounded = true;
+        // [충돌 검사 로직 변경]
+        grounded = false; // 일단 공중에 떴다고 가정
+        RECT tempRect;    // 교차 영역 저장용 (IntersectRect에 필요)
+
+        // 리스트 반복자 사용
+        std::list<RECT>::iterator iter;
+        for (iter = coll.m_Walls.begin(); iter != coll.m_Walls.end(); ++iter)
+        {
+            RECT wall = *iter; // 현재 검사할 벽
+
+            // 1. 플레이어와 벽이 겹쳤는지 확인
+            if (IntersectRect(&tempRect, &m_rc, &wall))
+            {
+                // 2. 바닥 착지 검사 (위에서 아래로 떨어지다가 닿음)
+                // (발바닥이 벽 윗면 근처에 있고 + 떨어지는 중일 때)
+                if (pos.y + imagesinfo.Height - 70 <= wall.top + 10 && gravity >= 0)
+                {
+                    grounded = true;
+                    pos.y = wall.top - (imagesinfo.Height - 70); // 발 위치 보정
+                }
+                // 3. (옵션) 가로 벽 막힘 처리 등은 나중에 추가
+            }
+        }
+
 
         m_rc.left = pos.x-40;
         m_rc.top = pos.y-40;
