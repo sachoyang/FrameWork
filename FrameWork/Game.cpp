@@ -10,11 +10,11 @@ Game::~Game()
 
 void Game::Init()
 {
+	coll.Init();
 	mapMng.Init();
 	//bird.Init();
 	knight.Init();
 	//player.Init();
-	coll.Init();
 	sound.Init();
 	Gmanager.Init();
 	// 데이타 베이스///////////////////
