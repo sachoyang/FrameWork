@@ -22,8 +22,24 @@ public:
 	//	객체 얻기
 	static Camera*	GetInstance();
 
+	// 맵 전체 크기 (이 밖으로 카메라가 못 나감)
+	int mapWidth, mapHeight;
+
+	// 카메라가 따라다닐 대상 (플레이어 좌표 포인터)
+	D3DXVECTOR2* target;
+
 	void SetXCam(double);
 	void SetYCam(double);
 
+	// 초기화 및 설정 함수
+	void Init();
+	void SetTarget(D3DXVECTOR2* _target);
+	void SetMapSize(int w, int h);
+
+	// 외부에서 카메라 위치를 가져갈 수 있게 해주는 함수
+	double GetX() { return camPos.posX; }
+	double GetY() { return camPos.posY; }
+
 	void Update();
 };
+#define CAM Camera::GetInstance()

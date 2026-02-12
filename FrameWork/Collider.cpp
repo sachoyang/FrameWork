@@ -55,17 +55,26 @@ void Collider::BoxSow(RECT m_rc, long x, long y, D3DCOLOR color)
 		dv_font.DrawString("└", m_rc.left-x, m_rc.bottom + y, color);
 		dv_font.DrawString(" ┘", m_rc.right+x, m_rc.bottom + y, color);*/
 		// Draw slightly inside the rect so it's visible
-		// Top-Left
-		dv_font.DrawString("┌", m_rc.left + 5, m_rc.top + 5, color);
 
-		// Top-Right (Draw slightly left of the right edge)
-		dv_font.DrawString("┐", m_rc.right - 15, m_rc.top + 5, color);
+		// 화면에 그릴 좌표 계산
+		int viewLeft = m_rc.left - (int)CAM->GetX();
+		int viewTop = m_rc.top - (int)CAM->GetY();
+		int viewRight = m_rc.right - (int)CAM->GetX();
+		int viewBottom = m_rc.bottom - (int)CAM->GetY();
 
-		// Bottom-Left (Draw slightly above the bottom edge)
-		dv_font.DrawString("└", m_rc.left + 5, m_rc.bottom - 15, color);
+		dv_font.DrawString("┌", viewLeft - x, viewTop - y, color);
+		dv_font.DrawString("┐", viewRight + x, viewTop - y, color);
+		dv_font.DrawString("└", viewLeft - x, viewBottom + y, color);
+		dv_font.DrawString(" ┘", viewRight + x, viewBottom + y, color);
 
-		// Bottom-Right
-		dv_font.DrawString("┘", m_rc.right - 15, m_rc.bottom - 15, color);
+		//// Top-Left
+		//dv_font.DrawString("┌", m_rc.left + 5, m_rc.top + 5, color);
+		//// Top-Right (Draw slightly left of the right edge)
+		//dv_font.DrawString("┐", m_rc.right - 15, m_rc.top + 5, color);
+		//// Bottom-Left (Draw slightly above the bottom edge)
+		//dv_font.DrawString("└", m_rc.left + 5, m_rc.bottom - 15, color);
+		//// Bottom-Right
+		//dv_font.DrawString("┘", m_rc.right - 15, m_rc.bottom - 15, color);
 	}
 
 }

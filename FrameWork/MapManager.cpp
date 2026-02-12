@@ -186,6 +186,8 @@ void MapManager::ChangeMap(int mapID)
 	if (mapID < 1 || mapID > 10) return;
 
 	m_pCurrentMapChunk = &m_MapList[mapID];
+
+	CAM->SetMapSize(m_pCurrentMapChunk->width, m_pCurrentMapChunk->height);
 	// [필수] 맵 바뀔 때 상태 리셋
 	//knight.isDashing = false;
 	//knight.gravity = 0;
@@ -370,6 +372,8 @@ void MapManager::Draw()
 	for (int i = 0; i < m_pCurrentMapChunk->layerCount; i++)
 	{
 		// 좌표는 (0,0)에 그립니다. (카메라 적용 전)
-		m_pCurrentMapChunk->bgLayer[i].Render(0, 0, 0, 1, 1);
+		//m_pCurrentMapChunk->bgLayer[i].Render(0, 0, 0, 1, 1);
+		// 카메라 좌표만큼 빼주기
+		m_pCurrentMapChunk->bgLayer[i].Render(0 - CAM->GetX(), 0 - CAM->GetY(), 0, 1, 1);
 	}
 }

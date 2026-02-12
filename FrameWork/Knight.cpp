@@ -249,7 +249,8 @@ void Knight::Update()
             m_KnightAniTime = GetTickCount();
         }
     }
-}//
+}
+
 //void Knight::Update()
 //{
 //    if (GetTickCount() - m_KnightAniTime > 10)
@@ -383,7 +384,7 @@ void Knight::Draw()
             // 이미지가 납작한 만큼 더해줘야 합니다. (예: 10 ~ 30 사이)
             drawingOffsetY = 20.0f;
         }
-        Knightimg[m_KnightCount].Render(this->pos.x, this->pos.y + drawingOffsetY, 0, dir, 1, 1);
+        Knightimg[m_KnightCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
 
         /*if (isMove == 1)
         {

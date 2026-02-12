@@ -11,6 +11,10 @@ struct MapChunk
 
 	int nextMapID[DIR_NUM]; // 다음 맵 ID (오른쪽, 왼쪽, 위, 아래)
 	// 문 위치나 몬스터 위치 등등
+
+	// 맵 크기 정보
+	int width;
+	int height;
 };
 
 class MapManager

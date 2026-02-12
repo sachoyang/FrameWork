@@ -11,6 +11,8 @@ Game::~Game()
 void Game::Init()
 {
 	coll.Init();
+	CAM->Init();
+	CAM->SetTarget(&knight.pos);
 	mapMng.Init();
 	//bird.Init();
 	knight.Init();
@@ -47,7 +49,7 @@ void Game::Update(double frame)
 	if (GetTickCount64() - a > frame)
 	{
 		// 공부용
-		Camera::GetInstance()->Update();
+		//Camera::GetInstance()->Update();
 		key.Update();
 		//bird.Update();
 		knight.Update();
@@ -56,6 +58,8 @@ void Game::Update(double frame)
 		// 입 맛에 맞게
 		mapMng.Update(130);
 		Gmanager.Update();
+
+		CAM->Update(); // 모든 오브젝트 움직이고 나서 업데이트되야 함
 		// 데이타 베이스///////////////////
 		// 입 맛에 맞게 (여기선 안쓰임..프레임 값이 필요 할때만.. 그냥 방법만...)
 		sql.Update(frame+3000);
