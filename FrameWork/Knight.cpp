@@ -39,6 +39,25 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/Lookdown01.png");
     Knightimg[5].Create(FileName, false, D3DCOLOR_XRGB(0, 0, 0));
 
+    // =========================================================
+    // [추가] 점프 및 낙하 이미지 로딩 (6 ~ 10번)
+    // =========================================================
+    // 6: 점프 준비, 7: 상승, 8: 꼭대기, 9: 하강, 10: 착지
+    sprintf_s(FileName, "./resource/Img/knight1/jump01.png");
+    Knightimg[6].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/jump02.png");
+    Knightimg[7].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/jump03.png");
+    Knightimg[8].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/fall01.png");
+    Knightimg[9].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/fall02.png");
+    Knightimg[10].Create(FileName, false, 0);
+
     m_rc.left = pos.x-40;
     m_rc.top = pos.y-40;
     m_rc.right = pos.x + imagesinfo.Width-50;
@@ -104,28 +123,63 @@ void Knight::Update()
         m_rc.top = pos.y-40;
         m_rc.right = pos.x + imagesinfo.Width-50;
         m_rc.bottom = pos.y + imagesinfo.Height-70;
-        if (GetTickCount() - m_KnightAniTime > 100)
+
+        //if (GetTickCount() - m_KnightAniTime > 100)
+        //{
+        //    if (isMove)
+        //    {
+        //        m_KnightCount++;
+        //        if (m_KnightCount > 2) m_KnightCount = 0;
+        //    }
+        //    else if (isLookup)
+        //    {
+        //        m_KnightCount = 4;
+        //    }
+        //    else if (isLookdown)
+        //    {
+        //        m_KnightCount = 5;
+        //    }
+        //    else
+        //    {
+        //        m_KnightCount = 3;
+        //    }
+        //    m_KnightAniTime = GetTickCount();
+        //}
+        ////m_KnightAniTime = GetTickCount();
+
+        // =========================================================
+        // [애니메이션 상태 머신] (속도에 따라 이미지 교체)
+        // =========================================================
+        if (GetTickCount() - m_KnightAniTime > 50) // 애니메이션 속도
         {
-            if (isMove)
+            if (grounded)
             {
-                m_KnightCount++;
-                if (m_KnightCount > 2) m_KnightCount = 0;
-            }
-            else if (isLookup)
-            {
-                m_KnightCount = 4;
-            }
-            else if (isLookdown)
-            {
-                m_KnightCount = 5;
+                // [땅]
+                if (isMove)
+                {
+                    m_KnightCount++;
+                    if (m_KnightCount > 2) m_KnightCount = 0;
+                }
+                else if (isLookup) m_KnightCount = 4;
+                else if (isLookdown) m_KnightCount = 5;
+                else m_KnightCount = 3; // 기본 대기
             }
             else
             {
-                m_KnightCount = 3;
+                // [공중] 수직 속도(gravity)에 따라 이미지 변경
+                // gravity는 위로 갈수록 음수(-), 아래로 갈수록 양수(+)
+
+                if (gravity < -12.0f)      m_KnightCount = 6; // 점프 준비 (빠른 상승)
+                else if (gravity < -4.0f)  m_KnightCount = 7; // 상승 중
+                else if (gravity < 4.0f)   m_KnightCount = 8; // 꼭대기 (체공)
+                else if (gravity < 12.0f)  m_KnightCount = 9; // 하강 시작
+                else                       m_KnightCount = 9; // 착지 준비(fall02는 착지 순간 연출용이라 일단 fall01 유지)
+
+                // 참고: fall02(착지)는 grounded가 true가 된 직후 잠깐 보여줘야 해서 로직이 복잡하므로 
+                // 일단 하강 이미지를 계속 쓰도록 했습니다.
             }
             m_KnightAniTime = GetTickCount();
         }
-        //m_KnightAniTime = GetTickCount();
     }
     
 }
@@ -159,5 +213,30 @@ void Knight::Draw()
         {
             coll.BoxSow(m_rc, 0, -5);
         }
+    }
+}
+
+// [추가] 점프 시작 함수 (Key.cpp에서 호출)
+void Knight::JumpStart()
+{
+    if (grounded) // 땅에 있을 때만 점프 가능
+    {
+        // 최대 점프력 설정 (값이 클수록 높이 뜀)
+        gravity = -20.0f;
+        grounded = false;
+
+        // 점프 소리 재생 (필요 시)
+        // sound.Play("Jump");
+    }
+}
+
+// [추가] 가변 점프 (키 뗐을 때 속도 자르기)
+void Knight::JumpCut()
+{
+    // 공중에서 상승 중일 때(음수)만 속도를 깎음
+    if (!grounded && gravity < -5.0f)
+    {
+        // 현재 상승 속도를 절반으로 줄여버림 -> 뚝 떨어지는 느낌 구현
+        gravity *= 0.5f;
     }
 }

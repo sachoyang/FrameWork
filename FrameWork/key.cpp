@@ -267,7 +267,7 @@ void Key::Update()
 		if(GetTickCount64() - KeyTime1 > 10)
 		{
 			knight.isMove = TRUE;
-			knight.pos.x -= 2.0f;
+			knight.pos.x -= 3.0f;
 			knight.dir = 1;
 
 			KeyTime1 = GetTickCount64();
@@ -280,7 +280,7 @@ void Key::Update()
 		if(GetTickCount64() - KeyTime1 > 10)
 		{
 			knight.isMove = TRUE;
-			knight.pos.x += 2.0f;
+			knight.pos.x += 3.0f;
 			knight.dir = -1;
 
 			KeyTime1 = GetTickCount64();
@@ -307,6 +307,24 @@ void Key::Update()
 			KeyTime3 = GetTickCount64();
 		}
 		
+	}
+
+	// =========================================================
+	// [추가] 점프 (Z키) - 가변 점프 구현
+	// =========================================================
+
+	// 1. 점프 시작 (누르고 있을 때)
+	if (KeyDown('Z'))
+	{
+		// 땅에 있을 때만 점프 시작 (함수 내부에서 grounded 체크함)
+		knight.JumpStart();
+	}
+	else
+	{
+		// 2. 점프 컷 (키를 뗐을 때)
+		// Z키가 눌리지 않은 상태라면 무조건 CutJump 호출
+		// (함수 내부에서 '상승 중일 때만' 작동하도록 되어 있어서 안전함)
+		knight.JumpCut();
 	}
 
 

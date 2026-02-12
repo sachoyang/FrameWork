@@ -25,8 +25,6 @@ public :
 	// std::map<int, MapChunk*> m_MapList;
 	MapChunk m_MapList[11];
 
-	/*Sprite test;
-	bool tests;*/
 	Sprite m_MapImg1_1[6];
 	Sprite m_MapImg1_2[45];
 
