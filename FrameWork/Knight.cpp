@@ -10,7 +10,7 @@ Knight::Knight()
     isMove = 0;
     isLookup = 0;
     isLookdown = 0;
-    pos.x = 100;
+    pos.x = 200;
     pos.y = 100;
     gravity = 5.75f;
     grounded = false;
@@ -46,9 +46,6 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/Lookdown01.png");
     Knightimg[5].Create(FileName, false, D3DCOLOR_XRGB(0, 0, 0));
 
-    // =========================================================
-    // [추가] 점프 및 낙하 이미지 로딩 (6 ~ 10번)
-    // =========================================================
     // 6: 점프 준비, 7: 상승, 8: 꼭대기, 9: 하강, 10: 착지
     sprintf_s(FileName, "./resource/Img/knight1/jump01.png");
     Knightimg[6].Create(FileName, false, 0);
@@ -84,119 +81,159 @@ void Knight::Init()
 }
 
 
+// Knight.cpp
+
 void Knight::Update()
 {
     if (GetTickCount() - m_KnightAniTime > 10)
     {
-        // =========================================================
-        // [대시 로직]
-        // =========================================================
+        // ========================================================
+        // 1단계: 수평(X) 이동 및 충돌 처리 (걷기 + 대시)
+        // ========================================================
+        float moveX = 0.0f;
+
+        // [대시 중]
         if (isDashing)
         {
-            // 1. 대시 지속 시간 체크 (예: 0.2초 동안 대시)
-            if (GetTickCount() - dashStartTime > 200)
+            if (GetTickCount() - dashStartTime > 200) // 대시 지속시간 끝
             {
                 isDashing = false;
-                gravity = 0; // 대시 끝나면 정지 상태에서 낙하 시작
+                gravity = 0;
             }
             else
             {
-                // 2. 대시 이동 (보는 방향으로 직진)
-                pos.x -= dir * dashSpeed;
-
-                // 3. 수평 충돌 체크 (앞에 벽이 있나?)
-                // 일단 이동한 위치로 m_rc 갱신
-                m_rc.left = pos.x - 40;
-                m_rc.top = pos.y - 40;
-                m_rc.right = pos.x + imagesinfo.Width - 50;
-                m_rc.bottom = pos.y + imagesinfo.Height - 70;
-
-                // 바닥 충돌을 피하기 위해 검사 박스를 위아래로 조금 줄입니다.
-                RECT wallCheckRect = m_rc;
-                wallCheckRect.top += 10;    // 머리 쪽 여유
-                wallCheckRect.bottom -= 10; // 발 쪽 여유 (바닥 닿지 않게)
-
-                RECT tempRect;
-                for (auto& wall : coll.m_Walls)
-                {
-                    if (IntersectRect(&tempRect, &wallCheckRect, &wall))
-                    {
-                        // 벽에 부딪힘 -> 대시 즉시 종료 & 위치 복구
-                        isDashing = false;
-                        pos.x -= dir * dashSpeed; // 뚫고 들어간 만큼 뺌
-                        break;
-                    }
-                }
+                moveX = -(dir * dashSpeed); // 대시 이동량 계산
             }
         }
-        else
-        {
-            // [일반 상태] (대시 중이 아닐 때만 중력 & 일반 이동 적용)
+        // [걷기 상태] (Key.cpp에서 이미 pos.x를 건드려서 왔으므로 변화량을 추적해야 함)
+        // 하지만 지금 구조상 Key.cpp가 pos.x를 직접 바꾸므로, 
+        // 여기서 "이동 후 위치"가 벽이라면 "이동 전"으로 되돌리는 방식을 씁니다.
 
-            // 1. 중력 적용
-            if (!grounded) pos.y += gravity;
+        // 1-1. 일단 대시 이동 적용 (걷기는 Key.cpp에서 이미 적용됨)
+        if (isDashing) pos.x += moveX;
 
-            // 2. 수직 충돌 체크 (기존 코드)
-            bool isCollided = false;
-            RECT tempRect;
-
-            // 이동한 y좌표 기준 m_rc 갱신
-            m_rc.left = pos.x - 40;
-            m_rc.top = pos.y - 40;
-            m_rc.right = pos.x + imagesinfo.Width - 50;
-            m_rc.bottom = pos.y + imagesinfo.Height - 70;
-
-            for (auto& wall : coll.m_Walls)
-            {
-                if (IntersectRect(&tempRect, &m_rc, &wall))
-                {
-                    // 바닥 착지 로직
-                    if (gravity >= 0 && (m_rc.bottom - 30) < wall.top)
-                    {
-                        grounded = true;
-                        canAirDash = true; // [중요] 땅 밟으면 공중대시 리필!
-                        isCollided = true;
-                        gravity = 0;
-                        pos.y = (float)wall.top - (imagesinfo.Height - 70) + 1.0f; // 1px 겹침 유지
-                        break;
-                    }
-                }
-            }
-            if (!isCollided) grounded = false;
-
-            // 3. 중력 가속
-            if (!grounded)
-            {
-                gravity += 0.6f;
-                if (gravity > 15.0f) gravity = 15.0f;
-            }
-        }
-
-        // 공통: 충돌 박스 최종 갱신
+        // 1-2. 현재 위치로 박스 갱신
         m_rc.left = pos.x - 40;
         m_rc.top = pos.y - 40;
         m_rc.right = pos.x + imagesinfo.Width - 50;
         m_rc.bottom = pos.y + imagesinfo.Height - 70;
 
+        // 1-3. [수평 충돌 검사] (바닥에 걸리는 것 방지 위해 위아래를 줄임!)
+        RECT wallCheckRect = m_rc;
+        wallCheckRect.top += 10;    // 머리 쪽 여유 (천장에 머리 박고 걸을 때 걸림 방지)
+        wallCheckRect.bottom -= 10; // 발 쪽 여유 (바닥에 1px 박혀있을 때 걸림 방지)
 
-        // =========================================================
-        // [애니메이션]
-        // =========================================================
+        bool isHitWall = false;
+        RECT tempRect;
+
+        for (auto& wall : coll.m_Walls)
+        {
+            if (IntersectRect(&tempRect, &wallCheckRect, &wall))
+            {
+                isHitWall = true;
+                break;
+            }
+        }
+
+        // 1-4. 벽에 부딪혔다면? -> 튕겨내기!
+        if (isHitWall)
+        {
+            if (isDashing)
+            {
+                // 대시 중 벽 충돌 -> 대시 종료 및 원상복구
+                isDashing = false;
+                pos.x -= moveX;
+            }
+            if(isMove)
+            {
+                // 걷기 중 벽 충돌 -> Key.cpp가 옮긴 걸 취소해야 함
+                // Key.cpp에서 3.0f만큼 움직였다고 가정하고 반대로 밈
+                // (정확히 하려면 prevX를 저장해야 하지만, 간단히 반대 방향으로 밈)
+                
+                if (dir == 1) pos.x += 3.0f; // 왼쪽 보고 있었으면 오른쪽으로 밈
+                else pos.x -= 3.0f;          // 오른쪽 보고 있었으면 왼쪽으로 밈
+            }
+
+            // 위치 복구 후 박스 재갱신
+            m_rc.left = pos.x - 40;
+            m_rc.top = pos.y - 40;
+            m_rc.right = pos.x + imagesinfo.Width - 50;
+            m_rc.bottom = pos.y + imagesinfo.Height - 70;
+        }
+
+
+        // ========================================================
+        // 2단계: 수직(Y) 이동 및 충돌 처리 (중력 + 점프)
+        // ========================================================
+
+        // 2-1. 중력 적용 (대시 중엔 무시)
+        if (!isDashing)
+        {
+            if (!grounded) pos.y += gravity;
+        }
+
+        // 2-2. Y축 이동 후 박스 갱신
+        m_rc.left = pos.x - 40;
+        m_rc.top = pos.y - 40;
+        m_rc.right = pos.x + imagesinfo.Width - 50;
+        m_rc.bottom = pos.y + imagesinfo.Height - 70;
+
+        // 2-3. [수직 충돌 검사]
+        bool isLanded = false;
+
+        if (!isDashing) // 대시 중엔 바닥 착지 안 함 (공중 부양)
+        {
+            for (auto& wall : coll.m_Walls)
+            {
+                if (IntersectRect(&tempRect, &m_rc, &wall))
+                {
+                    // 바닥 착지 판정 (내려오고 있고 + 발이 벽 윗면 근처)
+                    if (gravity >= 0 && (m_rc.bottom - 30) < wall.top)
+                    {
+                        grounded = true;
+                        canAirDash = true; // 공중 대시 리필
+                        isLanded = true;
+                        gravity = 0;
+
+                        // [떨림 방지 +1.0f 적용]
+                        pos.y = (float)wall.top - (imagesinfo.Height - 70) + 1.0f;
+
+                        // 위치 보정 후 최종 박스 갱신
+                        m_rc.left = pos.x - 40;
+                        m_rc.top = pos.y - 40;
+                        m_rc.right = pos.x + imagesinfo.Width - 50;
+                        m_rc.bottom = pos.y + imagesinfo.Height - 70;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!isLanded) grounded = false;
+
+        // 2-4. 중력 가속
+        if (!grounded && !isDashing)
+        {
+            gravity += 0.6f;
+            if (gravity > 15.0f) gravity = 15.0f;
+        }
+
+
+        // ========================================================
+        // 3단계: 애니메이션 처리 (기존 코드 유지)
+        // ========================================================
         if (GetTickCount() - m_KnightAniTime > 50)
         {
             if (isDashing)
             {
-                // 대시 애니메이션 (시간 흐름에 따라 11 -> 12 -> 13 -> 14)
                 DWORD dashTime = GetTickCount() - dashStartTime;
-
-                if (dashTime < 50)       m_KnightCount = 11; // 준비
-                else if (dashTime < 100) m_KnightCount = 12; // 슝~
-                else if (dashTime < 150) m_KnightCount = 13; // 공중 부양
-                else                     m_KnightCount = 14; // 정지 동작
+                if (dashTime < 50)       m_KnightCount = 11;
+                else if (dashTime < 100) m_KnightCount = 12;
+                else if (dashTime < 150) m_KnightCount = 13;
+                else                     m_KnightCount = 14;
             }
             else if (grounded)
             {
-                // ... (기존 땅 애니메이션) ...
                 if (isMove) { m_KnightCount++; if (m_KnightCount > 2) m_KnightCount = 0; }
                 else if (isLookup) m_KnightCount = 4;
                 else if (isLookdown) m_KnightCount = 5;
@@ -204,7 +241,6 @@ void Knight::Update()
             }
             else
             {
-                // ... (기존 공중 애니메이션) ...
                 if (gravity < -12.0f) m_KnightCount = 6;
                 else if (gravity < -4.0f) m_KnightCount = 7;
                 else if (gravity < 4.0f) m_KnightCount = 8;
@@ -213,8 +249,7 @@ void Knight::Update()
             m_KnightAniTime = GetTickCount();
         }
     }
-}
-//
+}//
 //void Knight::Update()
 //{
 //    if (GetTickCount() - m_KnightAniTime > 10)

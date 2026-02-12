@@ -186,7 +186,10 @@ void MapManager::ChangeMap(int mapID)
 	if (mapID < 1 || mapID > 10) return;
 
 	m_pCurrentMapChunk = &m_MapList[mapID];
-
+	// [필수] 맵 바뀔 때 상태 리셋
+	//knight.isDashing = false;
+	//knight.gravity = 0;
+	//knight.isMove = false;
 	// 1. Clear existing walls
 	coll.ClearWalls();
 
