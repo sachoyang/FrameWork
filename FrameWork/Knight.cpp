@@ -205,6 +205,21 @@ void Knight::Update()
                         m_rc.bottom = pos.y + imagesinfo.Height - 70;
                         break;
                     }
+                    // 머리 찧기 판정 (올라가고 있고 + 머리 쪽이 부딪힘)
+                    else if (gravity < 0)
+                    {
+                        gravity = 0; // 상승 힘 제거 (머리 쿵)
+
+                        // 머리 위치 보정: 벽의 바닥(wall.bottom) 바로 아래로 내림
+                        // m_rc.top = pos.y - 40 이므로, pos.y = wall.bottom + 40
+                        pos.y = (float)wall.bottom + 40.0f;
+
+                        // 박스 갱신
+                        m_rc.left = pos.x - 40;
+                        m_rc.top = pos.y - 40;
+                        m_rc.right = pos.x + imagesinfo.Width - 50;
+                        m_rc.bottom = pos.y + imagesinfo.Height - 70;
+                    }
                 }
             }
         }
@@ -380,20 +395,12 @@ void Knight::Draw()
         float drawingOffsetY = 0.0f;
         if (m_KnightCount == 5)
         {
-            // ▼ 이 숫자를 조절해서 발을 땅에 맞추세요! 
-            // 이미지가 납작한 만큼 더해줘야 합니다. (예: 10 ~ 30 사이)
+            // 이 숫자를 조절해서 발을 땅에 맞춤 
+            // 이미지가 납작한 만큼 더해줘야 함. (예: 10 ~ 30 사이)
             drawingOffsetY = 20.0f;
         }
         Knightimg[m_KnightCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
 
-        /*if (isMove == 1)
-        {
-            Knightimg[m_KnightCount].Render(this->pos.x, this->pos.y, 0, dir, 1, 1);
-        }
-        else
-        {
-            Knightimg[m_KnightCount].Render(this->pos.x, this->pos.y, 0, dir, 1, 1);
-        }*/
         if (grounded)
         {
             coll.BoxSow(m_rc, 0, -5, 0xffff0000);
@@ -405,7 +412,7 @@ void Knight::Draw()
     }
 }
 
-// [추가] 점프 시작 함수 (Key.cpp에서 호출)
+// 점프 시작 함수 (Key.cpp에서 호출)
 void Knight::JumpStart()
 {
     if (grounded) // 땅에 있을 때만 점프 가능
@@ -419,7 +426,7 @@ void Knight::JumpStart()
     }
 }
 
-// [추가] 가변 점프 (키 뗐을 때 속도 자르기)
+// 가변 점프 (키 뗐을 때 속도 자르기)
 void Knight::JumpCut()
 {
     // 공중에서 상승 중일 때(음수)만 속도를 깎음
@@ -430,10 +437,10 @@ void Knight::JumpCut()
     }
 }
 
-// [추가] 대시 시작
+// 대시 시작
 void Knight::DashStart()
 {
-    DWORD curTime = GetTickCount();
+    DWORD curTime = GetTickCount64();
 
     // 1. 쿨타임 체크 (0.5초 = 500ms)
     if (curTime - dashCooldownTime < 500) return;
@@ -441,7 +448,7 @@ void Knight::DashStart()
     // 2. 공중 사용 제한 체크
     if (!grounded && !canAirDash) return;
 
-    // 3. 대시 발동!
+    // 3. 대시
     isDashing = true;
     dashStartTime = curTime;
     dashCooldownTime = curTime;
