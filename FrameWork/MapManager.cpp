@@ -187,93 +187,79 @@ void MapManager::ChangeMap(int mapID)
 
 	m_pCurrentMapChunk = &m_MapList[mapID];
 
-	// 1. 기존 벽 싹 지우기 (초기화)
+	// 1. Clear existing walls
 	coll.ClearWalls();
 
 	RECT rc;
-	int thickness = 50; // 콜라이더 두께 100 설정
+	int thickness = 100; // Wall thickness
+	int floorY = SCREEN_HEIGHT - thickness; // The top Y of the floor (e.g., 500 if height is 600)
 
 	// =============================================================
-	// 1. 바닥 (아래쪽) 처리
+	// 1. FLOOR (Bottom) Handling
 	// =============================================================
 	if (m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0)
 	{
-		// [길 없음] 바닥을 꽉 막음 (화면 아래쪽 50픽셀 영역)
-		SetRect(&rc, 0, SCREEN_HEIGHT - thickness, SCREEN_WITH, SCREEN_HEIGHT);
+		// [No Path] Solid floor
+		// Top: 500, Bottom: 600 (or slightly more to catch falling)
+		SetRect(&rc, 0, floorY, SCREEN_WITH, SCREEN_HEIGHT + 50);
 		coll.AddWall(rc);
 	}
 	else
 	{
-		// [길 있음] 가운데 구멍 뚫기 (왼쪽 덩어리 + 오른쪽 덩어리)
-		int holeSize = 200; // 구멍 크기
-		int midX = SCREEN_WITH / 2;
-
-		// 왼쪽 바닥
-		SetRect(&rc, 0, SCREEN_HEIGHT - thickness, midX - (holeSize / 2), SCREEN_HEIGHT);
-		coll.AddWall(rc);
-
-		// 오른쪽 바닥
-		SetRect(&rc, midX + (holeSize / 2), SCREEN_HEIGHT - thickness, SCREEN_WITH, SCREEN_HEIGHT);
-		coll.AddWall(rc);
-	}
-
-	// =============================================================
-	// 2. 천장 (위쪽) 처리
-	// =============================================================
-	if (m_pCurrentMapChunk->nextMapID[DIR_UP] == 0)
-	{
-		// [길 없음] 천장을 꽉 막음 (화면 위쪽 100픽셀 영역)
-		SetRect(&rc, 0, 0, SCREEN_WITH, thickness);
-		coll.AddWall(rc);
-	}
-	else
-	{
-		// [길 있음] 구멍 뚫기 (왼쪽 천장 + 오른쪽 천장)
+		// [Path Exists] Hole in the middle
 		int holeSize = 200;
 		int midX = SCREEN_WITH / 2;
 
-		SetRect(&rc, 0, 0, midX - (holeSize / 2), thickness);
+		// Left Floor Piece (0 to 300)
+		SetRect(&rc, 0, floorY, midX - (holeSize / 2), SCREEN_HEIGHT + 50);
 		coll.AddWall(rc);
 
-		SetRect(&rc, midX + (holeSize / 2), 0, SCREEN_WITH, thickness);
+		// Right Floor Piece (500 to 800)
+		SetRect(&rc, midX + (holeSize / 2), floorY, SCREEN_WITH, SCREEN_HEIGHT + 50);
 		coll.AddWall(rc);
 	}
 
 	// =============================================================
-	// 3. 왼쪽 벽 처리
+	// 2. CEILING (Top) Handling
+	// =============================================================
+	if (m_pCurrentMapChunk->nextMapID[DIR_UP] == 0)
+	{
+		// [No Path] Solid ceiling
+		SetRect(&rc, 0, -50, SCREEN_WITH, thickness); // -50 to 100
+		coll.AddWall(rc);
+	}
+	// Else: No ceiling wall (allow jumping up)
+
+	// =============================================================
+	// 3. LEFT WALL Handling
 	// =============================================================
 	if (m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0)
 	{
-		// [길 없음] 왼쪽 꽉 막음 (화면 왼쪽 100픽셀)
-		SetRect(&rc, 0, 0, thickness, SCREEN_HEIGHT);
+		// [No Path] Solid left wall
+		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT);
 		coll.AddWall(rc);
 	}
 	else
 	{
-		// [길 있음] 문 구멍 뚫기 (위쪽 벽 + 아래쪽 벽)
-		// 사람이 지나갈 높이(바닥에서 250 정도)는 남겨둠
-
-		// 위쪽 덩어리 (천장부터 바닥 300지점 전까지)
-		SetRect(&rc, 0, 0, thickness, SCREEN_HEIGHT - 300);
+		// [Path Exists] Doorway (Wall only on top part)
+		// Adjust 300 to control door height
+		SetRect(&rc, -50, 0, thickness, floorY - 200);
 		coll.AddWall(rc);
-
-		// 아래쪽 덩어리는 보통 바닥이 있어서 안 만들어도 되지만, 
-		// 공중 부양 문이라면 아래도 막아야 함. 여기선 뚫어둠.
 	}
 
 	// =============================================================
-	// 4. 오른쪽 벽 처리
+	// 4. RIGHT WALL Handling
 	// =============================================================
 	if (m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0)
 	{
-		// [길 없음] 오른쪽 꽉 막음
-		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH, SCREEN_HEIGHT);
+		// [No Path] Solid right wall
+		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH + 50, SCREEN_HEIGHT);
 		coll.AddWall(rc);
 	}
 	else
 	{
-		// [길 있음] 위쪽 벽만 생성 (문 만듦)
-		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH, SCREEN_HEIGHT - 300);
+		// [Path Exists] Doorway
+		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH + 50, floorY - 200);
 		coll.AddWall(rc);
 	}
 }

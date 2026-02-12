@@ -49,31 +49,54 @@ void Knight::Update()
 {
     if (GetTickCount() - m_KnightAniTime > 10)
     {
+        // Gravity
         if (!grounded) pos.y += gravity;
 
-        //if (m_rc.left < coll.m_Walls[].right && coll.m_rc.left < m_rc.right && m_rc.top < coll.m_rc.bottom && coll.m_rc.top < m_rc.bottom) grounded = true;
-        // [충돌 검사 로직 변경]
-        grounded = false; // 일단 공중에 떴다고 가정
-        RECT tempRect;    // 교차 영역 저장용 (IntersectRect에 필요)
+        // Collision Check
+        bool isCollided = false; // 이번 프레임에 땅에 닿았는지 체크
+        RECT tempRect;
 
-        // 리스트 반복자 사용
-        std::list<RECT>::iterator iter;
-        for (iter = coll.m_Walls.begin(); iter != coll.m_Walls.end(); ++iter)
+        // coll.m_Walls 리스트를 순회
+        for (auto& wall : coll.m_Walls)
         {
-            RECT wall = *iter; // 현재 검사할 벽
-
-            // 1. 플레이어와 벽이 겹쳤는지 확인
             if (IntersectRect(&tempRect, &m_rc, &wall))
             {
-                // 2. 바닥 착지 검사 (위에서 아래로 떨어지다가 닿음)
-                // (발바닥이 벽 윗면 근처에 있고 + 떨어지는 중일 때)
-                if (pos.y + imagesinfo.Height - 70 <= wall.top + 10 && gravity >= 0)
+                // [착지 판정] 떨어지는 중이고(gravity >= 0), 발이 벽 윗부분에 걸쳤을 때
+                // (m_rc.bottom - 20)은 발바닥 조금 위, (wall.top + 20)은 벽 윗면 조금 아래
+                // 즉, "발이 벽 윗모서리를 타고 넘었을 때"만 착지로 인정
+                if (gravity >= 0 && (m_rc.bottom - 30) < wall.top)
                 {
+                    // 1. 땅에 닿음 처리
                     grounded = true;
-                    pos.y = wall.top - (imagesinfo.Height - 70); // 발 위치 보정
+                    isCollided = true;
+                    gravity = 0; // 중력 초기화 (안 그러면 계속 빨라짐)
+
+                    // 2. 위치 보정 (스냅)
+                    // 캐릭터를 벽 바로 위로 끌어올림 (1px 정도 겹치게 해서 다음 프레임에도 충돌 유지)
+                    //pos.y = (float)wall.top - (imagesinfo.Height - 70);
+
+                    // 3. 보정된 위치로 m_rc 다시 갱신 (중요!)
+                    m_rc.left = pos.x - 40;
+                    m_rc.top = pos.y - 40;
+                    m_rc.right = pos.x + imagesinfo.Width - 50;
+                    m_rc.bottom = pos.y + imagesinfo.Height - 70;
+
+                    break; // 땅 하나만 밟으면 되니까 루프 종료
                 }
-                // 3. (옵션) 가로 벽 막힘 처리 등은 나중에 추가
             }
+        }
+
+        // 충돌한 벽이 하나도 없으면 공중에 뜬 것
+        if (isCollided == false)
+        {
+            grounded = false;
+        }
+
+        // 공중에 있을 때만 중력 가속
+        if (!grounded)
+        {
+            gravity += 0.5f; // 0.8f는 너무 빠를 수 있어 조절함
+            if (gravity > 15.0f) gravity = 15.0f; // 최대 낙하 속도 제한 (안전장치)
         }
 
 

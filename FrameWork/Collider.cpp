@@ -36,11 +36,11 @@ void Collider::Draw()
 		dv_font.DrawString("┐ ", m_rc.right, m_rc.top, D3DCOLOR_ARGB(255, 0, 255, 0));
 		dv_font.DrawString("└", m_rc.left, m_rc.bottom, D3DCOLOR_ARGB(255, 0, 255, 0));
 		dv_font.DrawString(" ┘", m_rc.right, m_rc.bottom, D3DCOLOR_ARGB(255, 0, 255, 0));*/
-		// 모든 벽을 반복해서 그리기
-		for (auto iter = m_Walls.begin(); iter != m_Walls.end(); ++iter)
+		// 리스트에 있는 모든 벽 그리기
+		for (auto& wall : m_Walls)
 		{
-			// *iter 가 RECT 정보
-			BoxSow(*iter, 0, 0, D3DCOLOR_ARGB(255, 0, 255, 0));
+			// 벽을 초록색 박스로 그림
+			BoxSow(wall, 0, 0, D3DCOLOR_ARGB(255, 0, 255, 0));
 		}
 	}
 }
@@ -50,10 +50,22 @@ void Collider::BoxSow(RECT m_rc, long x, long y, D3DCOLOR color)
 {
 	if (Gmanager.m_GameStart == true /* && 디버그 일때 처리 */)
 	{
-		dv_font.DrawString("┌ ", m_rc.left-x, m_rc.top  - y, color);
+		/*dv_font.DrawString("┌ ", m_rc.left-x, m_rc.top  - y, color);
 		dv_font.DrawString("┐ ", m_rc.right+x, m_rc.top - y, color);
 		dv_font.DrawString("└", m_rc.left-x, m_rc.bottom + y, color);
-		dv_font.DrawString(" ┘", m_rc.right+x, m_rc.bottom + y, color);
+		dv_font.DrawString(" ┘", m_rc.right+x, m_rc.bottom + y, color);*/
+		// Draw slightly inside the rect so it's visible
+		// Top-Left
+		dv_font.DrawString("┌", m_rc.left + 5, m_rc.top + 5, color);
+
+		// Top-Right (Draw slightly left of the right edge)
+		dv_font.DrawString("┐", m_rc.right - 15, m_rc.top + 5, color);
+
+		// Bottom-Left (Draw slightly above the bottom edge)
+		dv_font.DrawString("└", m_rc.left + 5, m_rc.bottom - 15, color);
+
+		// Bottom-Right
+		dv_font.DrawString("┘", m_rc.right - 15, m_rc.bottom - 15, color);
 	}
 
 }
