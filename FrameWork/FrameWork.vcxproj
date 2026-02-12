@@ -156,7 +156,6 @@
     <ClInclude Include="DeviceFont.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameManager.h" />
-    <ClInclude Include="Ground.h" />
     <ClInclude Include="Include.h" />
     <ClInclude Include="key.h" />
     <ClInclude Include="Knight.h" />
@@ -179,7 +178,6 @@
     <ClCompile Include="DeviceFont.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="Ground.cpp" />
     <ClCompile Include="key.cpp" />
     <ClCompile Include="Knight.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>

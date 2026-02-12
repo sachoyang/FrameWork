@@ -49,9 +49,6 @@
     <Filter Include="소스 파일\Knight">
       <UniqueIdentifier>{c6051ed8-bf8f-4da2-a7b5-db98dfb77656}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\Ground">
-      <UniqueIdentifier>{ff11b8e9-85ce-4fa8-b52e-cfd11f873e04}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -120,9 +117,6 @@
     <ClInclude Include="Knight.h">
       <Filter>소스 파일\Knight</Filter>
     </ClInclude>
-    <ClInclude Include="Ground.h">
-      <Filter>소스 파일\Ground</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="key.cpp">
@@ -184,9 +178,6 @@
     </ClCompile>
     <ClCompile Include="Knight.cpp">
       <Filter>소스 파일\Knight</Filter>
-    </ClCompile>
-    <ClCompile Include="Ground.cpp">
-      <Filter>소스 파일\Ground</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

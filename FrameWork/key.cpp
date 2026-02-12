@@ -260,34 +260,33 @@ void Key::Update()
 		
 	}
 
-
-
-	if(KeyDown(VK_LEFT))
+	if (knight.isDashing == false)
 	{
-		if(GetTickCount64() - KeyTime1 > 10)
+		if (KeyDown(VK_LEFT))
 		{
-			knight.isMove = TRUE;
-			knight.pos.x -= 3.0f;
-			knight.dir = 1;
+			if (GetTickCount64() - KeyTime1 > 10)
+			{
+				knight.isMove = TRUE;
+				knight.pos.x -= 3.0f;
+				knight.dir = 1;
 
-			KeyTime1 = GetTickCount64();
+				KeyTime1 = GetTickCount64();
+			}
+		}
+
+		if (KeyDown(VK_RIGHT))
+		{
+			if (GetTickCount64() - KeyTime1 > 10)
+			{
+				knight.isMove = TRUE;
+				knight.pos.x += 3.0f;
+				knight.dir = -1;
+
+				KeyTime1 = GetTickCount64();
+			}
 		}
 	}
 
-	if(KeyDown(VK_RIGHT))
-	{
-
-		if(GetTickCount64() - KeyTime1 > 10)
-		{
-			knight.isMove = TRUE;
-			knight.pos.x += 3.0f;
-			knight.dir = -1;
-
-			KeyTime1 = GetTickCount64();
-		}
-		
-	}
-	
 	if(KeyDown(VK_UP))
 	{
 		if(GetTickCount64() - KeyTime3 > 10)
@@ -309,10 +308,6 @@ void Key::Update()
 		
 	}
 
-	// =========================================================
-	// [추가] 점프 (Z키) - 가변 점프 구현
-	// =========================================================
-
 	// 1. 점프 시작 (누르고 있을 때)
 	if (KeyDown('Z'))
 	{
@@ -330,10 +325,7 @@ void Key::Update()
 
 	if(KeyDown('C') )
 	{
-		if(GetTickCount64() - KeyTime1 > 200)
-		{	
-			KeyTime1 = GetTickCount64();
-		}
+		knight.DashStart();
 	}
 
 
