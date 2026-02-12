@@ -41,7 +41,8 @@ void MapManager::Init()
 	// -------------------------------------------------------
 	m_MapList[1].id = 1;
 	m_MapList[1].layerCount = 2; // 배경 2장 쓴다고 가정
-
+	m_MapList[1].width = SCREEN_WITH;  // 1280
+	m_MapList[1].height = SCREEN_HEIGHT; // 800
 	// 배경 1 (가장 뒤)
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0001.tga");
 	m_MapList[1].bgLayer[0].Create(FileName, false, 0);
@@ -55,7 +56,8 @@ void MapManager::Init()
 	// -------------------------------------------------------
 	m_MapList[2].id = 2;
 	m_MapList[2].layerCount = 1;
-
+	m_MapList[2].width = SCREEN_WITH;  // 1280
+	m_MapList[2].height = SCREEN_HEIGHT; // 800
 	// 2번 맵은 그냥 다른 이미지 하나
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0003.tga");
 	m_MapList[2].bgLayer[0].Create(FileName, false, 0);
@@ -65,6 +67,8 @@ void MapManager::Init()
 	// -------------------------------------------------------
 	m_MapList[3].id = 3;
 	m_MapList[3].layerCount = 1;
+	m_MapList[3].width = SCREEN_WITH;  // 1280
+	m_MapList[3].height = SCREEN_HEIGHT; // 800
 	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map01.png");
 	m_MapList[3].bgLayer[0].Create(FileName, false, 0);
 	// -------------------------------------------------------
@@ -72,6 +76,8 @@ void MapManager::Init()
 	// -------------------------------------------------------
 	m_MapList[4].id = 2;
 	m_MapList[4].layerCount = 1;
+	m_MapList[4].width = SCREEN_WITH;  // 1280
+	m_MapList[4].height = SCREEN_HEIGHT; // 800
 	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map02.png");
 	m_MapList[4].bgLayer[0].Create(FileName, false, 0);
 
