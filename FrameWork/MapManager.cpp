@@ -34,6 +34,7 @@ void MapManager::Init()
 		j+=2;
 		
 	}*/
+
 #pragma region MapData_Init
 	char FileName[256];
 
@@ -131,7 +132,7 @@ void MapManager::CreateRandomMap()
 	// [1] 초기화: 모든 맵의 연결 정보를 0(막힘)으로 리셋
 	for (int i = 1; i <= 10; i++)
 	{
-		for (int j = 0; j < 6; j++) m_MapList[i].nextMapID[j] = 0;
+		for (int j = 0; j < 4; j++) m_MapList[i].nextMapID[j] = 0;
 	}
 
 	// [2] 가상의 격자판 만들기 (20x20 크기)
