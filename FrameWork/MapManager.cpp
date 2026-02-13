@@ -132,7 +132,7 @@ void MapManager::CreateRandomMap()
 	// [1] 초기화: 모든 맵의 연결 정보를 0(막힘)으로 리셋
 	for (int i = 1; i <= 10; i++)
 	{
-		for (int j = 0; j < 4; j++) m_MapList[i].nextMapID[j] = 0;
+		for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
 	}
 
 	// [2] 가상의 격자판 만들기 (20x20 크기)
@@ -260,6 +260,17 @@ void MapManager::ChangeMap(int mapID)
 		SetRect(&rc, 0, -50, MW, thickness); // -50 to 100
 		coll.AddWall(rc);
 	}
+	else
+	{	// 위가 뚫려있으면 중간에 밟고 올라갈 수 있는 발판 추가
+		int pW = 200; // 발판 넓이
+		int pH = 30;  // 발판 두께
+		// 맵 정중앙, 바닥에서 적당히 높은 곳에 배치 (여기선 바닥 위 400px 지점 예시)
+		int platformY = floorY - 350;
+
+		RECT platform;
+		SetRect(&platform, (MW / 2) - (pW / 2), platformY, (MW / 2) + (pW / 2), platformY + pH);
+		coll.AddWall(platform);
+	}
 	// Else: No ceiling wall (allow jumping up)
 
 	// =============================================================
@@ -308,12 +319,11 @@ void MapManager::Update(double frame)
 
 		m_MapImg1_1_ani1 = GetTickCount64();
 	}*/
+	if (m_pCurrentMapChunk == nullptr) return;
 
 	// [핵심 수정] 맵 이동 판정도 '현재 맵 크기' 기준으로 해야 함!
 	int MW = m_pCurrentMapChunk->width;
 	int MH = m_pCurrentMapChunk->height;
-
-	if (m_pCurrentMapChunk == nullptr) return;
 
 	// 1. 오른쪽으로 나갈 때 (플레이어 x > 화면너비)
 	if (knight.pos.x > SCREEN_WITH)
@@ -356,7 +366,7 @@ void MapManager::Update(double frame)
 		{
 			ChangeMap(nextMap);
 			// 아래쪽 끝에서 솟아오름
-			knight.pos.y = MH - 100.0f;
+			knight.pos.y = MH - 200.0f;
 		}
 		else
 		{
@@ -378,7 +388,7 @@ void MapManager::Update(double frame)
 		{
 			// 낭떠러지? (게임 오버 처리하거나 못 가게 막음)
 			// 여기서는 일단 바닥에 걸치게
-			knight.pos.y = MH;
+			knight.pos.y = MH - 100.0f;
 			knight.grounded = true; // 땅 밟은 판정
 		}
 	}
