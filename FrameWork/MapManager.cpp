@@ -36,66 +36,66 @@ void MapManager::Init()
 	}*/
 #pragma region MapData_Init
 	char FileName[256];
+
+	// [중요] 모든 맵의 기본 사이즈를 일단 화면 크기로 초기화 (안전장치)
+	for (int i = 1; i <= 10; ++i) {
+		m_MapList[i].width = SCREEN_WITH;
+		m_MapList[i].height = SCREEN_HEIGHT;
+	}
+
 	// -------------------------------------------------------
-	// [1번 맵] - 고정 시작 맵 (기존에 쓰던 그 맵)
+	// [1번 맵] 
 	// -------------------------------------------------------
 	m_MapList[1].id = 1;
-	m_MapList[1].layerCount = 2; // 배경 2장 쓴다고 가정
-	m_MapList[1].width = SCREEN_WITH;  // 1280
-	m_MapList[1].height = SCREEN_HEIGHT; // 800
-	// 배경 1 (가장 뒤)
+	m_MapList[1].layerCount = 2;
+	// width, height는 위에서 기본값 설정됨
+
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0001.tga");
 	m_MapList[1].bgLayer[0].Create(FileName, false, 0);
-
-	// 배경 2 (그 앞)
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0002.tga");
 	m_MapList[1].bgLayer[1].Create(FileName, false, 0);
 
 	// -------------------------------------------------------
-	// [2번 맵] - 테스트용 다른 맵 (배경 색이나 이미지를 다르게)
+	// [2번 맵]
 	// -------------------------------------------------------
 	m_MapList[2].id = 2;
 	m_MapList[2].layerCount = 1;
-	m_MapList[2].width = SCREEN_WITH;  // 1280
-	m_MapList[2].height = SCREEN_HEIGHT; // 800
-	// 2번 맵은 그냥 다른 이미지 하나
 	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0003.tga");
 	m_MapList[2].bgLayer[0].Create(FileName, false, 0);
 
 	// -------------------------------------------------------
-	// [3번 맵] 
+	// [3번 맵]
 	// -------------------------------------------------------
 	m_MapList[3].id = 3;
 	m_MapList[3].layerCount = 1;
-	m_MapList[3].width = SCREEN_WITH;  // 1280
-	m_MapList[3].height = SCREEN_HEIGHT; // 800
 	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map01.png");
 	m_MapList[3].bgLayer[0].Create(FileName, false, 0);
+
 	// -------------------------------------------------------
-	// [4번 맵] 
+	// [4번 맵]
 	// -------------------------------------------------------
 	m_MapList[4].id = 4;
 	m_MapList[4].layerCount = 1;
-	m_MapList[4].width = SCREEN_WITH;  // 1280
-	m_MapList[4].height = SCREEN_HEIGHT; // 800
 	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map02.png");
 	m_MapList[4].bgLayer[0].Create(FileName, false, 0);
+
 	// -------------------------------------------------------
-	// [5번 맵] 
+	// [5번 맵] - 큰 맵!
 	// -------------------------------------------------------
 	m_MapList[5].id = 5;
 	m_MapList[5].layerCount = 1;
-	m_MapList[5].width = 2624;//SCREEN_WITH;  // 1280
-	m_MapList[5].height = 1632; //SCREEN_HEIGHT
+	m_MapList[5].width = 2624;  // [중요] 큰 사이즈
+	m_MapList[5].height = 1632;
 	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map03.png");
 	m_MapList[5].bgLayer[0].Create(FileName, false, 0);
+
 	// -------------------------------------------------------
-	// [6번 맵] 
+	// [6번 맵] - 큰 맵!
 	// -------------------------------------------------------
 	m_MapList[6].id = 6;
 	m_MapList[6].layerCount = 1;
-	m_MapList[6].width = 2624;  // 1280
-	m_MapList[6].height = 1632; // 800
+	m_MapList[6].width = 2624;
+	m_MapList[6].height = 1632;
 	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map04.png");
 	m_MapList[6].bgLayer[0].Create(FileName, false, 0);
 
@@ -213,16 +213,18 @@ void MapManager::ChangeMap(int mapID)
 
 	CAM->SetMapSize(m_pCurrentMapChunk->width, m_pCurrentMapChunk->height);
 	// [필수] 맵 바뀔 때 상태 리셋
-	//knight.isDashing = false;
-	//knight.gravity = 0;
-	//knight.isMove = false;
+	knight.isDashing = false;
+	knight.gravity = 0;
+	knight.isMove = false;
 	// 1. Clear existing walls
 	coll.ClearWalls();
 
 	RECT rc;
 	int thickness = 100; // Wall thickness
-	int floorY = SCREEN_HEIGHT - thickness; // The top Y of the floor (e.g., 500 if height is 600)
-
+	//int floorY = SCREEN_HEIGHT - thickness; // The top Y of the floor (e.g., 500 if height is 600)
+	int MW = m_pCurrentMapChunk->width;
+	int MH = m_pCurrentMapChunk->height;
+	int floorY = MH - thickness; // 바닥 위치도 맵 높이 기준!
 	// =============================================================
 	// 1. FLOOR (Bottom) Handling
 	// =============================================================
@@ -230,7 +232,7 @@ void MapManager::ChangeMap(int mapID)
 	{
 		// [No Path] Solid floor
 		// Top: 500, Bottom: 600 (or slightly more to catch falling)
-		SetRect(&rc, 0, floorY, SCREEN_WITH, SCREEN_HEIGHT + 50);
+		SetRect(&rc, 0, floorY, MW, MH + 50);
 		coll.AddWall(rc);
 	}
 	else
@@ -240,11 +242,11 @@ void MapManager::ChangeMap(int mapID)
 		int midX = SCREEN_WITH / 2;
 
 		// Left Floor Piece (0 to 300)
-		SetRect(&rc, 0, floorY, midX - (holeSize / 2), SCREEN_HEIGHT + 50);
+		SetRect(&rc, 0, floorY, midX - (holeSize / 2), MH + 50);
 		coll.AddWall(rc);
 
 		// Right Floor Piece (500 to 800)
-		SetRect(&rc, midX + (holeSize / 2), floorY, SCREEN_WITH, SCREEN_HEIGHT + 50);
+		SetRect(&rc, midX + (holeSize / 2), floorY, MW, MH + 50);
 		coll.AddWall(rc);
 	}
 
@@ -254,7 +256,7 @@ void MapManager::ChangeMap(int mapID)
 	if (m_pCurrentMapChunk->nextMapID[DIR_UP] == 0)
 	{
 		// [No Path] Solid ceiling
-		SetRect(&rc, 0, -50, SCREEN_WITH, thickness); // -50 to 100
+		SetRect(&rc, 0, -50, MW, thickness); // -50 to 100
 		coll.AddWall(rc);
 	}
 	// Else: No ceiling wall (allow jumping up)
@@ -265,7 +267,7 @@ void MapManager::ChangeMap(int mapID)
 	if (m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0)
 	{
 		// [No Path] Solid left wall
-		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT);
+		SetRect(&rc, -50, 0, thickness, MH);
 		coll.AddWall(rc);
 	}
 	else
@@ -282,13 +284,13 @@ void MapManager::ChangeMap(int mapID)
 	if (m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0)
 	{
 		// [No Path] Solid right wall
-		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH + 50, SCREEN_HEIGHT);
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH);
 		coll.AddWall(rc);
 	}
 	else
 	{
 		// [Path Exists] Doorway
-		SetRect(&rc, SCREEN_WITH - thickness, 0, SCREEN_WITH + 50, floorY - 200);
+		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200);
 		coll.AddWall(rc);
 	}
 }
@@ -305,6 +307,11 @@ void MapManager::Update(double frame)
 
 		m_MapImg1_1_ani1 = GetTickCount64();
 	}*/
+
+	// [핵심 수정] 맵 이동 판정도 '현재 맵 크기' 기준으로 해야 함!
+	int MW = m_pCurrentMapChunk->width;
+	int MH = m_pCurrentMapChunk->height;
+
 	if (m_pCurrentMapChunk == nullptr) return;
 
 	// 1. 오른쪽으로 나갈 때 (플레이어 x > 화면너비)
@@ -320,7 +327,7 @@ void MapManager::Update(double frame)
 		}
 		else // 막힌 길이다!
 		{
-			knight.pos.x = SCREEN_WITH; // 못 나가게 막음
+			knight.pos.x = MW; // 못 나가게 막음
 		}
 	}
 
@@ -332,7 +339,7 @@ void MapManager::Update(double frame)
 		if (nextMap != 0)
 		{
 			ChangeMap(nextMap);
-			knight.pos.x = SCREEN_WITH - 50.0f; // 오른쪽 끝에서 등장
+			knight.pos.x = MW - 50.0f; // 오른쪽 끝에서 등장
 		}
 		else
 		{
@@ -348,7 +355,7 @@ void MapManager::Update(double frame)
 		{
 			ChangeMap(nextMap);
 			// 아래쪽 끝에서 솟아오름
-			knight.pos.y = SCREEN_HEIGHT - 100.0f;
+			knight.pos.y = MH - 100.0f;
 		}
 		else
 		{
@@ -357,7 +364,7 @@ void MapManager::Update(double frame)
 	}
 
 	// [추가] 4. 아래로 떨어질 때 (플레이어 y > 화면높이)
-	else if (knight.pos.y > SCREEN_HEIGHT)
+	else if (knight.pos.y > MH)
 	{
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_DOWN];
 		if (nextMap != 0)
@@ -370,7 +377,7 @@ void MapManager::Update(double frame)
 		{
 			// 낭떠러지? (게임 오버 처리하거나 못 가게 막음)
 			// 여기서는 일단 바닥에 걸치게
-			knight.pos.y = SCREEN_HEIGHT;
+			knight.pos.y = MH;
 			knight.grounded = true; // 땅 밟은 판정
 		}
 	}
