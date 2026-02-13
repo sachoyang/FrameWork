@@ -2,7 +2,7 @@
 
 MapManager mapMng;
 
-
+// 주석주석
 MapManager::MapManager()
 {
 	m_Stage = 1;
