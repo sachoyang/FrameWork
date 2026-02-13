@@ -78,7 +78,6 @@ void Mysql::save()
 	{
 		mysql_Success = true;
 	}
-
 }
 
 

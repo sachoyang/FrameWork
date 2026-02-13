@@ -27,7 +27,7 @@ public :
 	MapChunk* m_pCurrentMapChunk;
 
 	// std::map<int, MapChunk*> m_MapList;
-	MapChunk m_MapList[11];
+	MapChunk m_MapList[13];
 
 	Sprite m_MapImg1_1[6];
 	Sprite m_MapImg1_2[45];

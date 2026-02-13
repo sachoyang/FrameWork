@@ -74,12 +74,30 @@ void MapManager::Init()
 	// -------------------------------------------------------
 	// [4번 맵] 
 	// -------------------------------------------------------
-	m_MapList[4].id = 2;
+	m_MapList[4].id = 4;
 	m_MapList[4].layerCount = 1;
 	m_MapList[4].width = SCREEN_WITH;  // 1280
 	m_MapList[4].height = SCREEN_HEIGHT; // 800
 	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map02.png");
 	m_MapList[4].bgLayer[0].Create(FileName, false, 0);
+	// -------------------------------------------------------
+	// [5번 맵] 
+	// -------------------------------------------------------
+	m_MapList[5].id = 5;
+	m_MapList[5].layerCount = 1;
+	m_MapList[5].width = 2624;//SCREEN_WITH;  // 1280
+	m_MapList[5].height = 1632; //SCREEN_HEIGHT
+	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map03.png");
+	m_MapList[5].bgLayer[0].Create(FileName, false, 0);
+	// -------------------------------------------------------
+	// [6번 맵] 
+	// -------------------------------------------------------
+	m_MapList[6].id = 6;
+	m_MapList[6].layerCount = 1;
+	m_MapList[6].width = 2624;  // 1280
+	m_MapList[6].height = 1632; // 800
+	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map04.png");
+	m_MapList[6].bgLayer[0].Create(FileName, false, 0);
 
 #pragma endregion
 
@@ -113,7 +131,7 @@ void MapManager::CreateRandomMap()
 	// [1] 초기화: 모든 맵의 연결 정보를 0(막힘)으로 리셋
 	for (int i = 1; i <= 10; i++)
 	{
-		for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
+		for (int j = 0; j < 6; j++) m_MapList[i].nextMapID[j] = 0;
 	}
 
 	// [2] 가상의 격자판 만들기 (20x20 크기)
@@ -127,7 +145,7 @@ void MapManager::CreateRandomMap()
 
 	// [4] 2번 맵부터 10번 맵까지 순서대로 붙이기 (Random Walk 변형)
 	int currentMapCount = 1;
-	int maxMapCount = 4; // 일단 5개만 만들어봅시다 (최대 10개)
+	int maxMapCount = 6; // 일단 5개만 만들어봅시다 (최대 10개)
 
 	while (currentMapCount < maxMapCount)
 	{
