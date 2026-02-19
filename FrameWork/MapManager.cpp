@@ -133,53 +133,611 @@ void MapManager::InitPrefabs()
 {
 	RECT rc;
 	int thickness = 100;
+	// ====================================================================
+	// [프리팹 1번] 위(UP)만 뚫린 방
+	// 사이즈: 1칸 x 2칸 (1280 x 1600)
+	// 지형: 바닥부터 꼭대기 출구까지 8개의 발판을 징검다리처럼 밟고 올라감
+	// ====================================================================
+	{
+		int id = DOOR_UP; // 1
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 1; // 1칸
+		m_Prefabs[id].gridH = 2; // 2칸
+		m_Prefabs[id].width = SCREEN_WITH;         // 1280
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2;  // 1600
+		m_Prefabs[id].layerCount = 1;
+		// 배경 이미지 할당 (파일 이름은 나중에 맞게 수정)
+		// m_Prefabs[id].bgLayer[0].Create("...", false, 0); 
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness; // 1500
+
+		// 1. 외곽선 (바닥 막힘, 좌우 막힘)
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 천장 (가운데 300px 뚫림)
+		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 내부 플랫폼 (점프 높이 200~250 간격으로 지그재그 배치)
+		int pH = 30; // 두께
+		SetRect(&rc, 150, 1250, 350, 1250 + pH); m_Prefabs[id].walls.push_back(rc); // 1층(좌)
+		SetRect(&rc, 500, 1050, 800, 1050 + pH); m_Prefabs[id].walls.push_back(rc); // 2층(중)
+		SetRect(&rc, 900, 850, 1150, 850 + pH);  m_Prefabs[id].walls.push_back(rc); // 3층(우)
+		SetRect(&rc, 500, 650, 700, 650 + pH);   m_Prefabs[id].walls.push_back(rc); // 4층(중)
+		SetRect(&rc, 100, 450, 400, 450 + pH);   m_Prefabs[id].walls.push_back(rc); // 5층(좌)
+		SetRect(&rc, 450, 250, 800, 250 + pH);   m_Prefabs[id].walls.push_back(rc); // 6층(중앙 출구 밑)
+	}
+
+	// ====================================================================
+	// [프리팹 2번] 아래(DOWN)만 뚫린 방
+	// 사이즈: 1칸 x 1칸 (1280 x 800)
+	// 지형: 바닥 가운데 낭떠러지만 있는 좁은 방 (떨어지면 다음 맵)
+	// ====================================================================
+	{
+		int id = DOOR_DOWN; // 2
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 1;
+		m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH;
+		m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness; // 700
+
+		// 1. 외곽선 (천장 막힘, 좌우 막힘)
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 바닥 (가운데 300px 뚫림)
+		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 구멍 위를 안전하게 건널 수 있는 부서진 다리 (플랫폼)
+		SetRect(&rc, 200, 500, 450, 530); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 850, 500, 1100, 530); m_Prefabs[id].walls.push_back(rc);
+	}
+
+	// ====================================================================
+	// [프리팹 3번] 위, 아래(UP, DOWN) 뚫린 방
+	// 사이즈: 2칸 x 2칸 (2560 x 1600) - 거대한 웅덩이 형태
+	// 출구 위치: 상단은 정중앙, 하단도 정중앙
+	// 지형: 양옆으로 나뉘어진 거대 발판과 중앙 공중 섬들
+	// ====================================================================
+	{
+		int id = DOOR_UP | DOOR_DOWN; // 3
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2; // 2칸
+		m_Prefabs[id].gridH = 2; // 2칸
+		m_Prefabs[id].width = SCREEN_WITH * 2;        // 2560
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2;     // 1600
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness; // 1500
+
+		// 1. 좌우 벽 꽉 막음
+		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 천장(뚫림) & 바닥(뚫림)
+		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+
+		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 지형: 거대 협곡 (양쪽 벽에 붙은 큰 발판들)
+		SetRect(&rc, 0, 1100, 600, 1150); m_Prefabs[id].walls.push_back(rc); // 좌 하단 거대 발판
+		SetRect(&rc, MW - 600, 800, MW, 850); m_Prefabs[id].walls.push_back(rc); // 우 중단 거대 발판
+		SetRect(&rc, 0, 500, 500, 550); m_Prefabs[id].walls.push_back(rc);   // 좌 상단 거대 발판
+
+		// 4. 중앙 공중 섬들 (다리 역할)
+		SetRect(&rc, 800, 1300, 1050, 1330); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1500, 1050, 1750, 1080); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 900, 700, 1200, 730); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 330); m_Prefabs[id].walls.push_back(rc); // 출구 바로 밑
+	}
+
+	// ====================================================================
+	// [프리팹 4번] 왼쪽(LEFT)만 뚫린 방
+	// 사이즈: 2칸 x 2칸 (2560 x 1600)
+	// 출구 위치: "좌측 하단"에 문이 있음 (y = 800 ~ 1600 사이)
+	// 지형: 거대한 피라미드 계단이 중앙에 위치함
+	// ====================================================================
+	{
+		int id = DOOR_LEFT; // 4
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2; // 2칸
+		m_Prefabs[id].gridH = 2; // 2칸
+		m_Prefabs[id].width = SCREEN_WITH * 2;  // 2560
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2; // 1600
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness; // 1500
+
+		// 1. 천장, 바닥, 우측 벽 막힘
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 왼쪽 벽 (뚫리긴 했는데 '하단 1칸' 쪽만 문을 뚫습니다!)
+		// 윗부분 벽 막음 (y = 0 ~ 800)
+		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+		// 아랫부분 벽 (문 높이인 바닥에서 200px 위까지만 막음)
+		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 지형: 거대한 중앙 피라미드 제단
+		SetRect(&rc, 700, 1300, 1900, floorY); m_Prefabs[id].walls.push_back(rc); // 1단 (매우 넓음)
+		SetRect(&rc, 850, 1100, 1750, 1300); m_Prefabs[id].walls.push_back(rc);   // 2단
+		SetRect(&rc, 1000, 900, 1600, 1100); m_Prefabs[id].walls.push_back(rc);   // 3단
+		SetRect(&rc, 1150, 700, 1450, 900);  m_Prefabs[id].walls.push_back(rc);   // 꼭대기
+
+		// 4. 꼭대기 위 공중에 떠있는 장식용/도전용 발판
+		SetRect(&rc, 300, 800, 500, 830); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - 500, 600, MW - 300, 630); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 - 100, 350, MW / 2 + 100, 380); m_Prefabs[id].walls.push_back(rc);
+	}
+
+	// ====================================================================
+	// [프리팹 5번] 위, 왼쪽 (UP, LEFT) 뚫린 방
+	// 조합: DOOR_UP(1) | DOOR_LEFT(4) = 5
+	// 사이즈: 2칸 x 2칸 (2560 x 1600)
+	// 출구: 좌측은 '하단', 상단은 '중앙'
+	// 지형: 왼쪽 아래에서 들어와서 오른쪽으로 크게 돌며 위로 올라가는 나선형 구조
+	// ====================================================================
+	{
+		int id = DOOR_UP | DOOR_LEFT; // 5
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2;
+		m_Prefabs[id].gridH = 2;
+		m_Prefabs[id].width = SCREEN_WITH * 2;   // 2560
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2; // 1600
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness; // 1500
+
+		// 1. 외곽선 (바닥 막힘, 우측 벽 막힘)
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 천장 뚫기 (중앙)
+		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 왼쪽 벽 뚫기 (좌측 하단 1칸만)
+		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc); // 상단 막음
+		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc); // 하단 뚫음
+
+		// 4. 지형: 우회전 나선형 계단
+		int pH = 30;
+		SetRect(&rc, 500, 1300, 900, 1300 + pH); m_Prefabs[id].walls.push_back(rc);   // 1층
+		SetRect(&rc, 1100, 1100, 1600, 1100 + pH); m_Prefabs[id].walls.push_back(rc); // 2층
+		SetRect(&rc, 1800, 900, 2400, 900 + pH); m_Prefabs[id].walls.push_back(rc);   // 3층 (우측 끝)
+		SetRect(&rc, 1400, 650, 1700, 650 + pH); m_Prefabs[id].walls.push_back(rc);   // 4층 (다시 왼쪽으로)
+		SetRect(&rc, 900, 450, 1200, 450 + pH); m_Prefabs[id].walls.push_back(rc);    // 5층
+		SetRect(&rc, MW / 2 - 150, 250, MW / 2 + 150, 250 + pH); m_Prefabs[id].walls.push_back(rc); // 6층 (출구 밑)
+	}
+
+	// ====================================================================
+	// [프리팹 6번] 아래, 왼쪽 (DOWN, LEFT) 뚫린 방
+	// 조합: DOOR_DOWN(2) | DOOR_LEFT(4) = 6
+	// 사이즈: 1칸 x 2칸 (1280 x 1600) 세로 긴 방
+	// 출구: 좌측은 '상단', 하단은 '중앙'
+	// 지형: 왼쪽 위에서 들어와 조심스럽게 아래로 떨어지며 내려가야 하는 절벽
+	// ====================================================================
+	{
+		int id = DOOR_DOWN | DOOR_LEFT; // 6
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 1;
+		m_Prefabs[id].gridH = 2;
+		m_Prefabs[id].width = SCREEN_WITH;       // 1280
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2; // 1600
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness; // 1500
+
+		// 1. 외곽선 (천장 막힘, 우측 벽 막힘)
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 바닥 뚫기 (중앙)
+		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 왼쪽 벽 뚫기 (🌟이번엔 '좌측 상단'에 문이 있습니다!)
+		// 상단 문 뚫음 (y=0 ~ 600)
+		SetRect(&rc, -50, 0, thickness, 600); m_Prefabs[id].walls.push_back(rc);
+		// 하단 막음 (y=800 ~ 끝)
+		SetRect(&rc, -50, 800, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 4. 지형: 떨어지면서 밟아야 하는 절벽형 구조
+		SetRect(&rc, 0, 750, 400, 800); m_Prefabs[id].walls.push_back(rc); // 들어오자마자 밟는 곳
+		SetRect(&rc, 700, 950, 1000, 1000); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 200, 1200, 500, 1250); m_Prefabs[id].walls.push_back(rc);
+	}
+
+	// ====================================================================
+	// [프리팹 7번] 위, 아래, 왼쪽 (UP, DOWN, LEFT) 뚫린 방
+	// 조합: 1 | 2 | 4 = 7
+	// 사이즈: 2칸 x 2칸 (2560 x 1600)
+	// 출구: 상/하단은 '중앙', 좌측은 '하단'
+	// 지형: 거대한 십자 교차로 느낌. 아슬아슬한 구름 다리들.
+	// ====================================================================
+	{
+		int id = DOOR_UP | DOOR_DOWN | DOOR_LEFT; // 7
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2;
+		m_Prefabs[id].gridH = 2;
+		m_Prefabs[id].width = SCREEN_WITH * 2;
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
+
+		// 1. 우측 벽(막힘)
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 천장 & 바닥 뚫기 (중앙)
+		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 왼쪽 벽 뚫기 (하단)
+		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 4. 지형: 거대 교차로 다리
+		int pH = 30;
+		// 메인 중앙 다리 (좌우로 길게)
+		SetRect(&rc, 400, 1300, MW - 400, 1350); m_Prefabs[id].walls.push_back(rc);
+		// 위로 올라가는 징검다리
+		SetRect(&rc, MW / 2 + 300, 1050, MW / 2 + 600, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 - 400, 800, MW / 2 - 100, 800 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 100, 550, MW / 2 + 400, 550 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+	}
 
 	// ====================================================================
 	// [프리팹 8번] 오른쪽만 뚫린 방 (시작 방으로 쓸 예정)
 	// 조합: DOOR_RIGHT (8)
 	// ====================================================================
-	int id = DOOR_RIGHT; // id = 8
+	{
+		int id = DOOR_RIGHT; // id = 8
 
-	m_Prefabs[id].typeID = id;
-	m_Prefabs[id].width = SCREEN_WITH;   // 1280 고정
-	m_Prefabs[id].height = SCREEN_HEIGHT;  // 800 고정
-	m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].width = SCREEN_WITH;   // 1280 고정
+		m_Prefabs[id].height = SCREEN_HEIGHT;  // 800 고정
+		m_Prefabs[id].layerCount = 1;
 
-	// 배경 이미지 로드 (파일 경로는 임시로 적어둠. 나중에 맞는 이미지로 교체)
-	char FileName[256];
-	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map01.png");
-	m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
+		// 배경 이미지 로드 (파일 경로는 임시로 적어둠. 나중에 맞는 이미지로 교체)
+		char FileName[256];
+		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map01.png");
+		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
 
-	// -- 이 방의 고유 콜라이더(벽) 찍어내기 --
-	int MW = m_Prefabs[id].width;
-	int MH = m_Prefabs[id].height;
-	int floorY = MH - thickness;
+		// -- 이 방의 고유 콜라이더(벽) 찍어내기 --
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
 
-	// 1. 바닥 (아래 안 뚫렸으니 통짜 바닥)
-	SetRect(&rc, 0, floorY, MW, MH + 50);
-	m_Prefabs[id].walls.push_back(rc);
+		// 1. 바닥 (아래 안 뚫렸으니 통짜 바닥)
+		SetRect(&rc, 0, floorY, MW, MH + 50);
+		m_Prefabs[id].walls.push_back(rc);
+		// 2. 천장 (위 안 뚫렸으니 통짜 천장)
+		SetRect(&rc, 0, -50, MW, thickness);
+		m_Prefabs[id].walls.push_back(rc);
+		// 3. 왼쪽 벽 (왼쪽 안 뚫렸으니 통짜 벽)
+		SetRect(&rc, -50, 0, thickness, MH);
+		m_Prefabs[id].walls.push_back(rc);
+		// 4. 오른쪽 벽 (오른쪽 뚫렸음! -> 문 높이(floorY - 200)까지만 벽 생성)
+		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200);
+		m_Prefabs[id].walls.push_back(rc);
+	}
+	// ====================================================================
+	// [프리팹 9번] 위, 오른쪽 (UP, RIGHT) 뚫린 방
+	// 조합: DOOR_UP(1) | DOOR_RIGHT(8) = 9
+	// 사이즈: 1칸 x 2칸 (1280 x 1600)
+	// 출구: 상단은 '중앙', 우측은 '하단'
+	// 지형: 우측에서 들어와 좁은 탑을 지그재그로 기어올라가는 구조
+	// ====================================================================
+	{
+		int id = DOOR_UP | DOOR_RIGHT; // 9
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 1;
+		m_Prefabs[id].gridH = 2;
+		m_Prefabs[id].width = SCREEN_WITH;
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+		m_Prefabs[id].layerCount = 1;
 
-	// 2. 천장 (위 안 뚫렸으니 통짜 천장)
-	SetRect(&rc, 0, -50, MW, thickness);
-	m_Prefabs[id].walls.push_back(rc);
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
 
-	// 3. 왼쪽 벽 (왼쪽 안 뚫렸으니 통짜 벽)
-	SetRect(&rc, -50, 0, thickness, MH);
-	m_Prefabs[id].walls.push_back(rc);
+		// 1. 외곽선 (바닥 막힘, 좌측 벽 막힘)
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
 
-	// 4. 오른쪽 벽 (오른쪽 뚫렸음! -> 문 높이(floorY - 200)까지만 벽 생성)
-	SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200);
-	m_Prefabs[id].walls.push_back(rc);
+		// 2. 천장 뚫기 (중앙)
+		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
 
+		// 3. 오른쪽 벽 뚫기 (우측 하단)
+		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc); // 상단 막음
+		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc); // 하단 뚫음
+
+		// 4. 지형: 탑 등반 구조
+		int pH = 30;
+		SetRect(&rc, MW - 400, 1250, MW - 100, 1250 + pH); m_Prefabs[id].walls.push_back(rc); // 1단 (우)
+		SetRect(&rc, 100, 1000, 400, 1000 + pH); m_Prefabs[id].walls.push_back(rc);           // 2단 (좌)
+		SetRect(&rc, MW / 2 - 100, 750, MW / 2 + 200, 750 + pH); m_Prefabs[id].walls.push_back(rc); // 3단 (중)
+		SetRect(&rc, 150, 500, 450, 500 + pH); m_Prefabs[id].walls.push_back(rc);             // 4단 (좌)
+		SetRect(&rc, MW / 2 - 150, 250, MW / 2 + 150, 250 + pH); m_Prefabs[id].walls.push_back(rc); // 5단 (출구 밑)
+	}
 	// 필요하다면 중앙에 작은 장식용 발판 하나 추가 (예시)
 	// SetRect(&rc, MW/2 - 100, floorY - 150, MW/2 + 100, floorY - 120);
 	// m_Prefabs[id].walls.push_back(rc);
+	
+	// ====================================================================
+	// [프리팹 10번] 아래, 오른쪽 (DOWN, RIGHT) 뚫린 방
+	// 조합: DOOR_DOWN(2) | DOOR_RIGHT(8) = 10
+	// 사이즈: 2칸 x 1칸 (2560 x 800) 가로 긴 방
+	// 출구: 하단은 '중앙', 우측은 '하단'
+	// 지형: 거대한 낭떠러지를 밧줄 다리처럼 듬성듬성 건너가는 지형
+	// ====================================================================
+	{
+		int id = DOOR_DOWN | DOOR_RIGHT; // 10
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2;
+		m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH * 2;
+		m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].layerCount = 1;
 
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
+
+		// 1. 외곽선 (천장 막힘, 좌측 벽 막힘)
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 바닥 뚫기 (중앙 넓게)
+		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 우측 벽 뚫기
+		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 4. 지형: 구멍 위를 건너가는 징검다리
+		int pH = 30;
+		SetRect(&rc, 900, 600, 1100, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1200, 500, 1400, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1500, 650, 1700, 650 + pH); m_Prefabs[id].walls.push_back(rc);
+	}
 
 	// ====================================================================
-	// TODO: 나머지 14개 방(id: 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15)도
-	// 이런 식으로 디자인을 하드코딩해서 넣어주면 됩니다!
+	// [프리팹 11번] 위, 아래, 오른쪽 (UP, DOWN, RIGHT) 뚫린 방
+	// 조합: 1 | 2 | 8 = 11
+	// 사이즈: 1칸 x 2칸 (1280 x 1600) 세로 긴 방
+	// 출구: 상/하단은 '중앙', 우측은 '하단'
+	// 지형: 수직으로 긴 엘리베이터 통로 느낌
 	// ====================================================================
+	{
+		int id = DOOR_UP | DOOR_DOWN | DOOR_RIGHT; // 11
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 1;
+		m_Prefabs[id].gridH = 2;
+		m_Prefabs[id].width = SCREEN_WITH;
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
+
+		// 1. 좌측 벽 (막힘)
+		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 천장 & 바닥 (뚫림)
+		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 우측 벽 (하단 뚫림)
+		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 4. 지형: 지그재그 플랫폼
+		int pH = 30;
+		SetRect(&rc, MW - 400, 1300, MW - 100, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 150, 1050, 450, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - 500, 800, MW - 200, 800 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 200, 550, 500, 550 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+	}
+
+	// ====================================================================
+	// [프리팹 12번] 왼쪽, 오른쪽 (LEFT, RIGHT) 뚫린 방
+	// 조합: 4 | 8 = 12
+	// 사이즈: 2칸 x 1칸 (2560 x 800) 가로 긴 방
+	// 출구: 좌/우측 모두 하단
+	// 지형: 긴 복도. 중간에 높은 장애물이 있어 넘어가야 함.
+	// ====================================================================
+	{
+		int id = DOOR_LEFT | DOOR_RIGHT; // 12
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2;
+		m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH * 2;
+		m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
+
+		// 1. 천장 & 바닥 (막힘)
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 좌/우 벽 (뚫림)
+		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 지형: 복도 중앙을 막는 거대 바리케이드 (점프해서 넘어가야 함)
+		SetRect(&rc, 1100, 450, 1460, floorY); m_Prefabs[id].walls.push_back(rc);
+		// 장애물 넘기 편하게 보조 발판
+		SetRect(&rc, 800, 600, 1000, 630); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1560, 600, 1760, 630); m_Prefabs[id].walls.push_back(rc);
+	}
+
+	// ====================================================================
+	// [프리팹 13번] 위, 왼쪽, 오른쪽 (UP, LEFT, RIGHT) 뚫린 방
+	// 조합: 1 | 4 | 8 = 13
+	// 사이즈: 2칸 x 2칸 (2560 x 1600)
+	// 출구: 상단은 '중앙', 좌/우측은 '하단'
+	// 지형: 거대한 산 느낌. 좌/우에서 들어와 산 정상(위)으로 올라감.
+	// ====================================================================
+	{
+		int id = DOOR_UP | DOOR_LEFT | DOOR_RIGHT; // 13
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2;
+		m_Prefabs[id].gridH = 2;
+		m_Prefabs[id].width = SCREEN_WITH * 2;
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
+
+		// 1. 바닥 (막힘)
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 천장 (뚫림)
+		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 좌/우 벽 (하단 뚫림)
+		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 4. 지형: 거대 산맥 (중앙 밀집형 발판)
+		int pH = 30;
+		SetRect(&rc, 900, 1300, 1660, floorY); m_Prefabs[id].walls.push_back(rc); // 1단 베이스
+		SetRect(&rc, 600, 1050, 900, 1050 + pH); m_Prefabs[id].walls.push_back(rc);  // 좌측 등반로
+		SetRect(&rc, 1660, 1050, 1960, 1050 + pH); m_Prefabs[id].walls.push_back(rc); // 우측 등반로
+		SetRect(&rc, 1000, 800, 1560, 800 + pH); m_Prefabs[id].walls.push_back(rc);  // 중앙 2단
+		SetRect(&rc, 1150, 550, 1410, 550 + pH); m_Prefabs[id].walls.push_back(rc);  // 중앙 3단
+		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc); // 출구 밑
+	}
+
+	// ====================================================================
+	// [프리팹 14번] 아래, 왼쪽, 오른쪽 (DOWN, LEFT, RIGHT) 뚫린 방
+	// 조합: 2 | 4 | 8 = 14
+	// 사이즈: 2칸 x 1칸 (2560 x 800)
+	// 출구: 하단은 '중앙', 좌/우측은 '하단'
+	// 지형: 바닥이 무너진 긴 다리.
+	// ====================================================================
+	{
+		int id = DOOR_DOWN | DOOR_LEFT | DOOR_RIGHT; // 14
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2;
+		m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH * 2;
+		m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
+
+		// 1. 천장 (막힘)
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 바닥 (크게 뚫림)
+		SetRect(&rc, 0, floorY, MW / 2 - 300, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 300, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 좌/우 벽 (뚫림)
+		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 4. 지형: 흔들다리 (작은 발판 여러 개)
+		int pH = 30;
+		SetRect(&rc, 800, 650, 1000, 650 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1150, 550, 1410, 550 + pH); m_Prefabs[id].walls.push_back(rc); // 중앙 (높음)
+		SetRect(&rc, 1560, 650, 1760, 650 + pH); m_Prefabs[id].walls.push_back(rc);
+	}
+
+	// ====================================================================
+	// [프리팹 15번] 상, 하, 좌, 우 모두 뚫린 방 (The Nexus)
+	// 조합: 1 | 2 | 4 | 8 = 15
+	// 사이즈: 2칸 x 2칸 (2560 x 1600)
+	// 지형: 사방이 뚫린 거대한 메인 홀. 공중 정원 느낌.
+	// ====================================================================
+	{
+		int id = DOOR_UP | DOOR_DOWN | DOOR_LEFT | DOOR_RIGHT; // 15
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2;
+		m_Prefabs[id].gridH = 2;
+		m_Prefabs[id].width = SCREEN_WITH * 2;
+		m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+		m_Prefabs[id].layerCount = 1;
+
+		int MW = m_Prefabs[id].width;
+		int MH = m_Prefabs[id].height;
+		int floorY = MH - thickness;
+
+		// 1. 천장 & 바닥 (중앙 뚫림)
+		SetRect(&rc, 0, -50, MW / 2 - 200, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 200, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+
+		// 2. 좌/우 벽 (하단 뚫림)
+		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+
+		// 3. 지형: 거대 +자형 발판 구조
+		int pH = 30;
+
+		// 중앙 허브 정거장
+		SetRect(&rc, 1000, 1100, 1560, 1100 + pH); m_Prefabs[id].walls.push_back(rc);
+
+		// 하단 낙하 방지용 작은 발판
+		SetRect(&rc, 1150, 1350, 1410, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+
+		// 좌/우에서 중앙으로 이어지는 다리
+		SetRect(&rc, 400, 1250, 800, 1250 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1760, 1250, 2160, 1250 + pH); m_Prefabs[id].walls.push_back(rc);
+
+		// 위로 올라가는 계단
+		SetRect(&rc, 800, 850, 1100, 850 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1460, 600, 1760, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 - 150, 350, MW / 2 + 150, 350 + pH); m_Prefabs[id].walls.push_back(rc); // 출구 바로 밑
+	}
 }
 
 void MapManager::CreateRandomMap()

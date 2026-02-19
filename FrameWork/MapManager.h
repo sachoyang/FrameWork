@@ -18,9 +18,12 @@ struct RoomPrefab
 	int typeID;           // 1~15 사이의 값 (문이 뚫린 방향의 합)
 	int width;            // 이 방의 가로 크기
 	int height;           // 이 방의 세로 크기
+	
+	int gridW;				// 이 방이 차지하는 그리드 칸 수 (가로)
+	int gridH;				// 이 방이 차지하는 그리드 칸 수 (세로)
+
 	Sprite bgLayer[2];    // 배경 이미지 (일단 2개 쓴다고 가정)
 	int layerCount;
-
 	// 이 방에 무조건 고정으로 들어갈 벽과 발판들
 	std::list<RECT> walls;
 };
