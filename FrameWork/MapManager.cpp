@@ -240,7 +240,7 @@ void MapManager::ChangeMap(int mapID)
 	{
 		// [Path Exists] Hole in the middle
 		int holeSize = 200;
-		int midX = SCREEN_WITH / 2;
+		int midX = MW / 2;
 
 		// Left Floor Piece (0 to 300)
 		SetRect(&rc, 0, floorY, midX - (holeSize / 2), MH + 50);
@@ -321,12 +321,12 @@ void MapManager::Update(double frame)
 	}*/
 	if (m_pCurrentMapChunk == nullptr) return;
 
-	// [핵심 수정] 맵 이동 판정도 '현재 맵 크기' 기준으로 해야 함!
+	// 맵 이동 판정도 '현재 맵 크기' 기준으로 해야 함!
 	int MW = m_pCurrentMapChunk->width;
 	int MH = m_pCurrentMapChunk->height;
 
 	// 1. 오른쪽으로 나갈 때 (플레이어 x > 화면너비)
-	if (knight.pos.x > SCREEN_WITH)
+	if (knight.pos.x > MW)
 	{
 		// 갈 곳이 있는지 확인
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_RIGHT];
