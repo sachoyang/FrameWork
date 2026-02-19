@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Include.h"
 #include <list> // list 사용을 위해 추가
+#include <vector>
 
 // =======================================================
 // [추가] 프리팹 방 방향 비트 플래그
@@ -42,6 +43,8 @@ struct MapChunk
 	// 맵 크기 정보
 	int width;
 	int height;
+
+	int prefabID;
 };
 
 class MapManager

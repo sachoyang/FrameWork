@@ -740,84 +740,226 @@ void MapManager::InitPrefabs()
 	}
 }
 
+//void MapManager::CreateRandomMap()
+//{
+//	// [1] 초기화: 모든 맵의 연결 정보를 0(막힘)으로 리셋
+//	for (int i = 1; i <= 10; i++)
+//	{
+//		for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
+//	}
+//
+//	// [2] 가상의 격자판 만들기 (20x20 크기)
+//	// 0이면 빈칸, 1이상이면 맵 ID
+//	int grid[20][20] = { 0, };
+//
+//	// [3] 1번 맵을 정중앙에 배치
+//	int startX = 10;
+//	int startY = 10;
+//	grid[startY][startX] = 1;
+//
+//	// [4] 2번 맵부터 10번 맵까지 순서대로 붙이기 (Random Walk 변형)
+//	int currentMapCount = 1;
+//	int maxMapCount = 6; // 일단 5개만 만들어봅시다 (최대 10개)
+//
+//	while (currentMapCount < maxMapCount)
+//	{
+//		// 이미 배치된 맵 중 하나를 랜덤으로 고름 (거기서 가지를 뻗기 위해)
+//		int targetX = startX;
+//		int targetY = startY;
+//
+//		// (간단하게 1번 방 근처에서 계속 뻗어나가는 방식)
+//		// 더 복잡한 미로를 원하면 '배치된 방 목록'을 리스트로 관리해서 뽑아야 함.
+//		// 여기서는 "랜덤 워크" 방식으로 빈 공간 찾을 때까지 이동
+//
+//		int dir = rand() % 4 + 1; // 1~4 랜덤 방향
+//		int nextX = targetX;
+//		int nextY = targetY;
+//
+//		if (dir == DIR_UP)    nextY--;
+//		else if (dir == DIR_DOWN)  nextY++;
+//		else if (dir == DIR_LEFT)  nextX--;
+//		else if (dir == DIR_RIGHT) nextX++;
+//
+//		// 그 자리가 비어있으면 새 맵 배치!
+//		if (grid[nextY][nextX] == 0)
+//		{
+//			currentMapCount++;
+//			grid[nextY][nextX] = currentMapCount; // 2번, 3번... 맵 ID 할당
+//
+//			// 여기서 탐색 위치를 갱신해줌 (다음 맵은 이 맵 옆에 붙을 수도 있게)
+//			startX = nextX;
+//			startY = nextY;
+//		}
+//	}
+//
+//	// [5] 격자판을 보고 실제 연결(Link) 정보 입력
+//	for (int y = 1; y < 19; y++)
+//	{
+//		for (int x = 1; x < 19; x++)
+//		{
+//			int myID = grid[y][x];
+//			if (myID == 0) continue; // 맵 없음
+//
+//			// 상(Up) 확인 -> grid[y-1][x]
+//			if (grid[y - 1][x] != 0)
+//				m_MapList[myID].nextMapID[DIR_UP] = grid[y - 1][x];
+//
+//			// 하(Down) 확인 -> grid[y+1][x]
+//			if (grid[y + 1][x] != 0)
+//				m_MapList[myID].nextMapID[DIR_DOWN] = grid[y + 1][x];
+//
+//			// 좌(Left) 확인 -> grid[y][x-1]
+//			if (grid[y][x - 1] != 0)
+//				m_MapList[myID].nextMapID[DIR_LEFT] = grid[y][x - 1];
+//
+//			// 우(Right) 확인 -> grid[y][x+1]
+//			if (grid[y][x + 1] != 0)
+//				m_MapList[myID].nextMapID[DIR_RIGHT] = grid[y][x + 1];
+//		}
+//	}
+//}
+
+// MapManager.cpp
+
 void MapManager::CreateRandomMap()
 {
-	// [1] 초기화: 모든 맵의 연결 정보를 0(막힘)으로 리셋
+	// [1] 맵 초기화
 	for (int i = 1; i <= 10; i++)
 	{
 		for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
+		m_MapList[i].prefabID = 0;
 	}
+	int grid[15][15] = { 0, };
 
-	// [2] 가상의 격자판 만들기 (20x20 크기)
-	// 0이면 빈칸, 1이상이면 맵 ID
-	int grid[20][20] = { 0, };
+	// [2] 1번 방(시작 방) 배치: 무조건 '오른쪽'이 뚫린 8번 프리팹 사용
+	m_MapList[1].id = 1;
+	m_MapList[1].prefabID = DOOR_RIGHT; // 프리팹 8번
+	m_MapList[1].width = m_Prefabs[DOOR_RIGHT].width;
+	m_MapList[1].height = m_Prefabs[DOOR_RIGHT].height;
+	grid[7][7] = 1; // 15x15 그리드의 정중앙(7,7)에 배치
 
-	// [3] 1번 맵을 정중앙에 배치
-	int startX = 10;
-	int startY = 10;
-	grid[startY][startX] = 1;
-
-	// [4] 2번 맵부터 10번 맵까지 순서대로 붙이기 (Random Walk 변형)
 	int currentMapCount = 1;
-	int maxMapCount = 6; // 일단 5개만 만들어봅시다 (최대 10개)
+	int maxMapCount = 10;
+	int failCount = 0; // 무한 루프 방지용
 
-	while (currentMapCount < maxMapCount)
+	// [3] 레고 블록 조립 (절차적 생성 시작!)
+	while (currentMapCount < maxMapCount && failCount < 1000)
 	{
-		// 이미 배치된 맵 중 하나를 랜덤으로 고름 (거기서 가지를 뻗기 위해)
-		int targetX = startX;
-		int targetY = startY;
+		failCount++;
 
-		// (간단하게 1번 방 근처에서 계속 뻗어나가는 방식)
-		// 더 복잡한 미로를 원하면 '배치된 방 목록'을 리스트로 관리해서 뽑아야 함.
-		// 여기서는 "랜덤 워크" 방식으로 빈 공간 찾을 때까지 이동
+		// 3-1. 이미 배치된 방들 중 무작위로 하나 선택
+		int randRoomID = (rand() % currentMapCount) + 1;
+		int pID = m_MapList[randRoomID].prefabID;
 
-		int dir = rand() % 4 + 1; // 1~4 랜덤 방향
-		int nextX = targetX;
-		int nextY = targetY;
+		// 3-2. 그 방의 문 4방향 중 하나 랜덤 선택
+		int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
+		int checkDir = dirs[rand() % 4];
 
-		if (dir == DIR_UP)    nextY--;
-		else if (dir == DIR_DOWN)  nextY++;
-		else if (dir == DIR_LEFT)  nextX--;
-		else if (dir == DIR_RIGHT) nextX++;
+		// 선택한 방향이 프리팹 도면상 진짜 뚫려있는 문인지 비트마스크로 확인
+		int bitFlag = 0;
+		if (checkDir == DIR_UP) bitFlag = DOOR_UP;
+		else if (checkDir == DIR_DOWN) bitFlag = DOOR_DOWN;
+		else if (checkDir == DIR_LEFT) bitFlag = DOOR_LEFT;
+		else if (checkDir == DIR_RIGHT) bitFlag = DOOR_RIGHT;
 
-		// 그 자리가 비어있으면 새 맵 배치!
-		if (grid[nextY][nextX] == 0)
-		{
-			currentMapCount++;
-			grid[nextY][nextX] = currentMapCount; // 2번, 3번... 맵 ID 할당
+		if ((pID & bitFlag) == 0) continue; // 꽉 막힌 벽이면 취소
+		if (m_MapList[randRoomID].nextMapID[checkDir] != 0) continue; // 이미 다른 방과 연결된 문이어도 취소
 
-			// 여기서 탐색 위치를 갱신해줌 (다음 맵은 이 맵 옆에 붙을 수도 있게)
-			startX = nextX;
-			startY = nextY;
+		// 3-3. 이 방의 그리드 좌표 찾기 (방이 여러 칸을 차지하면 가장 좌측 상단 기준)
+		int rx = -1, ry = -1;
+		for (int y = 0; y < 15; y++) {
+			for (int x = 0; x < 15; x++) {
+				if (grid[y][x] == randRoomID) {
+					rx = x; ry = y; break;
+				}
+			}
+			if (rx != -1) break;
 		}
-	}
 
-	// [5] 격자판을 보고 실제 연결(Link) 정보 입력
-	for (int y = 1; y < 19; y++)
-	{
-		for (int x = 1; x < 19; x++)
-		{
-			int myID = grid[y][x];
-			if (myID == 0) continue; // 맵 없음
+		// 3-4. 새 방이 들어갈 타겟 좌표 계산
+		int targetX = rx, targetY = ry;
+		if (checkDir == DIR_UP) targetY--;
+		else if (checkDir == DIR_DOWN) targetY += m_Prefabs[pID].gridH; // 현재 방의 세로 칸 수만큼 밑으로
+		else if (checkDir == DIR_LEFT) targetX--;
+		else if (checkDir == DIR_RIGHT) targetX += m_Prefabs[pID].gridW; // 현재 방의 가로 칸 수만큼 우측으로
 
-			// 상(Up) 확인 -> grid[y-1][x]
-			if (grid[y - 1][x] != 0)
-				m_MapList[myID].nextMapID[DIR_UP] = grid[y - 1][x];
+		if (targetX < 0 || targetX >= 15 || targetY < 0 || targetY >= 15) continue; // 맵 밖으로 나가면 취소
 
-			// 하(Down) 확인 -> grid[y+1][x]
-			if (grid[y + 1][x] != 0)
-				m_MapList[myID].nextMapID[DIR_DOWN] = grid[y + 1][x];
+		// 3-5. 연결될 수 있는 "반대쪽 문"을 가진 프리팹들만 모으기
+		int oppositeBit = 0;
+		if (checkDir == DIR_UP) oppositeBit = DOOR_DOWN;
+		else if (checkDir == DIR_DOWN) oppositeBit = DOOR_UP;
+		else if (checkDir == DIR_LEFT) oppositeBit = DOOR_RIGHT;
+		else if (checkDir == DIR_RIGHT) oppositeBit = DOOR_LEFT;
 
-			// 좌(Left) 확인 -> grid[y][x-1]
-			if (grid[y][x - 1] != 0)
-				m_MapList[myID].nextMapID[DIR_LEFT] = grid[y][x - 1];
-
-			// 우(Right) 확인 -> grid[y][x+1]
-			if (grid[y][x + 1] != 0)
-				m_MapList[myID].nextMapID[DIR_RIGHT] = grid[y][x + 1];
+		std::vector<int> validPrefabs;
+		for (int i = 1; i <= 15; i++) {
+			if (m_Prefabs[i].typeID == 0) continue; // 아직 안 만든 도면 패스
+			if ((m_Prefabs[i].typeID & oppositeBit) != 0) { // 반대쪽 문이 있다면 후보에 추가!
+				validPrefabs.push_back(i);
+			}
 		}
+		if (validPrefabs.empty()) continue;
+
+		// 3-6. 후보 중 랜덤으로 하나 뽑아서 "그리드에 들어갈 공간(1x2, 2x2 등)이 있는지" 검사
+		int newPrefabID = validPrefabs[rand() % validPrefabs.size()];
+		int gw = m_Prefabs[newPrefabID].gridW;
+		int gh = m_Prefabs[newPrefabID].gridH;
+
+		bool isSpaceFree = true;
+		if (targetX + gw > 15 || targetY + gh > 15) isSpaceFree = false; // 배열 넘어가면 컷
+		else {
+			for (int y = 0; y < gh; y++) {
+				for (int x = 0; x < gw; x++) {
+					if (grid[targetY + y][targetX + x] != 0) {
+						isSpaceFree = false; // 다른 방이 이미 자리를 차지하고 있으면 컷
+						break;
+					}
+				}
+				if (!isSpaceFree) break;
+			}
+		}
+
+		if (!isSpaceFree) continue; // 공간 없으면 배치 포기하고 다시 처음부터
+
+		// ==========================================================
+		// 3-7. 🎉 모든 조건 통과! 새 방을 생성하고 연결합니다.
+		// ==========================================================
+		currentMapCount++;
+		int newRoomID = currentMapCount;
+
+		// 그리드 영역 차지 (예: 2x2 방이면 4칸에 모두 newRoomID 기록)
+		for (int y = 0; y < gh; y++) {
+			for (int x = 0; x < gw; x++) {
+				grid[targetY + y][targetX + x] = newRoomID;
+			}
+		}
+
+		// 새 방의 정보 저장
+		m_MapList[newRoomID].id = newRoomID;
+		m_MapList[newRoomID].prefabID = newPrefabID;
+		m_MapList[newRoomID].width = m_Prefabs[newPrefabID].width;
+		m_MapList[newRoomID].height = m_Prefabs[newPrefabID].height;
+		m_MapList[newRoomID].layerCount = m_Prefabs[newPrefabID].layerCount;
+
+		// 배경 이미지도 프리팹에서 가져와서 연결
+		for (int layer = 0; layer < m_MapList[newRoomID].layerCount; layer++) {
+			m_MapList[newRoomID].bgLayer[layer] = m_Prefabs[newPrefabID].bgLayer[layer];
+		}
+
+		// 기존 방과 새 방의 문(포탈) 서로 연결!
+		m_MapList[randRoomID].nextMapID[checkDir] = newRoomID;
+
+		int oppositeDir = 0;
+		if (checkDir == DIR_UP) oppositeDir = DIR_DOWN;
+		else if (checkDir == DIR_DOWN) oppositeDir = DIR_UP;
+		else if (checkDir == DIR_LEFT) oppositeDir = DIR_RIGHT;
+		else if (checkDir == DIR_RIGHT) oppositeDir = DIR_LEFT;
+
+		m_MapList[newRoomID].nextMapID[oppositeDir] = randRoomID;
 	}
 }
+
 
 void MapManager::ChangeMap(int mapID)
 {
