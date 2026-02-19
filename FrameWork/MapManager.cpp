@@ -2,7 +2,6 @@
 
 MapManager mapMng;
 
-// 주석주석
 MapManager::MapManager()
 {
 	m_Stage = 1;
@@ -34,6 +33,9 @@ void MapManager::Init()
 		j+=2;
 		
 	}*/
+
+	// 프리펩 초기화 먼저 진행 후 맵 생성 (맵 생성 시 프리펩 정보가 필요)
+	InitPrefabs();
 
 #pragma region MapData_Init
 	char FileName[256];
@@ -125,6 +127,59 @@ void MapManager::Init()
 
 	// [초기 시작] 1번 맵으로 시작!
 	ChangeMap(1);
+}
+
+void MapManager::InitPrefabs()
+{
+	RECT rc;
+	int thickness = 100;
+
+	// ====================================================================
+	// [프리팹 8번] 오른쪽만 뚫린 방 (시작 방으로 쓸 예정)
+	// 조합: DOOR_RIGHT (8)
+	// ====================================================================
+	int id = DOOR_RIGHT; // id = 8
+
+	m_Prefabs[id].typeID = id;
+	m_Prefabs[id].width = SCREEN_WITH;   // 1280 고정
+	m_Prefabs[id].height = SCREEN_HEIGHT;  // 800 고정
+	m_Prefabs[id].layerCount = 1;
+
+	// 배경 이미지 로드 (파일 경로는 임시로 적어둠. 나중에 맞는 이미지로 교체)
+	char FileName[256];
+	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map01.png");
+	m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
+
+	// -- 이 방의 고유 콜라이더(벽) 찍어내기 --
+	int MW = m_Prefabs[id].width;
+	int MH = m_Prefabs[id].height;
+	int floorY = MH - thickness;
+
+	// 1. 바닥 (아래 안 뚫렸으니 통짜 바닥)
+	SetRect(&rc, 0, floorY, MW, MH + 50);
+	m_Prefabs[id].walls.push_back(rc);
+
+	// 2. 천장 (위 안 뚫렸으니 통짜 천장)
+	SetRect(&rc, 0, -50, MW, thickness);
+	m_Prefabs[id].walls.push_back(rc);
+
+	// 3. 왼쪽 벽 (왼쪽 안 뚫렸으니 통짜 벽)
+	SetRect(&rc, -50, 0, thickness, MH);
+	m_Prefabs[id].walls.push_back(rc);
+
+	// 4. 오른쪽 벽 (오른쪽 뚫렸음! -> 문 높이(floorY - 200)까지만 벽 생성)
+	SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200);
+	m_Prefabs[id].walls.push_back(rc);
+
+	// 필요하다면 중앙에 작은 장식용 발판 하나 추가 (예시)
+	// SetRect(&rc, MW/2 - 100, floorY - 150, MW/2 + 100, floorY - 120);
+	// m_Prefabs[id].walls.push_back(rc);
+
+
+	// ====================================================================
+	// TODO: 나머지 14개 방(id: 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15)도
+	// 이런 식으로 디자인을 하드코딩해서 넣어주면 됩니다!
+	// ====================================================================
 }
 
 void MapManager::CreateRandomMap()

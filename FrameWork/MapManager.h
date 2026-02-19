@@ -1,5 +1,29 @@
-#pragma once
+﻿#pragma once
 #include "Include.h"
+#include <list> // list 사용을 위해 추가
+
+// =======================================================
+// [추가] 프리팹 방 방향 비트 플래그
+// =======================================================
+#define DOOR_UP    1   // 0001
+#define DOOR_DOWN  2   // 0010
+#define DOOR_LEFT  4   // 0100
+#define DOOR_RIGHT 8   // 1000
+
+// =======================================================
+// [추가] 프리팹(도면) 구조체
+// =======================================================
+struct RoomPrefab
+{
+	int typeID;           // 1~15 사이의 값 (문이 뚫린 방향의 합)
+	int width;            // 이 방의 가로 크기
+	int height;           // 이 방의 세로 크기
+	Sprite bgLayer[2];    // 배경 이미지 (일단 2개 쓴다고 가정)
+	int layerCount;
+
+	// 이 방에 무조건 고정으로 들어갈 벽과 발판들
+	std::list<RECT> walls;
+};
 
 enum DIR_TYPE { DIR_UP = 1, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NUM };
 
@@ -9,10 +33,10 @@ struct MapChunk
 	Sprite bgLayer[5];
 	int layerCount;
 
-	int nextMapID[DIR_NUM]; // ���� �� ID (������, ����, ��, �Ʒ�)
-	// �� ��ġ�� ���� ��ġ ���
+	int nextMapID[DIR_NUM]; // 다음 맵 ID (오른쪽, 왼쪽, 위, 아래)
+	// 문 위치나 몬스터 위치 등등
 
-	// �� ũ�� ����
+	// 맵 크기 정보
 	int width;
 	int height;
 };
@@ -40,10 +64,13 @@ public :
 
 	double posX, posY;
 
+	RoomPrefab m_Prefabs[16]; // 1~15번 프리팹 (0번은 빈칸)
+
 	void Init();
 	void Update(double frame);
 	void Draw();
 
+	void InitPrefabs();
 	void CreateRandomMap();
 	void ChangeMap(int mapID);
 };
