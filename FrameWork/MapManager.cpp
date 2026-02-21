@@ -422,6 +422,10 @@ void MapManager::InitPrefabs()
 		int id = DOOR_RIGHT; // id = 8
 
 		m_Prefabs[id].typeID = id;
+
+		m_Prefabs[id].gridW = 1;
+		m_Prefabs[id].gridH = 1;
+
 		m_Prefabs[id].width = SCREEN_WITH;   // 1280 고정
 		m_Prefabs[id].height = SCREEN_HEIGHT;  // 800 고정
 		m_Prefabs[id].layerCount = 1;
@@ -923,7 +927,7 @@ void MapManager::CreateRandomMap()
 		if (!isSpaceFree) continue; // 공간 없으면 배치 포기하고 다시 처음부터
 
 		// ==========================================================
-		// 3-7. 🎉 모든 조건 통과! 새 방을 생성하고 연결합니다.
+		// 모든 조건 통과! 새 방을 생성하고 연결합니다.
 		// ==========================================================
 		currentMapCount++;
 		int newRoomID = currentMapCount;
@@ -1113,7 +1117,7 @@ void MapManager::Update(double frame)
 		}
 	}
 
-	// [추가] 3. 위로 올라갈 때 (플레이어 y < 0)
+	// 3. 위로 올라갈 때 (플레이어 y < 0)
 	if (knight.pos.y < 0)
 	{
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_UP];
@@ -1129,7 +1133,7 @@ void MapManager::Update(double frame)
 		}
 	}
 
-	// [추가] 4. 아래로 떨어질 때 (플레이어 y > 화면높이)
+	// 4. 아래로 떨어질 때 (플레이어 y > 화면높이)
 	else if (knight.pos.y > MH)
 	{
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_DOWN];
