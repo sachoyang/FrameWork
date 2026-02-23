@@ -1305,6 +1305,11 @@ void MapManager::CreateRandomMap()
 
 		grid[3][0] = 1; // 시작 위치: 좌측 중간
 
+		// 시작 방의 배경 이미지를 복사
+		for (int i = 0; i < m_Prefabs[8].layerCount; i++) {
+			m_MapList[1].bgLayer[i] = m_Prefabs[8].bgLayer[i];
+		}
+
 		// 3. 큐(Queue) 생성 (연결해야 할 문들을 저장)
 		struct OpenDoor { int rID, dir; };
 		std::vector<OpenDoor> q;
@@ -1463,6 +1468,10 @@ void MapManager::CreateRandomMap()
 			m_MapList[newRoomID].width = m_Prefabs[newPrefabID].width;
 			m_MapList[newRoomID].height = m_Prefabs[newPrefabID].height;
 			m_MapList[newRoomID].layerCount = m_Prefabs[newPrefabID].layerCount;
+			// 새로 만들어진 방의 배경 이미지도 완벽하게 복사해 옵니다!
+			for (int i = 0; i < m_Prefabs[newPrefabID].layerCount; i++) {
+				m_MapList[newRoomID].bgLayer[i] = m_Prefabs[newPrefabID].bgLayer[i];
+			}
 
 			// 6. 새로 깔린 방의 모든 문을 확인하여, 이미 있는 방이면 연결하고 아니면 큐에 넣음
 			int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
