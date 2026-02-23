@@ -1284,7 +1284,7 @@ void MapManager::CreateRandomMap()
 	bool bossPlaced = false;
 	int mapGenAttempts = 0;
 
-	// 🌟 보스방이 우측(X >= 4)에 무사히 깔릴 때까지 맵 생성을 반복 (최대 50번 시도)
+	// 보스방이 우측(X >= 4)에 무사히 깔릴 때까지 맵 생성을 반복 (최대 50번 시도)
 	while (!bossPlaced && mapGenAttempts < 50)
 	{
 		mapGenAttempts++;
@@ -1339,7 +1339,7 @@ void MapManager::CreateRandomMap()
 			int gw_old = m_Prefabs[m_MapList[d.rID].prefabID].gridW;
 			int gh_old = m_Prefabs[m_MapList[d.rID].prefabID].gridH;
 
-			// 🌟 [핵심 수정 1] 새 방은 "어떤 비트마스크(DOOR)"를 가져야 하는가?
+			// [핵심 수정 1] 새 방은 "어떤 비트마스크(DOOR)"를 가져야 하는가?
 			int oppDoorBit = 0;
 			if (d.dir == DIR_UP) oppDoorBit = DOOR_DOWN;
 			if (d.dir == DIR_DOWN) oppDoorBit = DOOR_UP;
@@ -1509,6 +1509,21 @@ void MapManager::CreateRandomMap()
 
 			if (forceBoss) bossPlaced = true;
 		}
+
+		// ==========================================================
+		// [3단계 추가] 루프가 다 끝나고 맵이 완성된 후, 
+		// m_MapList의 맨 마지막 칸(39번)을 "진짜 보스방" 전용으로 셋팅합니다!
+		// ==========================================================
+		m_MapList[39].id = 39;
+		m_MapList[39].prefabID = ROOM_BOSS; // 16번 프리팹
+		m_MapList[39].width = m_Prefabs[ROOM_BOSS].width;
+		m_MapList[39].height = m_Prefabs[ROOM_BOSS].height;
+		m_MapList[39].layerCount = m_Prefabs[ROOM_BOSS].layerCount;
+
+		for (int i = 0; i < m_Prefabs[ROOM_BOSS].layerCount; i++)
+		{
+			m_MapList[39].bgLayer[i] = m_Prefabs[ROOM_BOSS].bgLayer[i];
+		}
 	}
 }
 
@@ -1585,7 +1600,7 @@ void MapManager::Update(double frame)
 		{
 			ChangeMap(nextMap);
 			int pID = m_pCurrentMapChunk->prefabID;
-			// 🌟 다음 방(pID)의 "왼쪽 문" 스폰 좌표로 딱 맞춰서 이동!
+			// 다음 방(pID)의 "왼쪽 문" 스폰 좌표로 딱 맞춰서 이동!
 			knight.pos.x = m_Prefabs[pID].spawnX[DIR_LEFT];
 			knight.pos.y = m_Prefabs[pID].spawnY[DIR_LEFT];
 
@@ -1602,7 +1617,7 @@ void MapManager::Update(double frame)
 		{
 			ChangeMap(nextMap);
 			int pID = m_pCurrentMapChunk->prefabID;
-			// 🌟 다음 방(pID)의 "오른쪽 문" 스폰 좌표로 딱 맞춰서 이동!
+			// 다음 방(pID)의 "오른쪽 문" 스폰 좌표로 딱 맞춰서 이동!
 			knight.pos.x = m_Prefabs[pID].spawnX[DIR_RIGHT];
 			knight.pos.y = m_Prefabs[pID].spawnY[DIR_RIGHT];
 
@@ -1647,6 +1662,30 @@ void MapManager::Update(double frame)
 		{
 			knight.pos.y = MH - 100.0f;
 			knight.grounded = true;
+		}
+	}
+
+	// ==========================================================
+	// 5. 보스 대기실 텔레포트 상호작용
+	// ==========================================================
+	if (m_pCurrentMapChunk->prefabID == 4) // 현재 방이 4번(보스 대기실)일 때만 작동!
+	{
+		// 기사가 맵의 중앙(MW / 2) 부근 제단 위에 서 있는지 확인 (좌우 100픽셀 여유)
+		if (knight.pos.x >= MW / 2.0f - 100.0f && knight.pos.x <= MW / 2.0f + 100.0f)
+		{
+			// 기사가 땅에 서 있고(grounded), 윗방향키(isLookup)를 눌렀다면 텔레포트 발동!
+			if (knight.grounded && knight.isLookup)
+			{
+				ChangeMap(39); // 미리 준비해둔 39번 맵(진짜 보스방)으로 전환!
+
+				int bossRoomID = 16;
+
+				// 진짜 보스방(16번)의 정중앙 공중에 스폰시켜서 멋지게 떨어지도록 연출
+				knight.pos.x = m_Prefabs[bossRoomID].width / 2.0f;
+				knight.pos.y = m_Prefabs[bossRoomID].height - 250.0f;
+
+				return; // 맵이 바뀌었으니 이번 프레임 Update 즉시 종료
+			}
 		}
 	}
 }
