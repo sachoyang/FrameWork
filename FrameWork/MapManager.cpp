@@ -37,91 +37,6 @@ void MapManager::Init()
 	// 프리펩 초기화 먼저 진행 후 맵 생성 (맵 생성 시 프리펩 정보가 필요)
 	InitPrefabs();
 
-#pragma region MapData_Init
-	char FileName[256];
-
-	// [중요] 모든 맵의 기본 사이즈를 일단 화면 크기로 초기화 (안전장치)
-	for (int i = 1; i <= 10; ++i) {
-		m_MapList[i].width = SCREEN_WITH;
-		m_MapList[i].height = SCREEN_HEIGHT;
-	}
-
-	// -------------------------------------------------------
-	// [1번 맵] 
-	// -------------------------------------------------------
-	m_MapList[1].id = 1;
-	m_MapList[1].layerCount = 2;
-	// width, height는 위에서 기본값 설정됨
-
-	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0001.tga");
-	m_MapList[1].bgLayer[0].Create(FileName, false, 0);
-	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0002.tga");
-	m_MapList[1].bgLayer[1].Create(FileName, false, 0);
-
-	// -------------------------------------------------------
-	// [2번 맵]
-	// -------------------------------------------------------
-	m_MapList[2].id = 2;
-	m_MapList[2].layerCount = 1;
-	sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_0003.tga");
-	m_MapList[2].bgLayer[0].Create(FileName, false, 0);
-
-	// -------------------------------------------------------
-	// [3번 맵]
-	// -------------------------------------------------------
-	m_MapList[3].id = 3;
-	m_MapList[3].layerCount = 1;
-	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map01.png");
-	m_MapList[3].bgLayer[0].Create(FileName, false, 0);
-
-	// -------------------------------------------------------
-	// [4번 맵]
-	// -------------------------------------------------------
-	m_MapList[4].id = 4;
-	m_MapList[4].layerCount = 1;
-	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map02.png");
-	m_MapList[4].bgLayer[0].Create(FileName, false, 0);
-
-	// -------------------------------------------------------
-	// [5번 맵] - 큰 맵!
-	// -------------------------------------------------------
-	m_MapList[5].id = 5;
-	m_MapList[5].layerCount = 1;
-	m_MapList[5].width = 2624;  // [중요] 큰 사이즈
-	m_MapList[5].height = 1632;
-	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map03.png");
-	m_MapList[5].bgLayer[0].Create(FileName, false, 0);
-
-	// -------------------------------------------------------
-	// [6번 맵] - 큰 맵!
-	// -------------------------------------------------------
-	m_MapList[6].id = 6;
-	m_MapList[6].layerCount = 1;
-	m_MapList[6].width = 2624;
-	m_MapList[6].height = 1632;
-	sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map04.png");
-	m_MapList[6].bgLayer[0].Create(FileName, false, 0);
-
-#pragma endregion
-
-//#pragma region MapData 연결	설정
-//	// -------------------------------------------------------
-//	// [맵 연결 설정] (나중에는 여기가 랜덤 알고리즘으로 대체됨)
-//	// -------------------------------------------------------
-//	// 1번 맵 초기화 (일단 다 0으로 막음)
-//	for (int i = 0; i < 4; i++) m_MapList[1].nextMapID[i] = 0;
-//
-//	// 1번 맵의 [오른쪽] -> 2번 맵
-//	m_MapList[1].nextMapID[DIR_RIGHT] = 2;
-//
-//	// 2번 맵 초기화
-//	for (int i = 0; i < 4; i++) m_MapList[2].nextMapID[i] = 0;
-//
-//	// 2번 맵의 [왼쪽] -> 1번 맵 (다시 돌아올 수 있게)
-//	m_MapList[2].nextMapID[DIR_LEFT] = 1;
-//
-////#pragma endregion
-
 	// [랜덤 맵 생성] 
 	CreateRandomMap();
 
@@ -979,91 +894,105 @@ void MapManager::ChangeMap(int mapID)
 	// 1. Clear existing walls
 	coll.ClearWalls();
 
-	RECT rc;
-	int thickness = 100; // Wall thickness
-	//int floorY = SCREEN_HEIGHT - thickness; // The top Y of the floor (e.g., 500 if height is 600)
-	int MW = m_pCurrentMapChunk->width;
-	int MH = m_pCurrentMapChunk->height;
-	int floorY = MH - thickness; // 바닥 위치도 맵 높이 기준!
-	// =============================================================
-	// 1. FLOOR (Bottom) Handling
-	// =============================================================
-	if (m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0)
-	{
-		// [No Path] Solid floor
-		// Top: 500, Bottom: 600 (or slightly more to catch falling)
-		SetRect(&rc, 0, floorY, MW, MH + 50);
-		coll.AddWall(rc);
-	}
-	else
-	{
-		// [Path Exists] Hole in the middle
-		int holeSize = 200;
-		int midX = MW / 2;
+	// =================================================================
+	// [4단계 핵심 로직] 프리팹 도면 복사 붙여넣기!
+	// =================================================================
+	int pID = m_pCurrentMapChunk->prefabID; // 이 방이 무슨 도면을 썼는지 가져옴
 
-		// Left Floor Piece (0 to 300)
-		SetRect(&rc, 0, floorY, midX - (holeSize / 2), MH + 50);
+	// 혹시 에러로 프리팹이 배정 안 된 방이라면? (안전장치: 안 떨어지게 바닥만 생성)
+	if (pID == 0 || m_Prefabs[pID].walls.empty())
+	{
+		RECT rc;
+		SetRect(&rc, 0, m_pCurrentMapChunk->height - 100, m_pCurrentMapChunk->width, m_pCurrentMapChunk->height + 50);
 		coll.AddWall(rc);
-
-		// Right Floor Piece (500 to 800)
-		SetRect(&rc, midX + (holeSize / 2), floorY, MW, MH + 50);
-		coll.AddWall(rc);
+		return;
 	}
 
-	// =============================================================
-	// 2. CEILING (Top) Handling
-	// =============================================================
-	if (m_pCurrentMapChunk->nextMapID[DIR_UP] == 0)
+	// 도면에 있는 수많은 벽과 발판들을 그냥 리스트에서 꺼내서 맵에 쫙! 뿌립니다.
+	for (auto& prefabWall : m_Prefabs[pID].walls)
 	{
-		// [No Path] Solid ceiling
-		SetRect(&rc, 0, -50, MW, thickness); // -50 to 100
-		coll.AddWall(rc);
-	}
-	else
-	{	// 위가 뚫려있으면 중간에 밟고 올라갈 수 있는 발판 추가
-		int pW = 200; // 발판 넓이
-		int pH = 30;  // 발판 두께
-		// 맵 정중앙, 바닥에서 적당히 높은 곳에 배치 (여기선 바닥 위 400px 지점 예시)
-		int platformY = floorY - 350;
-
-		RECT platform;
-		SetRect(&platform, (MW / 2) - (pW / 2), platformY, (MW / 2) + (pW / 2), platformY + pH);
-		coll.AddWall(platform);
-	}
-	// Else: No ceiling wall (allow jumping up)
-
-	// =============================================================
-	// 3. LEFT WALL Handling
-	// =============================================================
-	if (m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0)
-	{
-		// [No Path] Solid left wall
-		SetRect(&rc, -50, 0, thickness, MH);
-		coll.AddWall(rc);
-	}
-	else
-	{
-		// [Path Exists] Doorway (Wall only on top part)
-		// Adjust 300 to control door height
-		SetRect(&rc, -50, 0, thickness, floorY - 200);
-		coll.AddWall(rc);
+		coll.AddWall(prefabWall);
 	}
 
-	// =============================================================
-	// 4. RIGHT WALL Handling
-	// =============================================================
-	if (m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0)
-	{
-		// [No Path] Solid right wall
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH);
-		coll.AddWall(rc);
-	}
-	else
-	{
-		// [Path Exists] Doorway
-		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200);
-		coll.AddWall(rc);
-	}
+	//RECT rc;
+	//int thickness = 100; // Wall thickness
+	////int floorY = SCREEN_HEIGHT - thickness; // The top Y of the floor (e.g., 500 if height is 600)
+	//int MW = m_pCurrentMapChunk->width;
+	//int MH = m_pCurrentMapChunk->height;
+	//int floorY = MH - thickness; // 바닥 위치도 맵 높이 기준!
+	//// =============================================================
+	//// 1. FLOOR (Bottom) Handling
+	//// =============================================================
+	//if (m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0)
+	//{
+	//	// [No Path] Solid floor
+	//	// Top: 500, Bottom: 600 (or slightly more to catch falling)
+	//	SetRect(&rc, 0, floorY, MW, MH + 50);
+	//	coll.AddWall(rc);
+	//}
+	//else
+	//{
+	//	// [Path Exists] Hole in the middle
+	//	int holeSize = 200;
+	//	int midX = MW / 2;
+	//	// Left Floor Piece (0 to 300)
+	//	SetRect(&rc, 0, floorY, midX - (holeSize / 2), MH + 50);
+	//	coll.AddWall(rc);
+	//	// Right Floor Piece (500 to 800)
+	//	SetRect(&rc, midX + (holeSize / 2), floorY, MW, MH + 50);
+	//	coll.AddWall(rc);
+	//}
+	//// =============================================================
+	//// 2. CEILING (Top) Handling
+	//// =============================================================
+	//if (m_pCurrentMapChunk->nextMapID[DIR_UP] == 0)
+	//{
+	//	// [No Path] Solid ceiling
+	//	SetRect(&rc, 0, -50, MW, thickness); // -50 to 100
+	//	coll.AddWall(rc);
+	//}
+	//else
+	//{	// 위가 뚫려있으면 중간에 밟고 올라갈 수 있는 발판 추가
+	//	int pW = 200; // 발판 넓이
+	//	int pH = 30;  // 발판 두께
+	//	// 맵 정중앙, 바닥에서 적당히 높은 곳에 배치 (여기선 바닥 위 400px 지점 예시)
+	//	int platformY = floorY - 350;
+	//	RECT platform;
+	//	SetRect(&platform, (MW / 2) - (pW / 2), platformY, (MW / 2) + (pW / 2), platformY + pH);
+	//	coll.AddWall(platform);
+	//}
+	//// Else: No ceiling wall (allow jumping up)
+	//// =============================================================
+	//// 3. LEFT WALL Handling
+	//// =============================================================
+	//if (m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0)
+	//{
+	//	// [No Path] Solid left wall
+	//	SetRect(&rc, -50, 0, thickness, MH);
+	//	coll.AddWall(rc);
+	//}
+	//else
+	//{
+	//	// [Path Exists] Doorway (Wall only on top part)
+	//	// Adjust 300 to control door height
+	//	SetRect(&rc, -50, 0, thickness, floorY - 200);
+	//	coll.AddWall(rc);
+	//}
+	//// =============================================================
+	//// 4. RIGHT WALL Handling
+	//// =============================================================
+	//if (m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0)
+	//{
+	//	// [No Path] Solid right wall
+	//	SetRect(&rc, MW - thickness, 0, MW + 50, MH);
+	//	coll.AddWall(rc);
+	//}
+	//else
+	//{
+	//	// [Path Exists] Doorway
+	//	SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200);
+	//	coll.AddWall(rc);
+	//}
 }
 
 void MapManager::Update(double frame)
