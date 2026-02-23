@@ -1365,91 +1365,84 @@ void MapManager::ChangeMap(int mapID)
 
 void MapManager::Update(double frame)
 {
-	/*if(GetTickCount64() - m_MapImg1_1_ani1 > frame)
-	{
-		if(m_Stage==1)
-		{
-			m_MapImg1_1_ani1Count++;
-			if(m_MapImg1_1_ani1Count > 44) m_MapImg1_1_ani1Count = 0;
-		}
-
-		m_MapImg1_1_ani1 = GetTickCount64();
-	}*/
 	if (m_pCurrentMapChunk == nullptr) return;
 
-	// 맵 이동 판정도 '현재 맵 크기' 기준으로 해야 함!
 	int MW = m_pCurrentMapChunk->width;
 	int MH = m_pCurrentMapChunk->height;
 
-	// 1. 오른쪽으로 나갈 때 (플레이어 x > 화면너비)
+	// 1. 오른쪽으로 나갈 때 (-> 다음 방의 '왼쪽 문'으로 스폰됨)
 	if (knight.pos.x > MW)
 	{
-		// 갈 곳이 있는지 확인
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_RIGHT];
-
-		if (nextMap != 0) // 연결된 맵이 있다!
-		{
-			ChangeMap(nextMap);     // 맵 교체
-			knight.pos.x = 50.0f;   // 플레이어를 왼쪽 끝으로 이동 (입장 연출)
-		}
-		else // 막힌 길이다!
-		{
-			knight.pos.x = MW; // 못 나가게 막음
-		}
-	}
-
-	// 2. 왼쪽으로 나갈 때 (플레이어 x < 0)
-	else if (knight.pos.x < 0)
-	{
-		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_LEFT];
-
 		if (nextMap != 0)
 		{
 			ChangeMap(nextMap);
-			knight.pos.x = MW - 50.0f; // 오른쪽 끝에서 등장
+			int pID = m_pCurrentMapChunk->prefabID;
+			// 🌟 다음 방(pID)의 "왼쪽 문" 스폰 좌표로 딱 맞춰서 이동!
+			knight.pos.x = m_Prefabs[pID].spawnX[DIR_LEFT];
+			knight.pos.y = m_Prefabs[pID].spawnY[DIR_LEFT];
+
+			return;
 		}
-		else
-		{
-			knight.pos.x = 0; // 막힘
-		}
+		else knight.pos.x = MW;
 	}
 
-	// 3. 위로 올라갈 때 (플레이어 y < 0)
+	// 2. 왼쪽으로 나갈 때 (-> 다음 방의 '오른쪽 문'으로 스폰됨)
+	else if (knight.pos.x < 0)
+	{
+		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_LEFT];
+		if (nextMap != 0)
+		{
+			ChangeMap(nextMap);
+			int pID = m_pCurrentMapChunk->prefabID;
+			// 🌟 다음 방(pID)의 "오른쪽 문" 스폰 좌표로 딱 맞춰서 이동!
+			knight.pos.x = m_Prefabs[pID].spawnX[DIR_RIGHT];
+			knight.pos.y = m_Prefabs[pID].spawnY[DIR_RIGHT];
+
+			return;
+		}
+		else knight.pos.x = 0;
+	}
+
+	// 3. 위로 올라갈 때 (-> 다음 방의 '아랫 문'으로 스폰됨)
 	if (knight.pos.y < 0)
 	{
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_UP];
 		if (nextMap != 0)
 		{
 			ChangeMap(nextMap);
-			// 아래쪽 끝에서 솟아오름
-			knight.pos.y = MH - 200.0f;
+			int pID = m_pCurrentMapChunk->prefabID;
+			knight.pos.x = m_Prefabs[pID].spawnX[DIR_DOWN];
+			knight.pos.y = m_Prefabs[pID].spawnY[DIR_DOWN];
+
+			// 솟아오르는 관성 유지 (기존처럼)
+			knight.gravity = -12.0f;
+
+			return;
 		}
-		else
-		{
-			knight.pos.y = 0; // 천장에 머리 쿵
-		}
+		else knight.pos.y = 0;
 	}
 
-	// 4. 아래로 떨어질 때 (플레이어 y > 화면높이)
+	// 4. 아래로 떨어질 때 (-> 다음 방의 '윗 문'으로 스폰됨)
 	else if (knight.pos.y > MH)
 	{
 		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_DOWN];
 		if (nextMap != 0)
 		{
 			ChangeMap(nextMap);
-			// 위쪽 끝에서 떨어짐
-			knight.pos.y = 50.0f;
+			int pID = m_pCurrentMapChunk->prefabID;
+			knight.pos.x = m_Prefabs[pID].spawnX[DIR_UP];
+			knight.pos.y = m_Prefabs[pID].spawnY[DIR_UP];
+
+			return;
 		}
 		else
 		{
-			// 낭떠러지? (게임 오버 처리하거나 못 가게 막음)
-			// 여기서는 일단 바닥에 걸치게
 			knight.pos.y = MH - 100.0f;
-			knight.grounded = true; // 땅 밟은 판정
+			knight.grounded = true;
 		}
 	}
 }
-
 void MapManager::Draw()
 {
 	/*if(m_Stage==1)
