@@ -89,6 +89,17 @@ void Game::OnMessage( MSG* msg )
 		case '2':
 			mapMng.ChangeMap(2);
 			break;
+
+		// =======================================================
+		// 디버그 모드 단축키 (Page Up / Page Down)
+		// =======================================================
+		case VK_PRIOR: // Page Up 키 (이전 프리팹)
+			mapMng.LoadDebugPrefab(mapMng.m_DebugPrefabID - 1);
+			break;
+
+		case VK_NEXT:  // Page Down 키 (다음 프리팹)
+			mapMng.LoadDebugPrefab(mapMng.m_DebugPrefabID + 1);
+			break;
 		}
 		break;
 	}

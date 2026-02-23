@@ -1363,6 +1363,7 @@ void MapManager::ChangeMap(int mapID)
 	//}
 }
 
+
 void MapManager::Update(double frame)
 {
 	if (m_pCurrentMapChunk == nullptr) return;
@@ -1462,9 +1463,49 @@ void MapManager::Draw()
 	// 현재 맵의 모든 레이어 그리기
 	for (int i = 0; i < m_pCurrentMapChunk->layerCount; i++)
 	{
-		// 좌표는 (0,0)에 그립니다. (카메라 적용 전)
-		//m_pCurrentMapChunk->bgLayer[i].Render(0, 0, 0, 1, 1);
 		// 카메라 좌표만큼 빼주기
 		m_pCurrentMapChunk->bgLayer[i].Render(0 - CAM->GetX(), 0 - CAM->GetY(), 0, 1, 1);
 	}
+
+	// =======================================================
+	// 디버그용: 현재 프리팹 번호 화면 출력
+	// =======================================================
+	char debugText[256];
+	sprintf_s(debugText, "Current Prefab ID : %d", m_pCurrentMapChunk->prefabID);
+
+	dv_font.DrawString(debugText, 0, 0);   //글자출력
+}
+
+void MapManager::LoadDebugPrefab(int pID)
+{
+	// 1. 1~15번을 순환하도록 범위 제한
+	if (pID < 1) pID = 15;
+	if (pID > 15) pID = 1;
+
+	// 혹시 아직 도면을 안 짠 프리팹이면 건너뛰기
+	if (m_Prefabs[pID].typeID == 0) return;
+
+	m_DebugPrefabID = pID;
+
+	// 2. 1번 맵을 강제로 현재 선택한 프리팹 도면으로 덮어씌움
+	m_MapList[1].id = 1;
+	m_MapList[1].prefabID = pID;
+	m_MapList[1].width = m_Prefabs[pID].width;
+	m_MapList[1].height = m_Prefabs[pID].height;
+	m_MapList[1].layerCount = m_Prefabs[pID].layerCount;
+
+	for (int i = 0; i < m_Prefabs[pID].layerCount; i++)
+	{
+		m_MapList[1].bgLayer[i] = m_Prefabs[pID].bgLayer[i];
+	}
+
+	// 3. 1번 방으로 즉시 이동! (콜라이더 생성 및 카메라 세팅)
+	ChangeMap(1);
+
+	// 4. 캐릭터를 맵의 가로 중앙 & 맨 위(공중)로 안전하게 스폰
+	knight.pos.x = m_Prefabs[pID].width / 2.0f;
+	knight.pos.y = 50.0f;
+	knight.gravity = 0;
+	knight.isDashing = false;
+	knight.grounded = false;
 }
