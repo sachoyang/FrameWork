@@ -733,33 +733,34 @@ void MapManager::InitPrefabs()
 	}
 
 	// ====================================================================
-	// [프리팹 4번] 왼쪽(LEFT)
+	// [프리팹 4번] 왼쪽(LEFT)만 뚫린 방 -> 🌟 보스 대기실로 변경!
+	// 사이즈: 1칸 x 1칸 (1280 x 800)
+	// 특징: 평탄한 지형, 정중앙에 보스방으로 가는 텔레포터 제단 존재
 	// ====================================================================
 	{
-		int id = DOOR_LEFT;
+		int id = DOOR_LEFT; // 4
 		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+		m_Prefabs[id].gridW = 1;
+		m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH;
+		m_Prefabs[id].height = SCREEN_HEIGHT;
 		m_Prefabs[id].layerCount = 1;
 
 		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+		char FileName[256];
+		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_bossin.png");
+		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
+		// 1. 외곽선 세팅
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장 막음
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥 막음
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우측 막음
 
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우
+		// 2. 왼쪽 문 뚫기
+		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
 
-		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc); // 좌(상) 막음
-		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc); // 문
-
-		// [발판 추가] 완만한 피라미드
-		SetRect(&rc, 500, 1350, 2000, floorY); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 700, 1200, 1800, 1350); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 900, 1050, 1600, 1200); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1100, 900, 1400, 1050);  m_Prefabs[id].walls.push_back(rc);
-
-		SetRect(&rc, 200, 1150, 400, 1150 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - 400, 1000, MW - 200, 1000 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 100, 700, MW / 2 + 100, 700 + pH); m_Prefabs[id].walls.push_back(rc); // 꼭대기 장식
+		// 3. 지형: 정중앙에 텔레포터 제단 (살짝 솟아오른 형태)
+		SetRect(&rc, MW / 2 - 150, floorY - 30, MW / 2 + 150, floorY); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, MW / 2 - 100, floorY - 60, MW / 2 + 100, floorY - 30); m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// ====================================================================
@@ -1074,9 +1075,41 @@ void MapManager::InitPrefabs()
 		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
 
+	// ====================================================================
+	// [프리팹 16번] 진짜 보스방!
+	// 조합: ROOM_BOSS (16)
+	// 사이즈: 2칸 x 1칸 (2560 x 800) 넓은 결전의 무대
+	// 특징: 사방이 꽉 막혀있음. 텔레포트 전용 방.
+	// ====================================================================
+	{
+		int id = ROOM_BOSS; // 16
+		m_Prefabs[id].typeID = id;
+		m_Prefabs[id].gridW = 2; // 보스전은 넓게 2칸!
+		m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH * 2;
+		m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].layerCount = 1;
+
+		// 🌟 보스방만의 특별한 배경 이미지가 있다면 여기에 세팅 (지금은 임시)
+		char FileName[256];
+		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_boss.png");
+		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
+
+		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+
+		// 1. 사방을 완벽히 차단 (아무데도 못 나감)
+		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
+		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);  // 천장
+		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);  // 좌측 벽
+		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우측 벽
+
+		// 2. 지형: 보스전용 완전 평지 (또는 필요에 따라 양쪽 끝에 회피용 발판 추가)
+		SetRect(&rc, 350, 450, 550, 480); m_Prefabs[id].walls.push_back(rc); // 좌측 회피 발판
+		SetRect(&rc, MW - 550, 450, MW - 350, 480); m_Prefabs[id].walls.push_back(rc); // 우측 회피 발판
+	}
 
 	// ====================================================================
-	// 🌟 [자동 스폰 위치 계산기] (모든 1~15번 방 일괄 적용)
+	// [자동 스폰 위치 계산기] (모든 1~15번 방 일괄 적용)
 	// ====================================================================
 	for (int i = 1; i <= 15; i++)
 	{
@@ -1479,8 +1512,8 @@ void MapManager::Draw()
 void MapManager::LoadDebugPrefab(int pID)
 {
 	// 1. 1~15번을 순환하도록 범위 제한
-	if (pID < 1) pID = 15;
-	if (pID > 15) pID = 1;
+	if (pID < 1) pID = 16;
+	if (pID > 16) pID = 1;
 
 	// 혹시 아직 도면을 안 짠 프리팹이면 건너뛰기
 	if (m_Prefabs[pID].typeID == 0) return;

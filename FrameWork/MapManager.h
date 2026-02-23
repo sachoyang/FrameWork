@@ -4,15 +4,17 @@
 #include <vector>
 
 // =======================================================
-// [추가] 프리팹 방 방향 비트 플래그
+// 프리팹 방 방향 비트 플래그
 // =======================================================
 #define DOOR_UP    1   // 0001
 #define DOOR_DOWN  2   // 0010
 #define DOOR_LEFT  4   // 0100
 #define DOOR_RIGHT 8   // 1000
+// 보스방 고유 ID
+#define ROOM_BOSS  16
 
 // =======================================================
-// [추가] 프리팹(도면) 구조체
+// 프리팹(도면) 구조체
 // =======================================================
 struct RoomPrefab
 {
@@ -75,7 +77,7 @@ public :
 
 	double posX, posY;
 
-	RoomPrefab m_Prefabs[16]; // 1~15번 프리팹 (0번은 빈칸)
+	RoomPrefab m_Prefabs[17]; // 1~16번 프리팹 (0번은 빈칸)
 
 	void Init();
 	void Update(double frame);
