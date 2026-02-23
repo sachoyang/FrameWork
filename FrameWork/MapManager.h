@@ -27,6 +27,11 @@ struct RoomPrefab
 	int layerCount;
 	// 이 방에 무조건 고정으로 들어갈 벽과 발판들
 	std::list<RECT> walls;
+
+	// 특정방향으로 들어왔을 때 플레이어가 스폰될 위치 (문 위치에서 약간 안쪽으로)
+	// 인덱스: 1(UP), 2(DOWN), 3(LEFT), 4(RIGHT)
+	float spawnX[5];
+	float spawnY[5];
 };
 
 enum DIR_TYPE { DIR_UP = 1, DIR_DOWN, DIR_LEFT, DIR_RIGHT, DIR_NUM };
