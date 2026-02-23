@@ -98,7 +98,6 @@ void GameManager::Draw()
 	//if(m_Alpha == 0) { Menuimg[0].SetColor(255,255, 255, 255);  Menuimg[1].SetColor(255,255, 255, 255);}
 	//if(m_Alpha == 1) { Menuimg[0].SetColor(255,255,255,0); Menuimg[1].SetColor(255,255,255,0); }
 	
-
 	//map.numimg[5].Draw(50, 53);
 	//map.numimg[0].Draw(65, 53);
 	//map.numimg[0].Draw(80, 53);
