@@ -114,7 +114,7 @@ void UIManager::DrawMinimap()
                 int rightRoomID = mapMng.m_Grid[y][x + 1];
                 if (rightRoomID == rID) {
                     // 나랑 같은 맵 병합
-                    dv_font.DrawString(m_bLargeMap ? "===" : "==", drawX + (spacingX * 0.5f), drawY, color);
+                    //dv_font.DrawString(m_bLargeMap ? "===" : "==", drawX + (spacingX * 0.5f), drawY, color);
                 }
                 else if (rightRoomID != 0 && room->nextMapID[DIR_RIGHT] == rightRoomID) {
                     // 다른 방 얇은 통로
@@ -127,7 +127,7 @@ void UIManager::DrawMinimap()
                 int downRoomID = mapMng.m_Grid[y + 1][x];
                 if (downRoomID == rID) {
                     // 나랑 같은 맵 병합
-                    dv_font.DrawString("||", drawX + 8, drawY + (spacingY * 0.4f), color);
+                    //dv_font.DrawString("||", drawX + 8, drawY + (spacingY * 0.4f), color);
                 }
                 else if (downRoomID != 0 && room->nextMapID[DIR_DOWN] == downRoomID) {
                     // 다른 방 얇은 통로
