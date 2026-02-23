@@ -1,4 +1,5 @@
 ﻿#include "Include.h"
+#include <vector>
 
 MapManager mapMng;
 
@@ -1280,314 +1281,294 @@ void MapManager::InitPrefabs()
 
 void MapManager::CreateRandomMap()
 {
-	// [1] 초기화 (배열을 30까지 늘렸으므로 30 미만으로 초기화)
-	for (int i = 1; i < 30; i++)
+	bool bossPlaced = false;
+	int mapGenAttempts = 0;
+
+	// 🌟 보스방이 우측(X >= 4)에 무사히 깔릴 때까지 맵 생성을 반복 (최대 50번 시도)
+	while (!bossPlaced && mapGenAttempts < 50)
 	{
-		for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
-		m_MapList[i].prefabID = 0;
-	}
-	int grid[10][10] = { 0, }; // 🌟 15x15에서 10x10으로 다이어트!
+		mapGenAttempts++;
 
-	// [2] 시작 방(1번) 배치: 무조건 '오른쪽'이 뚫린 8번 프리팹 사용
-	m_MapList[1].id = 1;
-	m_MapList[1].prefabID = 8; // 시작 방 (8번)
-	m_MapList[1].width = m_Prefabs[8].width;
-	m_MapList[1].height = m_Prefabs[8].height;
-	m_MapList[1].layerCount = m_Prefabs[8].layerCount;
+		// 1. 맵 초기화
+		for (int i = 1; i < 40; i++) {
+			for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
+			m_MapList[i].prefabID = 0;
+		}
+		int grid[6][6] = { 0 };
 
-	// 🌟 10x10 그리드의 가장 왼쪽 중간(y=4, x=0)에 시작 방 배치!
-	grid[4][0] = 1;
+		// 2. 시작 방(1번) 배치: 오른쪽(DOOR_RIGHT)만 뚫린 8번 프리팹
+		m_MapList[1].id = 1;
+		m_MapList[1].prefabID = 8;
+		m_MapList[1].width = m_Prefabs[8].width;
+		m_MapList[1].height = m_Prefabs[8].height;
+		m_MapList[1].layerCount = m_Prefabs[8].layerCount;
 
-	int currentMapCount = 1;
-	int maxMapCount = 10; // 총 생성할 방의 개수 (10x10에 맞게 10개 정도로 줄임)
-	int failCount = 0;
-	bool bossRoomPlaced = false;
+		grid[3][0] = 1; // 시작 위치: 좌측 중간
 
-	// [3] 던전 조립 시작
-	while (currentMapCount < maxMapCount && failCount < 2000)
-	{
-		failCount++;
+		// 3. 큐(Queue) 생성 (연결해야 할 문들을 저장)
+		struct OpenDoor { int rID, dir; };
+		std::vector<OpenDoor> q;
+		q.push_back({ 1, DIR_RIGHT }); // 1번 방의 오른쪽 문을 뚫어라!
 
-		// 3-1. 기준 방 선택 
-		// 🌟 보스방이 아직 안 깔렸다면, "가장 오른쪽에 있는 방"을 찾아 무조건 오른쪽으로 뻗게 함
-		int randRoomID = 1;
-		if (!bossRoomPlaced)
+		int currentMapCount = 1;
+		int maxMaps = 36;
+		int failCount = 0;
+
+		// 4. 레고 블록 조립 시작
+		while (!q.empty() && failCount < 1000 && currentMapCount < maxMaps)
 		{
-			int maxX = -1;
-			for (int i = 1; i <= currentMapCount; i++)
-			{
-				int rx = -1;
-				for (int y = 0; y < 10; y++) { // 10으로 변경
-					for (int x = 0; x < 10; x++) { // 10으로 변경
-						if (grid[y][x] == i) { rx = x; break; }
+			failCount++;
+
+			// 큐에서 무작위 문 하나 꺼내기
+			int qIdx = rand() % q.size();
+			OpenDoor d = q[qIdx];
+			q.erase(q.begin() + qIdx);
+
+			if (m_MapList[d.rID].nextMapID[d.dir] != 0) continue;
+
+			// 기준 방 원점 찾기
+			int rx = -1, ry = -1;
+			for (int y = 0; y < 6; y++) {
+				for (int x = 0; x < 6; x++) {
+					if (grid[y][x] == d.rID) { rx = x; ry = y; break; }
+				}
+				if (rx != -1) break;
+			}
+			if (rx == -1) continue;
+
+			int gw_old = m_Prefabs[m_MapList[d.rID].prefabID].gridW;
+			int gh_old = m_Prefabs[m_MapList[d.rID].prefabID].gridH;
+
+			// 🌟 [핵심 수정 1] 새 방은 "어떤 비트마스크(DOOR)"를 가져야 하는가?
+			int oppDoorBit = 0;
+			if (d.dir == DIR_UP) oppDoorBit = DOOR_DOWN;
+			if (d.dir == DIR_DOWN) oppDoorBit = DOOR_UP;
+			if (d.dir == DIR_LEFT) oppDoorBit = DOOR_RIGHT;
+			if (d.dir == DIR_RIGHT) oppDoorBit = DOOR_LEFT;
+
+			std::vector<int> validPrefabs;
+			bool forceBoss = false;
+
+			int testTargetX = rx;
+			if (d.dir == DIR_RIGHT) testTargetX = rx + gw_old;
+			else if (d.dir == DIR_LEFT) testTargetX = rx - 1;
+
+			// X가 4 이상 다다르면 4번 프리팹(보스 대기실) 확정!
+			if (!bossPlaced && testTargetX >= 4 && d.dir == DIR_RIGHT) {
+				validPrefabs.push_back(4);
+				forceBoss = true;
+			}
+			else {
+				for (int newID = 1; newID <= 15; newID++) {
+					if (newID == 4 || newID == 16) continue;
+					if (m_Prefabs[newID].typeID == 0) continue;
+
+					// 🌟 짝이 맞는 문이 있는지 정확한 비트마스크로 검사!
+					if ((m_Prefabs[newID].typeID & oppDoorBit) == 0) continue;
+
+					int gw_new = m_Prefabs[newID].gridW;
+					int gh_new = m_Prefabs[newID].gridH;
+
+					int targetX = rx, targetY = ry;
+					if (d.dir == DIR_UP) { targetY = ry - gh_new; targetX = rx; }
+					if (d.dir == DIR_DOWN) { targetY = ry + gh_old; targetX = rx; }
+					if (d.dir == DIR_LEFT) { targetX = rx - gw_new; targetY = ry; }
+					if (d.dir == DIR_RIGHT) { targetX = rx + gw_old; targetY = ry; }
+
+					if (targetX < 0 || targetX + gw_new > 6 || targetY < 0 || targetY + gh_new > 6) continue;
+
+					bool spaceFree = true;
+					for (int y = 0; y < gh_new; y++) {
+						for (int x = 0; x < gw_new; x++) {
+							if (grid[targetY + y][targetX + x] != 0) spaceFree = false;
+						}
 					}
-					if (rx != -1) break;
+					if (!spaceFree) continue;
+
+					bool sealBroken = false;
+					int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
+					for (int checkD : dirs) {
+						// 🌟 [핵심 수정 2] DIR을 DOOR 비트마스크로 안전하게 변환
+						int checkDoorBit = 0;
+						if (checkD == DIR_UP) checkDoorBit = DOOR_UP;
+						if (checkD == DIR_DOWN) checkDoorBit = DOOR_DOWN;
+						if (checkD == DIR_LEFT) checkDoorBit = DOOR_LEFT;
+						if (checkD == DIR_RIGHT) checkDoorBit = DOOR_RIGHT;
+
+						if ((m_Prefabs[newID].typeID & checkDoorBit) != 0) {
+							int adjX = targetX, adjY = targetY;
+							if (checkD == DIR_UP) adjY = targetY - 1;
+							if (checkD == DIR_DOWN) adjY = targetY + gh_new;
+							if (checkD == DIR_LEFT) adjX = targetX - 1;
+							if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
+
+							if (adjX < 0 || adjX >= 6 || adjY < 0 || adjY >= 6) {
+								sealBroken = true; break;
+							}
+							if (grid[adjY][adjX] != 0) {
+								int adjRoom = grid[adjY][adjX];
+
+								int adjOppDoorBit = 0;
+								if (checkD == DIR_UP) adjOppDoorBit = DOOR_DOWN;
+								if (checkD == DIR_DOWN) adjOppDoorBit = DOOR_UP;
+								if (checkD == DIR_LEFT) adjOppDoorBit = DOOR_RIGHT;
+								if (checkD == DIR_RIGHT) adjOppDoorBit = DOOR_LEFT;
+
+								if ((m_MapList[adjRoom].prefabID & adjOppDoorBit) == 0) {
+									sealBroken = true; break; // 옆방이 꽉 막힌 벽이면 탈락!
+								}
+							}
+						}
+					}
+					if (sealBroken) continue;
+
+					// 맵이 너무 커지지 않게 가지치기 제한
+					int doorCount = 0;
+					if (m_Prefabs[newID].typeID & DOOR_UP) doorCount++;
+					if (m_Prefabs[newID].typeID & DOOR_DOWN) doorCount++;
+					if (m_Prefabs[newID].typeID & DOOR_LEFT) doorCount++;
+					if (m_Prefabs[newID].typeID & DOOR_RIGHT) doorCount++;
+
+					if (currentMapCount >= 25 && doorCount > 2) continue;
+					if (currentMapCount >= 30 && doorCount > 1) continue;
+
+					validPrefabs.push_back(newID);
 				}
+			}
 
-				if (rx > maxX)
-				{
-					// 문이 남아있는 방만 선택
-					int p = m_MapList[i].prefabID;
-					bool hasOpen = false;
-					if ((p & DOOR_UP) && m_MapList[i].nextMapID[DIR_UP] == 0) hasOpen = true;
-					if ((p & DOOR_DOWN) && m_MapList[i].nextMapID[DIR_DOWN] == 0) hasOpen = true;
-					if ((p & DOOR_LEFT) && m_MapList[i].nextMapID[DIR_LEFT] == 0) hasOpen = true;
-					if ((p & DOOR_RIGHT) && m_MapList[i].nextMapID[DIR_RIGHT] == 0) hasOpen = true;
+			if (validPrefabs.empty()) continue;
 
-					if (hasOpen) {
-						maxX = rx;
-						randRoomID = i;
+			// 5. 조건 통과! 새 방 배치
+			int newPrefabID = validPrefabs[rand() % validPrefabs.size()];
+			int gw_new = m_Prefabs[newPrefabID].gridW;
+			int gh_new = m_Prefabs[newPrefabID].gridH;
+
+			int targetX = rx, targetY = ry;
+			if (d.dir == DIR_UP) { targetY = ry - gh_new; targetX = rx; }
+			if (d.dir == DIR_DOWN) { targetY = ry + gh_old; targetX = rx; }
+			if (d.dir == DIR_LEFT) { targetX = rx - gw_new; targetY = ry; }
+			if (d.dir == DIR_RIGHT) { targetX = rx + gw_old; targetY = ry; }
+
+			currentMapCount++;
+			int newRoomID = currentMapCount;
+
+			for (int y = 0; y < gh_new; y++) {
+				for (int x = 0; x < gw_new; x++) {
+					grid[targetY + y][targetX + x] = newRoomID;
+				}
+			}
+
+			m_MapList[newRoomID].id = newRoomID;
+			m_MapList[newRoomID].prefabID = newPrefabID;
+			m_MapList[newRoomID].width = m_Prefabs[newPrefabID].width;
+			m_MapList[newRoomID].height = m_Prefabs[newPrefabID].height;
+			m_MapList[newRoomID].layerCount = m_Prefabs[newPrefabID].layerCount;
+
+			// 6. 새로 깔린 방의 모든 문을 확인하여, 이미 있는 방이면 연결하고 아니면 큐에 넣음
+			int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
+			for (int checkD : dirs) {
+				int checkDoorBit = 0;
+				if (checkD == DIR_UP) checkDoorBit = DOOR_UP;
+				if (checkD == DIR_DOWN) checkDoorBit = DOOR_DOWN;
+				if (checkD == DIR_LEFT) checkDoorBit = DOOR_LEFT;
+				if (checkD == DIR_RIGHT) checkDoorBit = DOOR_RIGHT;
+
+				if ((m_Prefabs[newPrefabID].typeID & checkDoorBit) != 0) {
+					int adjX = targetX, adjY = targetY;
+					if (checkD == DIR_UP) adjY = targetY - 1;
+					if (checkD == DIR_DOWN) adjY = targetY + gh_new;
+					if (checkD == DIR_LEFT) adjX = targetX - 1;
+					if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
+
+					if (adjX >= 0 && adjX < 6 && adjY >= 0 && adjY < 6 && grid[adjY][adjX] != 0) {
+						int adjRoom = grid[adjY][adjX];
+
+						int adjOppDir = 0;
+						if (checkD == DIR_UP) adjOppDir = DIR_DOWN;
+						if (checkD == DIR_DOWN) adjOppDir = DIR_UP;
+						if (checkD == DIR_LEFT) adjOppDir = DIR_RIGHT;
+						if (checkD == DIR_RIGHT) adjOppDir = DIR_LEFT;
+
+						int adjOppDoorBit = 0;
+						if (adjOppDir == DIR_UP) adjOppDoorBit = DOOR_UP;
+						if (adjOppDir == DIR_DOWN) adjOppDoorBit = DOOR_DOWN;
+						if (adjOppDir == DIR_LEFT) adjOppDoorBit = DOOR_LEFT;
+						if (adjOppDir == DIR_RIGHT) adjOppDoorBit = DOOR_RIGHT;
+
+						// 옆 방에도 마주보는 문이 있다면 포탈 연결!
+						if ((m_MapList[adjRoom].prefabID & adjOppDoorBit) != 0) {
+							m_MapList[newRoomID].nextMapID[checkD] = adjRoom;
+							m_MapList[adjRoom].nextMapID[adjOppDir] = newRoomID;
+						}
+					}
+					else {
+						q.push_back({ newRoomID, checkD }); // 연결할 빈 공간이 있다면 큐에 추가
 					}
 				}
 			}
+
+			if (forceBoss) bossPlaced = true;
 		}
-		else
-		{
-			// 보스방이 깔린 이후엔 평범하게 랜덤 방에서 가지치기
-			randRoomID = (rand() % currentMapCount) + 1;
-		}
-
-		int pID = m_MapList[randRoomID].prefabID;
-
-		// 3-2. 연결할 문 방향 선택
-		int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
-		int checkDir = dirs[rand() % 4];
-
-		// 보스방 전까지는 무조건 오른쪽(RIGHT)을 최우선으로 시도
-		if (!bossRoomPlaced && (pID & DOOR_RIGHT) != 0 && m_MapList[randRoomID].nextMapID[DIR_RIGHT] == 0) {
-			checkDir = DIR_RIGHT;
-		}
-
-		int bitFlag = 0;
-		if (checkDir == DIR_UP) bitFlag = DOOR_UP;
-		else if (checkDir == DIR_DOWN) bitFlag = DOOR_DOWN;
-		else if (checkDir == DIR_LEFT) bitFlag = DOOR_LEFT;
-		else if (checkDir == DIR_RIGHT) bitFlag = DOOR_RIGHT;
-
-		if ((pID & bitFlag) == 0) continue; // 막힌 문이면 패스
-		if (m_MapList[randRoomID].nextMapID[checkDir] != 0) continue; // 이미 연결된 문이면 패스
-
-		// 3-3. 기준 방의 (x, y) 원점 좌표 찾기
-		int rx = -1, ry = -1;
-		for (int y = 0; y < 10; y++) { // 10으로 변경
-			for (int x = 0; x < 10; x++) { // 10으로 변경
-				if (grid[y][x] == randRoomID) {
-					rx = x; ry = y; break;
-				}
-			}
-			if (rx != -1) break;
-		}
-
-		// 3-4. 새로 붙일 방이 조건에 맞는지 필터링
-		int oppositeBit = 0;
-		if (checkDir == DIR_UP) oppositeBit = DOOR_DOWN;
-		else if (checkDir == DIR_DOWN) oppositeBit = DOOR_UP;
-		else if (checkDir == DIR_LEFT) oppositeBit = DOOR_RIGHT;
-		else if (checkDir == DIR_RIGHT) oppositeBit = DOOR_LEFT;
-
-		std::vector<int> validPrefabs;
-		bool forceBoss = false;
-
-		// 🌟 10x10 그리드에 맞춰 수정: 타겟 X가 8 이상에 다다르면 보스 대기실 출현!
-		int tempTargetX = rx;
-		if (checkDir == DIR_RIGHT) tempTargetX = rx + m_Prefabs[pID].gridW;
-		else if (checkDir == DIR_LEFT) tempTargetX = rx - 1;
-
-		if (!bossRoomPlaced && checkDir == DIR_RIGHT && tempTargetX >= 8)
-		{
-			// 무조건 4번 프리팹(보스 대기실)만 선택하게 강제!
-			validPrefabs.push_back(4);
-			forceBoss = true;
-		}
-		else
-		{
-			// 평소에는 4번(보스 대기실)과 16번(진짜 보스방)을 제외하고 랜덤 선택
-			for (int i = 1; i <= 15; i++) {
-				if (i == 4 || i == 16) continue;
-				if (m_Prefabs[i].typeID == 0) continue;
-				if ((m_Prefabs[i].typeID & oppositeBit) != 0) {
-					validPrefabs.push_back(i);
-				}
-			}
-		}
-
-		if (validPrefabs.empty()) continue;
-
-		int newPrefabID = validPrefabs[rand() % validPrefabs.size()];
-		int gw = m_Prefabs[newPrefabID].gridW;
-		int gh = m_Prefabs[newPrefabID].gridH;
-
-		// 3-5. 타겟 좌표(새 방의 원점) 정확한 계산
-		int targetX = rx, targetY = ry;
-		if (checkDir == DIR_UP)    targetY = ry - gh;
-		if (checkDir == DIR_DOWN)  targetY = ry + m_Prefabs[pID].gridH;
-		if (checkDir == DIR_LEFT)  targetX = rx - gw;
-		if (checkDir == DIR_RIGHT) targetX = rx + m_Prefabs[pID].gridW;
-
-		// 🌟 그리드 배열(10x10) 밖으로 나가면 패스
-		if (targetX < 0 || targetX + gw > 10 || targetY < 0 || targetY + gh > 10) continue;
-
-		// 빈 공간인지 검사
-		bool isSpaceFree = true;
-		for (int y = 0; y < gh; y++) {
-			for (int x = 0; x < gw; x++) {
-				if (grid[targetY + y][targetX + x] != 0) {
-					isSpaceFree = false;
-					break;
-				}
-			}
-			if (!isSpaceFree) break;
-		}
-
-		if (!isSpaceFree) continue;
-
-		// ==========================================================
-		// 3-6. 조건 통과! 새 방 배치
-		// ==========================================================
-		currentMapCount++;
-		int newRoomID = currentMapCount;
-
-		for (int y = 0; y < gh; y++) {
-			for (int x = 0; x < gw; x++) {
-				grid[targetY + y][targetX + x] = newRoomID;
-			}
-		}
-
-		m_MapList[newRoomID].id = newRoomID;
-		m_MapList[newRoomID].prefabID = newPrefabID;
-		m_MapList[newRoomID].width = m_Prefabs[newPrefabID].width;
-		m_MapList[newRoomID].height = m_Prefabs[newPrefabID].height;
-		m_MapList[newRoomID].layerCount = m_Prefabs[newPrefabID].layerCount;
-
-		// 포탈 연결
-		m_MapList[randRoomID].nextMapID[checkDir] = newRoomID;
-		int oppositeDir = 0;
-		if (checkDir == DIR_UP) oppositeDir = DIR_DOWN;
-		else if (checkDir == DIR_DOWN) oppositeDir = DIR_UP;
-		else if (checkDir == DIR_LEFT) oppositeDir = DIR_RIGHT;
-		else if (checkDir == DIR_RIGHT) oppositeDir = DIR_LEFT;
-		m_MapList[newRoomID].nextMapID[oppositeDir] = randRoomID;
-
-		// 보스 대기실이 무사히 깔렸다면 플래그 ON!
-		if (forceBoss) bossRoomPlaced = true;
 	}
 }
 
+// MapManager.cpp
+
 void MapManager::ChangeMap(int mapID)
 {
-	if (mapID < 1 || mapID > 10) return;
+	// 맵을 36개까지 쓰기로 했으니, 제한을 40으로
+	if (mapID < 1 || mapID >= 40) return;
 
 	m_pCurrentMapChunk = &m_MapList[mapID];
 
 	CAM->SetMapSize(m_pCurrentMapChunk->width, m_pCurrentMapChunk->height);
+
 	// [필수] 맵 바뀔 때 상태 리셋
 	knight.isDashing = false;
 	knight.gravity = 0;
 	knight.isMove = false;
-	// 1. Clear existing walls
 	coll.ClearWalls();
 
-	// =================================================================
-	// [4단계 핵심 로직] 프리팹 도면 복사 붙여넣기!
-	// =================================================================
-	int pID = m_pCurrentMapChunk->prefabID; // 이 방이 무슨 도면을 썼는지 가져옴
+	int pID = m_pCurrentMapChunk->prefabID;
 
-	// 혹시 에러로 프리팹이 배정 안 된 방이라면? (안전장치: 안 떨어지게 바닥만 생성)
+	RECT rc;
+
+	// 혹시 에러로 프리팹이 배정 안 된 방이라면? (안전장치)
 	if (pID == 0 || m_Prefabs[pID].walls.empty())
 	{
-		RECT rc;
 		SetRect(&rc, 0, m_pCurrentMapChunk->height - 100, m_pCurrentMapChunk->width, m_pCurrentMapChunk->height + 50);
 		coll.AddWall(rc);
 		return;
 	}
 
-	// 도면에 있는 수많은 벽과 발판들을 그냥 리스트에서 꺼내서 맵에 쫙! 뿌립니다.
+	// 1. 도면에 있는 수많은 벽과 발판들을 그냥 리스트에서 꺼내서 맵에 쫙! 뿌립니다.
 	for (auto& prefabWall : m_Prefabs[pID].walls)
 	{
 		coll.AddWall(prefabWall);
 	}
 
-	//RECT rc;
-	//int thickness = 100; // Wall thickness
-	////int floorY = SCREEN_HEIGHT - thickness; // The top Y of the floor (e.g., 500 if height is 600)
-	//int MW = m_pCurrentMapChunk->width;
-	//int MH = m_pCurrentMapChunk->height;
-	//int floorY = MH - thickness; // 바닥 위치도 맵 높이 기준!
-	//// =============================================================
-	//// 1. FLOOR (Bottom) Handling
-	//// =============================================================
-	//if (m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0)
-	//{
-	//	// [No Path] Solid floor
-	//	// Top: 500, Bottom: 600 (or slightly more to catch falling)
-	//	SetRect(&rc, 0, floorY, MW, MH + 50);
-	//	coll.AddWall(rc);
-	//}
-	//else
-	//{
-	//	// [Path Exists] Hole in the middle
-	//	int holeSize = 200;
-	//	int midX = MW / 2;
-	//	// Left Floor Piece (0 to 300)
-	//	SetRect(&rc, 0, floorY, midX - (holeSize / 2), MH + 50);
-	//	coll.AddWall(rc);
-	//	// Right Floor Piece (500 to 800)
-	//	SetRect(&rc, midX + (holeSize / 2), floorY, MW, MH + 50);
-	//	coll.AddWall(rc);
-	//}
-	//// =============================================================
-	//// 2. CEILING (Top) Handling
-	//// =============================================================
-	//if (m_pCurrentMapChunk->nextMapID[DIR_UP] == 0)
-	//{
-	//	// [No Path] Solid ceiling
-	//	SetRect(&rc, 0, -50, MW, thickness); // -50 to 100
-	//	coll.AddWall(rc);
-	//}
-	//else
-	//{	// 위가 뚫려있으면 중간에 밟고 올라갈 수 있는 발판 추가
-	//	int pW = 200; // 발판 넓이
-	//	int pH = 30;  // 발판 두께
-	//	// 맵 정중앙, 바닥에서 적당히 높은 곳에 배치 (여기선 바닥 위 400px 지점 예시)
-	//	int platformY = floorY - 350;
-	//	RECT platform;
-	//	SetRect(&platform, (MW / 2) - (pW / 2), platformY, (MW / 2) + (pW / 2), platformY + pH);
-	//	coll.AddWall(platform);
-	//}
-	//// Else: No ceiling wall (allow jumping up)
-	//// =============================================================
-	//// 3. LEFT WALL Handling
-	//// =============================================================
-	//if (m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0)
-	//{
-	//	// [No Path] Solid left wall
-	//	SetRect(&rc, -50, 0, thickness, MH);
-	//	coll.AddWall(rc);
-	//}
-	//else
-	//{
-	//	// [Path Exists] Doorway (Wall only on top part)
-	//	// Adjust 300 to control door height
-	//	SetRect(&rc, -50, 0, thickness, floorY - 200);
-	//	coll.AddWall(rc);
-	//}
-	//// =============================================================
-	//// 4. RIGHT WALL Handling
-	//// =============================================================
-	//if (m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0)
-	//{
-	//	// [No Path] Solid right wall
-	//	SetRect(&rc, MW - thickness, 0, MW + 50, MH);
-	//	coll.AddWall(rc);
-	//}
-	//else
-	//{
-	//	// [Path Exists] Doorway
-	//	SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200);
-	//	coll.AddWall(rc);
-	//}
-}
+	// =================================================================
+	// 2. 막힌 문 자동 캡핑 (진행 불가 버그 완벽 차단)
+	// =================================================================
+	int MW = m_pCurrentMapChunk->width;
+	int MH = m_pCurrentMapChunk->height;
+	int thick = 100;
 
+	// 프리팹 도면상으로는 문이 뚫려있는데, 실제 연결된 맵(nextMapID)이 0(없음)이라면?
+	// 묻지도 따지지도 않고 그곳에 보이지 않는 거대한 철벽을 세워버립니다!
+	if ((m_Prefabs[pID].typeID & DOOR_UP) && m_pCurrentMapChunk->nextMapID[DIR_UP] == 0) {
+		SetRect(&rc, 0, -50, MW, thick); coll.AddWall(rc);
+	}
+	if ((m_Prefabs[pID].typeID & DOOR_DOWN) && m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0) {
+		SetRect(&rc, 0, MH - thick, MW, MH + 50); coll.AddWall(rc);
+	}
+	if ((m_Prefabs[pID].typeID & DOOR_LEFT) && m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0) {
+		SetRect(&rc, -50, 0, thick, MH); coll.AddWall(rc);
+	}
+	if ((m_Prefabs[pID].typeID & DOOR_RIGHT) && m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0) {
+		SetRect(&rc, MW - thick, 0, MW + 50, MH); coll.AddWall(rc);
+	}
+}
 
 void MapManager::Update(double frame)
 {
