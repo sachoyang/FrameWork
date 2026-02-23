@@ -49,6 +49,9 @@
     <Filter Include="소스 파일\Knight">
       <UniqueIdentifier>{c6051ed8-bf8f-4da2-a7b5-db98dfb77656}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\UI">
+      <UniqueIdentifier>{76be01cd-727b-4414-9444-35edf83bbbbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -117,6 +120,9 @@
     <ClInclude Include="Knight.h">
       <Filter>소스 파일\Knight</Filter>
     </ClInclude>
+    <ClInclude Include="UIManager.h">
+      <Filter>소스 파일\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="key.cpp">
@@ -178,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="Knight.cpp">
       <Filter>소스 파일\Knight</Filter>
+    </ClCompile>
+    <ClCompile Include="UIManager.cpp">
+      <Filter>소스 파일\UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
