@@ -1294,8 +1294,12 @@ void MapManager::CreateRandomMap()
 			for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
 			m_MapList[i].prefabID = 0;
 		}
-		int grid[6][6] = { 0 };
-
+		// 그리드 초기화 (0 = 빈 칸)
+		for (int y = 0; y < 6; y++) {
+			for (int x = 0; x < 6; x++) {
+				m_Grid[y][x] = 0;
+			}
+		}
 		// 2. 시작 방(1번) 배치: 오른쪽(DOOR_RIGHT)만 뚫린 8번 프리팹
 		m_MapList[1].id = 1;
 		m_MapList[1].prefabID = 8;
@@ -1303,7 +1307,7 @@ void MapManager::CreateRandomMap()
 		m_MapList[1].height = m_Prefabs[8].height;
 		m_MapList[1].layerCount = m_Prefabs[8].layerCount;
 
-		grid[3][0] = 1; // 시작 위치: 좌측 중간
+		m_Grid[3][0] = 1; // 시작 위치: 좌측 중간
 
 		// 시작 방의 배경 이미지를 복사
 		for (int i = 0; i < m_Prefabs[8].layerCount; i++) {
@@ -1335,7 +1339,7 @@ void MapManager::CreateRandomMap()
 			int rx = -1, ry = -1;
 			for (int y = 0; y < 6; y++) {
 				for (int x = 0; x < 6; x++) {
-					if (grid[y][x] == d.rID) { rx = x; ry = y; break; }
+					if (m_Grid[y][x] == d.rID) { rx = x; ry = y; break; }
 				}
 				if (rx != -1) break;
 			}
@@ -1385,7 +1389,7 @@ void MapManager::CreateRandomMap()
 					bool spaceFree = true;
 					for (int y = 0; y < gh_new; y++) {
 						for (int x = 0; x < gw_new; x++) {
-							if (grid[targetY + y][targetX + x] != 0) spaceFree = false;
+							if (m_Grid[targetY + y][targetX + x] != 0) spaceFree = false;
 						}
 					}
 					if (!spaceFree) continue;
@@ -1410,8 +1414,8 @@ void MapManager::CreateRandomMap()
 							if (adjX < 0 || adjX >= 6 || adjY < 0 || adjY >= 6) {
 								sealBroken = true; break;
 							}
-							if (grid[adjY][adjX] != 0) {
-								int adjRoom = grid[adjY][adjX];
+							if (m_Grid[adjY][adjX] != 0) {
+								int adjRoom = m_Grid[adjY][adjX];
 
 								int adjOppDoorBit = 0;
 								if (checkD == DIR_UP) adjOppDoorBit = DOOR_DOWN;
@@ -1459,7 +1463,7 @@ void MapManager::CreateRandomMap()
 
 			for (int y = 0; y < gh_new; y++) {
 				for (int x = 0; x < gw_new; x++) {
-					grid[targetY + y][targetX + x] = newRoomID;
+					m_Grid[targetY + y][targetX + x] = newRoomID;
 				}
 			}
 
@@ -1489,8 +1493,8 @@ void MapManager::CreateRandomMap()
 					if (checkD == DIR_LEFT) adjX = targetX - 1;
 					if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
 
-					if (adjX >= 0 && adjX < 6 && adjY >= 0 && adjY < 6 && grid[adjY][adjX] != 0) {
-						int adjRoom = grid[adjY][adjX];
+					if (adjX >= 0 && adjX < 6 && adjY >= 0 && adjY < 6 && m_Grid[adjY][adjX] != 0) {
+						int adjRoom = m_Grid[adjY][adjX];
 
 						int adjOppDir = 0;
 						if (checkD == DIR_UP) adjOppDir = DIR_DOWN;

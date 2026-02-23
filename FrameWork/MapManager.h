@@ -66,6 +66,9 @@ public :
 	// std::map<int, MapChunk*> m_MapList;
 	MapChunk m_MapList[40];
 
+	// UI에서 미니맵을 그릴 때 읽어갈 6x6 배열
+	int m_Grid[6][6];
+
 	Sprite m_MapImg1_1[6];
 	Sprite m_MapImg1_2[45];
 
