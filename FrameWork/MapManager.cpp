@@ -15,24 +15,6 @@ MapManager::~MapManager()
 void MapManager::Init()
 {
 	srand((unsigned int)time(NULL)); // 랜덤 시드 초기화
-	/*int i,j;
-	char FileName[256];
-	
-	for(i = 0; i<6; i++ )
-	{
-		sprintf_s(FileName, "./resource/Img/map1/BG_Hades_1/BG_Hades_%04d.tga", i + 1);
-		m_MapImg1_1[i].Create( FileName ,false,D3DCOLOR_XRGB(0,0,0));
-		
-	}
-
-	j = 1;
-	for(i = 0; i<45; i++ )
-	{
-		sprintf_s(FileName, "./resource/Img/map1/BG_Hades_2/BG_Hades_0002_%06d.tga", j);
-		m_MapImg1_2[i].Create(FileName, false, D3DCOLOR_XRGB(0, 0, 0));
-		j+=2;
-		
-	}*/
 
 	// 프리펩 초기화 먼저 진행 후 맵 생성 (맵 생성 시 프리펩 정보가 필요)
 	InitPrefabs();

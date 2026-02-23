@@ -63,62 +63,62 @@ void Logo::Init()
 		*/
 
 	// mysql 구조체 변수 초기화
-	mysql_init( &sql.conn );
+	//mysql_init( &sql.conn );
 
 	// ip, 접속 id , pass, 데이타 베이스명, 포트번호 등으로 접속
-	sql.connection = mysql_real_connect(&sql.conn, DB_HOST,
-		DB_USER, DB_PASS,
-		DB_NAME, 3306,
-		(char *)NULL, 0);
+	//sql.connection = mysql_real_connect(&sql.conn, DB_HOST,
+	//	DB_USER, DB_PASS,
+	//	DB_NAME, 3306,
+	//	(char *)NULL, 0);
 
-	// 만약 접속에 실패하면 다음 실행
-	if (sql.connection == NULL)
-	{
-		sprintf_s(sql.state, "Mysql connection error : %s", mysql_error(&sql.conn));
-		sql.mysql_Success = false;
-	}
-	else // 아니면...
-	{
-		sql.mysql_Success = true;
-	}
+	//// 만약 접속에 실패하면 다음 실행
+	//if (sql.connection == NULL)
+	//{
+	//	sprintf_s(sql.state, "Mysql connection error : %s", mysql_error(&sql.conn));
+	//	sql.mysql_Success = false;
+	//}
+	//else // 아니면...
+	//{
+	//	sql.mysql_Success = true;
+	//}
 
-	// 다음 mysql_query() 함수로 MYSQL 구조체를 통한 쿼리문 전송
-	sql.query_start = mysql_query(sql.connection, "select * from login");
-	if (sql.query_start != 0) // 전송 실패시
-	{
-		sprintf_s(sql.state, "Mysql query error : %s", mysql_error(&sql.conn));
-	}
-	else // 성공시
-	{
-		sql.mysql_Success = true;
-	}
+	//// 다음 mysql_query() 함수로 MYSQL 구조체를 통한 쿼리문 전송
+	//sql.query_start = mysql_query(sql.connection, "select * from login");
+	//if (sql.query_start != 0) // 전송 실패시
+	//{
+	//	sprintf_s(sql.state, "Mysql query error : %s", mysql_error(&sql.conn));
+	//}
+	//else // 성공시
+	//{
+	//	sql.mysql_Success = true;
+	//}
 
-	// mysql_store_result 함수로 넘어온 데이타 베이스 값 저장
-	sql.sql_result = mysql_store_result(sql.connection);
+	//// mysql_store_result 함수로 넘어온 데이타 베이스 값 저장
+	//sql.sql_result = mysql_store_result(sql.connection);
 
-	// ID, 비밀번호 가져오기 
-	// select * from login where ?? 사용 안했으니... 총 레코드 수 만큼 넘어옴(그 만큼 루프를 돈다)
-	while ( ( sql.sql_row = mysql_fetch_row( sql.sql_result ) ) != NULL)
-	{
-		// 지금 현재는 마지막 레코드 값만 가져오지만... where id = ? ? 등으로 특정 대상의 값을 가져오던지...
-		// 전체 데이타가 필요할 경우는 배열로 적절히 처리하자....
-		// sql.sql_row[0] 인덱스로 해당 칼럼(열,필드)값 가져옴
-		sprintf_s(sql.result, "%s %s\n", sql.sql_row[0], sql.sql_row[1]);
+	//// ID, 비밀번호 가져오기 
+	//// select * from login where ?? 사용 안했으니... 총 레코드 수 만큼 넘어옴(그 만큼 루프를 돈다)
+	//while ( ( sql.sql_row = mysql_fetch_row( sql.sql_result ) ) != NULL)
+	//{
+	//	// 지금 현재는 마지막 레코드 값만 가져오지만... where id = ? ? 등으로 특정 대상의 값을 가져오던지...
+	//	// 전체 데이타가 필요할 경우는 배열로 적절히 처리하자....
+	//	// sql.sql_row[0] 인덱스로 해당 칼럼(열,필드)값 가져옴
+	//	sprintf_s(sql.result, "%s %s\n", sql.sql_row[0], sql.sql_row[1]);
 
-		// 이런식으로 문자열을 정수로 변환
-		int a = atoi(sql.sql_row[1]);
-		// 정수형을 문자열로 변환 함수 참고로 #define _CRT_NONSTDC_NO_DEPRECATE 안하면 에러 발생
-		itoa(a, pw, 10);	// 10 진수로 가져옴
+	//	// 이런식으로 문자열을 정수로 변환
+	//	int a = atoi(sql.sql_row[1]);
+	//	// 정수형을 문자열로 변환 함수 참고로 #define _CRT_NONSTDC_NO_DEPRECATE 안하면 에러 발생
+	//	itoa(a, pw, 10);	// 10 진수로 가져옴
 
-		// 레코드 수만큼 증가... 
-		count += 1;
-	}
+	//	// 레코드 수만큼 증가... 
+	//	count += 1;
+	//}
 
-	// 정수형을 문자열로 변환 함수 참고로 #define _CRT_NONSTDC_NO_DEPRECATE 안하면 에러 발생
-	itoa(count, cnt, 10);	// 10 진수로 가져옴
+	//// 정수형을 문자열로 변환 함수 참고로 #define _CRT_NONSTDC_NO_DEPRECATE 안하면 에러 발생
+	//itoa(count, cnt, 10);	// 10 진수로 가져옴
 
-	// sql.sql_result 값 해제
-	mysql_free_result(sql.sql_result);
+	//// sql.sql_result 값 해제
+	//mysql_free_result(sql.sql_result);
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 }
@@ -148,24 +148,24 @@ void Logo::Draw()
 
 
 	// 데이타 베이스 결과 및 처리 상태 표시/////////////////////////////////////
-	if (sql.mysql_Success)
-	{
-		dv_font.DrawString("Success", 500, 0);   
-	}
-	else
-	{
-		dv_font.DrawString("Error", 500, 0);   
-		dv_font.DrawString(sql.state, 700, 0);
-	}
+	//if (sql.mysql_Success)
+	//{
+	//	dv_font.DrawString("Success", 500, 0);   
+	//}
+	//else
+	//{
+	//	dv_font.DrawString("Error", 500, 0);   
+	//	dv_font.DrawString(sql.state, 700, 0);
+	//}
 
-	// 결과
-	dv_font.DrawString(sql.result, 500, 30, 0xff0000ff);
+	//// 결과
+	//dv_font.DrawString(sql.result, 500, 30, 0xff0000ff);
 
-	// 총 레코드 수
-	dv_font.DrawString(cnt, 500, 60, 0xff0000ff);
+	//// 총 레코드 수
+	//dv_font.DrawString(cnt, 500, 60, 0xff0000ff);
 
-	// 비번
-	dv_font.DrawString(pw, 500, 100, 0xff0000ff);
+	//// 비번
+	//dv_font.DrawString(pw, 500, 100, 0xff0000ff);
 	////////////////////////////////////////////////////////////
 }
 

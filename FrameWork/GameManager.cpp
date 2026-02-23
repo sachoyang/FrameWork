@@ -38,15 +38,15 @@ void GameManager::Init()
 	//	return ;
 	//}
 	
-	// 기계어 버전
-	if ((fp = fopen("./Save/save.fss","rb"))== NULL)
-	{
-		return ;
-	}
-	
-	fread(&m_SysTem,sizeof(SysTem),1,fp);
+	//// 기계어 버전
+	//if ((fp = fopen("./Save/save.fss","rb"))== NULL)
+	//{
+	//	return ;
+	//}
+	//
+	//fread(&m_SysTem,sizeof(SysTem),1,fp);
 
-	fclose(fp);
+	//fclose(fp);
 	
 	g_Mng.n_Chap = LOGO;
 }
