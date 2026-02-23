@@ -1,4 +1,4 @@
-#include "Include.h"
+ï»¿#include "Include.h"
 
 Game::Game()
 {
@@ -19,7 +19,7 @@ void Game::Init()
 	//player.Init();
 	sound.Init();
 	Gmanager.Init();
-	// µ¥ÀÌÅ¸ º£ÀÌ½º///////////////////
+	// ë°ì´íƒ€ ë² ì´ìŠ¤///////////////////
 	//sql.Init();
 }
 
@@ -31,11 +31,11 @@ void Game::Draw()
 	//player.Draw();
 	coll.Draw();
 	Gmanager.Draw();
-	// µ¥ÀÌÅ¸ º£ÀÌ½º///////////////////
+	// ë°ì´íƒ€ ë² ì´ìŠ¤///////////////////
 	//sql.Draw();
 }
 
-// Chap, ÀçÁ¤ÀÇ ÇÔ¼ö È£Ãâ
+// Chap, ì¬ì •ì˜ í•¨ìˆ˜ í˜¸ì¶œ
 void Game::Update(double frame)
 {
 	//static int a = 0;
@@ -48,20 +48,20 @@ void Game::Update(double frame)
 
 	if (GetTickCount64() - a > frame)
 	{
-		// °øºÎ¿ë
+		// ê³µë¶€ìš©
 		//Camera::GetInstance()->Update();
 		key.Update();
 		//bird.Update();
 		knight.Update();
 		//player.Update();
 		coll.Update();
-		// ÀÔ ¸À¿¡ ¸Â°Ô
+		// ì… ë§›ì— ë§ê²Œ
 		mapMng.Update(130);
 		Gmanager.Update();
 
-		CAM->Update(); // ¸ğµç ¿ÀºêÁ§Æ® ¿òÁ÷ÀÌ°í ³ª¼­ ¾÷µ¥ÀÌÆ®µÇ¾ß ÇÔ
-		// µ¥ÀÌÅ¸ º£ÀÌ½º///////////////////
-		// ÀÔ ¸À¿¡ ¸Â°Ô (¿©±â¼± ¾È¾²ÀÓ..ÇÁ·¹ÀÓ °ªÀÌ ÇÊ¿ä ÇÒ¶§¸¸.. ±×³É ¹æ¹ı¸¸...)
+		CAM->Update(); // ëª¨ë“  ì˜¤ë¸Œì íŠ¸ ì›€ì§ì´ê³  ë‚˜ì„œ ì—…ë°ì´íŠ¸ë˜ì•¼ í•¨
+		// ë°ì´íƒ€ ë² ì´ìŠ¤///////////////////
+		// ì… ë§›ì— ë§ê²Œ (ì—¬ê¸°ì„  ì•ˆì“°ì„..í”„ë ˆì„ ê°’ì´ í•„ìš” í• ë•Œë§Œ.. ê·¸ëƒ¥ ë°©ë²•ë§Œ...)
 		sql.Update(frame+3000);
 
 		a = GetTickCount64();
@@ -72,14 +72,14 @@ void Game::Update(double frame)
 
 void Game::OnMessage( MSG* msg )
 {
-	// °ÔÀÓ ¾À¿¡¼­ Æ¯¼ö Å° Ã³¸® (ESC·Î ÀÏ½ÃÁ¤Áö µî)
+	// ê²Œì„ ì”¬ì—ì„œ íŠ¹ìˆ˜ í‚¤ ì²˜ë¦¬ (ESCë¡œ ì¼ì‹œì •ì§€ ë“±)
 	switch (msg->message)
 	{
 	case WM_KEYDOWN:
 		switch (msg->wParam)
 		{
 		case VK_ESCAPE:
-			// ¸Ş´º·Î µ¹¾Æ°¡±â ¿¹½Ã
+			// ë©”ë‰´ë¡œ ëŒì•„ê°€ê¸° ì˜ˆì‹œ
 			g_Mng.n_Chap = MENU;
 			break;
 
@@ -91,14 +91,21 @@ void Game::OnMessage( MSG* msg )
 			break;
 
 		// =======================================================
-		// µğ¹ö±× ¸ğµå ´ÜÃàÅ° (Page Up / Page Down)
+		// ë””ë²„ê·¸ ëª¨ë“œ ë‹¨ì¶•í‚¤ (Page Up / Page Down)
 		// =======================================================
-		case VK_PRIOR: // Page Up Å° (ÀÌÀü ÇÁ¸®ÆÕ)
+		case VK_PRIOR: // Page Up í‚¤ (ì´ì „ í”„ë¦¬íŒ¹)
 			mapMng.LoadDebugPrefab(mapMng.m_DebugPrefabID - 1);
 			break;
 
-		case VK_NEXT:  // Page Down Å° (´ÙÀ½ ÇÁ¸®ÆÕ)
+		case VK_NEXT:  // Page Down í‚¤ (ë‹¤ìŒ í”„ë¦¬íŒ¹)
 			mapMng.LoadDebugPrefab(mapMng.m_DebugPrefabID + 1);
+			break;
+		// =======================================================
+		// ë¯¸ë‹ˆë§µ (M)
+		// =======================================================
+			// M í‚¤ë¥¼ ëˆ„ë¥´ë©´ ë§µ í™•ëŒ€ & ì¼ì‹œì •ì§€ í† ê¸€
+		case 'M':
+			uiMng.m_bLargeMap = !uiMng.m_bLargeMap;
 			break;
 		}
 		break;
