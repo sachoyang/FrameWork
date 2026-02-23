@@ -1092,7 +1092,7 @@ void MapManager::InitPrefabs()
 
 		// 🌟 보스방만의 특별한 배경 이미지가 있다면 여기에 세팅 (지금은 임시)
 		char FileName[256];
-		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_boss.png");
+		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_bossroom01.png");
 		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
 
 		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
