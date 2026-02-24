@@ -62,21 +62,25 @@ void UIManager::Draw()
     {
         float drawX = startX + (i * spacingX);
 
-        if (i < knight.hp) {
+        if (i < knight.hp) 
+        {
             // 온전한 하트
             heartFull.Render(drawX, startY, 0, 1, 1);
         }
-        else if (i == breakingHeartIndex) {
+        else if (i == breakingHeartIndex) 
+        {
             // 깨지는 중인 하트! (100ms마다 프레임 변경)
             DWORD t = GetTickCount() - breakStartTime;
             if (t < 100)      heartBreak[0].Render(drawX, startY, 0, 1, 1);
             else if (t < 200) heartBreak[1].Render(drawX, startY, 0, 1, 1);
             else if (t < 300) heartBreak[2].Render(drawX, startY, 0, 1, 1);
-            else {
+            else 
+            {
                 heartEmpty.Render(drawX, startY, 0, 1, 1); // 다 깨지면 빈 하트로
             }
         }
-        else {
+        else 
+        {
             // 이미 다 깨져서 비어버린 하트
             heartEmpty.Render(drawX, startY, 0, 1, 1);
         }
@@ -90,7 +94,8 @@ void UIManager::DrawMinimap()
     float spacingX = m_bLargeMap ? 70.0f : 35.0f;
     float spacingY = m_bLargeMap ? 70.0f : 35.0f;
 
-    if (m_bLargeMap) {
+    if (m_bLargeMap) 
+    {
         dv_font.DrawString("== WORLD MAP ==", startX + 70, startY - 50, D3DCOLOR_ARGB(255, 255, 255, 0));
     }
 
@@ -112,10 +117,12 @@ void UIManager::DrawMinimap()
             char roomChar[10] = "■";
 
             // 시작 방(S)과 보스 방(B)만 예외 처리
-            if (rID == 1) {
+            if (rID == 1) 
+            {
                 strcpy_s(roomChar, "S");
             }
-            else if (room->prefabID == 4 || room->prefabID == 16) {
+            else if (room->prefabID == 4 || room->prefabID == 16) 
+            {
                 strcpy_s(roomChar, "B");
             }
 
@@ -128,7 +135,8 @@ void UIManager::DrawMinimap()
             else if (room->prefabID == 4 || room->prefabID == 16) color = D3DCOLOR_ARGB(255, 255, 100, 100); // 보스 (빨강)
 
             // 현재 위치는 빛나는 초록색
-            if (rID == mapMng.m_pCurrentMapChunk->id) {
+            if (rID == mapMng.m_pCurrentMapChunk->id) 
+            {
                 color = D3DCOLOR_ARGB(255, 50, 255, 50);
             }
 
@@ -145,11 +153,13 @@ void UIManager::DrawMinimap()
             {
                 int rightRoomID = mapMng.m_Grid[y][x + 1];
 
-                if (rightRoomID == rID) {
+                if (rightRoomID == rID) 
+                {
                     // 👉 나랑 같은 맵(큰 방)이면 굵은 선으로 끈끈하게 연결
                     dv_font.DrawString(m_bLargeMap ? "===" : "==", drawX + (spacingX * 0.5f), drawY, color);
                 }
-                else if (rightRoomID != 0 && room->nextMapID[DIR_RIGHT] == rightRoomID) {
+                else if (rightRoomID != 0 && room->nextMapID[DIR_RIGHT] == rightRoomID) 
+                {
                     // 👉 다른 방으로 이어지는 통로(문)면 얇은 선(-)으로 연결
                     dv_font.DrawString("-", drawX + (spacingX * 0.45f), drawY, doorColor);
                 }
@@ -160,11 +170,13 @@ void UIManager::DrawMinimap()
             {
                 int downRoomID = mapMng.m_Grid[y + 1][x];
 
-                if (downRoomID == rID) {
+                if (downRoomID == rID) 
+                {
                     // 👉 나랑 같은 맵(큰 방)이면 굵은 선
                     dv_font.DrawString("||", drawX + 8, drawY + (spacingY * 0.4f), color);
                 }
-                else if (downRoomID != 0 && room->nextMapID[DIR_DOWN] == downRoomID) {
+                else if (downRoomID != 0 && room->nextMapID[DIR_DOWN] == downRoomID) 
+                {
                     // 👉 다른 방으로 이어지는 통로(문)면 얇은 선(|)
                     dv_font.DrawString("|", drawX + 4, drawY + (spacingY * 0.45f), doorColor);
                 }

@@ -11,13 +11,15 @@ void Enemy::TakeDamage(int damage, int hitDir)
     isHit = true;
     hitStartTime = GetTickCount();
 
-    if (hp <= 0) {
+    if (hp <= 0) 
+    {
         hp = 0;
         isDead = true;
         aniCount = 0; // 시체 프레임 시작
         gravity = -5.0f; // 죽을 때도 살짝 위로 튀며 사망
     }
-    else {
+    else 
+    {
         // 🌟 타격감 2번: 통통 튀어오르는 넉백!
         velocity.x = hitDir * 5.0f; // 맞은 방향으로 밀려남
         gravity = -7.0f;            // 위로 튀어오름
@@ -26,10 +28,9 @@ void Enemy::TakeDamage(int damage, int hitDir)
 
 void Enemy::Draw()
 {
-    // 피격 시 빨간색 깜빡임 효과 (무적/피격 리액션)
     D3DCOLOR color = 0xFFFFFFFF;
     if (isHit && !isDead) {
-        if ((GetTickCount() - hitStartTime) < 200) color = D3DCOLOR_ARGB(255, 255, 50, 50); // 0.2초간 빨갛게
+        if ((GetTickCount() - hitStartTime) < 200) color = D3DCOLOR_ARGB(255, 255, 50, 50);
         else isHit = false;
     }
 
@@ -37,19 +38,25 @@ void Enemy::Draw()
     float renderY = pos.y - CAM->GetY();
 
     if (isDead) {
-        // 죽었을 땐 시체 이미지 출력
+        // 🌟 [핵심 수정] 살아있을 때와 죽었을 때의 이미지 높이 차이를 계산해서,
+        // 시체의 발바닥(바닥)이 살아있을 때의 발바닥 위치와 정확히 일치하도록 아래로 내려줍니다!
+        float liveHeight = img[0].imagesinfo.Height;
+        float deadHeight = deadImg[aniCount].imagesinfo.Height;
+        float yOffset = (liveHeight - deadHeight) / 2.0f; // 높이 차이의 절반만큼 내림
+
         deadImg[aniCount].SetColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);
-        deadImg[aniCount].Render(renderX, renderY, 0, dir, 1, 1);
+        deadImg[aniCount].Render(renderX, renderY + yOffset, 0, dir, 1, 1);
     }
     else {
         img[aniCount].SetColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);
         img[aniCount].Render(renderX, renderY, 0, dir, 1, 1);
     }
 
-    // 디버그용 박스
-    coll.BoxSow(m_rc, 0, 0, D3DCOLOR_ARGB(255, 255, 0, 255));
+    // 디버그 박스
+    if (Gmanager.m_GameStart == true) {
+         coll.BoxSow(m_rc, 0, 0, D3DCOLOR_ARGB(255, 255, 0, 255)); 
+    }
 }
-
 
 // ==========================================
 // [자식 1] 지상 몹 (Ground Enemy)
@@ -72,15 +79,13 @@ void GroundEnemy::Update()
         aniTime = GetTickCount();
     }
 
-    // 시체가 땅에 안착했다면 물리 연산을 완전히 멈춤 (떨림 방지!)
-    bool isRestingCorpse = (isDead && gravity == 0 && abs(velocity.x) < 0.5f);
+    // 허공 정점(gravity=0)에서 얼지 않도록, '바닥에 닿아 속도가 0.0f가 된 순간'만 동결!
+    bool isRestingCorpse = (isDead && velocity.x == 0.0f);
 
     if (!isRestingCorpse) {
-        // 중력 적용
         pos.y += gravity;
         gravity += 0.5f; if (gravity > 10.0f) gravity = 10.0f;
 
-        // x축 이동
         if (isHit || isDead) {
             pos.x += velocity.x;
             velocity.x *= 0.9f;
@@ -98,8 +103,7 @@ void GroundEnemy::Update()
     cliffRc.left += (dir == -1) ? 20 : -20; cliffRc.right += (dir == -1) ? 20 : -20;
     cliffRc.top = m_rc.bottom + 5; cliffRc.bottom = m_rc.bottom + 30;
 
-    bool hitWall = false;
-    bool hitFloor = false;
+    bool hitWall = false, hitFloor = false;
     RECT temp;
 
     for (auto& w : coll.m_Walls) {
@@ -110,7 +114,7 @@ void GroundEnemy::Update()
             if (gravity >= 0 && (m_rc.bottom - 20) <= w.top) {
                 pos.y = w.top - 40.0f;
                 gravity = 0;
-                if (isDead) velocity.x = 0; // 시체 미끄러짐 멈춤 (동결 시작)
+                if (isDead) velocity.x = 0.0f; // 바닥에 닿는 순간 속도 0 -> 다음 프레임부터 완벽 동결!
             }
         }
     }
@@ -142,10 +146,9 @@ void FlyEnemy::Update()
         aniTime = GetTickCount();
     }
 
-    bool isRestingCorpse = (isDead && gravity == 0 && abs(velocity.x) < 0.5f);
+    bool isRestingCorpse = (isDead && velocity.x == 0.0f);
 
     if (isDead || isHit) {
-        // 🌟 [핵심 수정] 비행 몹 시체도 땅에 닿으면 동결
         if (!isRestingCorpse) {
             pos.y += gravity; gravity += 0.5f;
             pos.x += velocity.x; velocity.x *= 0.9f;
@@ -162,7 +165,7 @@ void FlyEnemy::Update()
                 if (gravity >= 0 && (m_rc.bottom - 20) <= w.top) {
                     pos.y = w.top - 30.0f;
                     gravity = 0;
-                    velocity.x = 0;
+                    velocity.x = 0.0f; // 바닥 닿음 인증!
                 }
             }
         }
