@@ -4,7 +4,7 @@
 class Knight
 {
 public:
-	Sprite Knightimg[15];
+	Sprite Knightimg[20];
 
 	float gravity;
 	bool grounded;
@@ -33,6 +33,10 @@ public:
 
 	float dashSpeed;        // 대시 속도
 
+	bool isAttacking;       // 현재 공격 중인가?
+	DWORD attackStartTime;  // 공격 시작 시간 (애니메이션 및 판정 지속시간 체크용)
+	RECT attackBox;         // 공격 판정 범위 (칼의 히트박스)
+
 	void Init();
 	void Update();
 	void Draw();
@@ -42,6 +46,8 @@ public:
 	void JumpCut();   // Z키 뗄 때 (속도 줄이기)
 	// 대시 시작 함수
 	void DashStart();
+	// 공격 시작 함수 (X키 누를 때)
+	void AttackStart();
 };
 
 extern Knight knight;

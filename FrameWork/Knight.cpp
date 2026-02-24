@@ -74,6 +74,19 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/dash04.png"); // 정지
     Knightimg[14].Create(FileName, false, 0);
 
+    sprintf_s(FileName, "./resource/Img/knight1/attack01.png"); // 공격 준비
+    Knightimg[15].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/attack02.png"); // 칼 휘두름 (히트박스 발생)
+    Knightimg[16].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/attack03.png"); // 공격 마무리
+    Knightimg[17].Create(FileName, false, 0);
+
+    isAttacking = false;
+    attackStartTime = 0;
+    SetRect(&attackBox, 0, 0, 0, 0);
+
     m_rc.left = pos.x-40;
     m_rc.top = pos.y-40;
     m_rc.right = pos.x + imagesinfo.Width-50;
@@ -87,6 +100,44 @@ void Knight::Update()
 {
     if (GetTickCount() - m_KnightAniTime > 10)
     {
+        // ========================================================
+        // 0단계: 공격 상태 및 히트박스(AttackBox) 업데이트
+        // ========================================================
+        if (isAttacking)
+        {
+            DWORD attackTime = GetTickCount() - attackStartTime;
+
+            // 공격 지속 시간 (예: 300ms = 0.3초 동안 공격)
+            if (attackTime > 300)
+            {
+                isAttacking = false;
+                SetRect(&attackBox, 0, 0, 0, 0); // 공격이 끝나면 히트박스 소멸
+            }
+            else
+            {
+                // 기사가 바라보는 방향(dir)에 따라 히트박스 생성 위치가 다름
+                // 기사의 몸통(pos)을 기준으로 앞쪽에 네모난 공격 판정을 만듭니다.
+                if (dir == 1) // 왼쪽을 보고 있을 때
+                {
+                    attackBox.left = pos.x - 100; // 사거리 90
+                    attackBox.right = pos.x - 10;
+                }
+                else // 오른쪽을 보고 있을 때
+                {
+                    attackBox.left = pos.x + 10;
+                    attackBox.right = pos.x + 100;  // 사거리 90 
+                }
+
+                // Y축(상하) 판정 범위 (머리 위부터 발끝 살짝 위까지)
+                attackBox.top = pos.y - 30;
+                attackBox.bottom = pos.y + 20;
+            }
+        }
+        else
+        {
+            SetRect(&attackBox, 0, 0, 0, 0);
+        }
+
         // ========================================================
         // 1단계: 수평(X) 이동 및 충돌 처리 (걷기 + 대시)
         // ========================================================
@@ -235,11 +286,19 @@ void Knight::Update()
 
 
         // ========================================================
-        // 3단계: 애니메이션 처리 (기존 코드 유지)
+        // 3단계: 애니메이션 처리
         // ========================================================
         if (GetTickCount() - m_KnightAniTime > 50)
         {
-            if (isDashing)
+            // 공격 애니메이션이 최우선!
+            if (isAttacking)
+            {
+                DWORD attackTime = GetTickCount() - attackStartTime;
+                if (attackTime < 100)      m_KnightCount = 15; // 0.1초: 준비
+                else if (attackTime < 200) m_KnightCount = 16; // 0.2초: 휘두름
+                else                       m_KnightCount = 17; // 0.3초: 마무리
+            }
+            else if (isDashing)
             {
                 DWORD dashTime = GetTickCount() - dashStartTime;
                 if (dashTime < 50)       m_KnightCount = 11;
@@ -409,6 +468,11 @@ void Knight::Draw()
         {
             coll.BoxSow(m_rc, 0, -5);
         }
+
+        if (isAttacking)
+        {
+            coll.BoxSow(attackBox, 0, 0, D3DCOLOR_ARGB(255, 255, 255, 0)); // 노란색
+        }
     }
 }
 
@@ -456,4 +520,13 @@ void Knight::DashStart()
 
     // 공중에서 썼다면 기회 소진
     if (!grounded) canAirDash = false;
+}
+
+void Knight::AttackStart()
+{
+    // 이미 공격 중이거나 대시 중이면 무시
+    if (isAttacking || isDashing) return;
+
+    isAttacking = true;
+    attackStartTime = GetTickCount();
 }

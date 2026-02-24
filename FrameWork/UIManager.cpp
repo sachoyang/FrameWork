@@ -55,36 +55,11 @@ void UIManager::DrawMinimap()
             float drawY = startY + y * spacingY;
 
             // =========================================================
-            // 🌟 2. 방 모양 결정 (네모 & 직각 꺽쇠로 완벽한 상자 형태 구현)
+            // 🌟 1. 방 모양 결정 (모두 심플한 네모로 통일!)
             // =========================================================
             char roomChar[10] = "■";
 
-            bool isLeft = true, isRight = true, isTop = true, isBottom = true;
-            if (x > 0 && mapMng.m_Grid[y][x - 1] == rID) isLeft = false;
-            if (x < 5 && mapMng.m_Grid[y][x + 1] == rID) isRight = false;
-            if (y > 0 && mapMng.m_Grid[y - 1][x] == rID) isTop = false;
-            if (y < 5 && mapMng.m_Grid[y + 1][x] == rID) isBottom = false;
-
-            if (isLeft && isRight && isTop && isBottom) {
-                strcpy_s(roomChar, "■"); // 1x1 일반 네모
-            }
-            else {
-                // 2x2 맵 (직각 꺽쇠)
-                if (isTop && isLeft && !isRight && !isBottom) strcpy_s(roomChar, "┌");
-                else if (isTop && isRight && !isLeft && !isBottom) strcpy_s(roomChar, "┐");
-                else if (isBottom && isLeft && !isRight && !isTop) strcpy_s(roomChar, "└");
-                else if (isBottom && isRight && !isLeft && !isTop) strcpy_s(roomChar, "┘");
-
-                // 🌟 2x1 맵 (가로 네모 꺽쇠) -> [ 와 ] 사용
-                else if (isTop && isBottom && isLeft && !isRight) strcpy_s(roomChar, "[");
-                else if (isTop && isBottom && isRight && !isLeft) strcpy_s(roomChar, "]");
-
-                // 🌟 1x2 맵 (세로 네모 꺽쇠) -> ┌ 와 └ 사용 (길쭉한 네모 느낌)
-                else if (isLeft && isRight && isTop && !isBottom) strcpy_s(roomChar, "┌");
-                else if (isLeft && isRight && isBottom && !isTop) strcpy_s(roomChar, "└");
-            }
-
-            // 3. 시작 방/보스 방 S, B 표시
+            // 시작 방(S)과 보스 방(B)만 예외 처리
             if (rID == 1) {
                 strcpy_s(roomChar, "S");
             }
@@ -92,45 +67,53 @@ void UIManager::DrawMinimap()
                 strcpy_s(roomChar, "B");
             }
 
-            // 4. 색상 결정 
-            D3DCOLOR color = D3DCOLOR_ARGB(255, 180, 180, 180);
+            // =========================================================
+            // 2. 색상 결정 
+            // =========================================================
+            D3DCOLOR color = D3DCOLOR_ARGB(255, 180, 180, 180); // 일반 방 (회색)
 
-            if (rID == 1) color = D3DCOLOR_ARGB(255, 100, 200, 255);
-            else if (room->prefabID == 4 || room->prefabID == 16) color = D3DCOLOR_ARGB(255, 255, 100, 100);
+            if (rID == 1) color = D3DCOLOR_ARGB(255, 100, 200, 255); // 시작 (파랑)
+            else if (room->prefabID == 4 || room->prefabID == 16) color = D3DCOLOR_ARGB(255, 255, 100, 100); // 보스 (빨강)
 
+            // 현재 위치는 빛나는 초록색
             if (rID == mapMng.m_pCurrentMapChunk->id) {
                 color = D3DCOLOR_ARGB(255, 50, 255, 50);
             }
 
+            // 기호 렌더링
             dv_font.DrawString(roomChar, drawX, drawY, color);
 
             // =========================================================
-            // 5. 실제 연결된 문(통로)만 선으로 연결 및 대형 맵 병합
+            // 3. 맵 연결선 그리기
             // =========================================================
             D3DCOLOR doorColor = D3DCOLOR_ARGB(255, 100, 100, 100);
 
+            // [오른쪽 검사]
             if (x + 1 < 6)
             {
                 int rightRoomID = mapMng.m_Grid[y][x + 1];
+
                 if (rightRoomID == rID) {
-                    // 나랑 같은 맵 병합
-                    //dv_font.DrawString(m_bLargeMap ? "===" : "==", drawX + (spacingX * 0.5f), drawY, color);
+                    // 👉 나랑 같은 맵(큰 방)이면 굵은 선으로 끈끈하게 연결
+                    dv_font.DrawString(m_bLargeMap ? "===" : "==", drawX + (spacingX * 0.5f), drawY, color);
                 }
                 else if (rightRoomID != 0 && room->nextMapID[DIR_RIGHT] == rightRoomID) {
-                    // 다른 방 얇은 통로
+                    // 👉 다른 방으로 이어지는 통로(문)면 얇은 선(-)으로 연결
                     dv_font.DrawString("-", drawX + (spacingX * 0.45f), drawY, doorColor);
                 }
             }
 
+            // [아래쪽 검사]
             if (y + 1 < 6)
             {
                 int downRoomID = mapMng.m_Grid[y + 1][x];
+
                 if (downRoomID == rID) {
-                    // 나랑 같은 맵 병합
-                    //dv_font.DrawString("||", drawX + 8, drawY + (spacingY * 0.4f), color);
+                    // 👉 나랑 같은 맵(큰 방)이면 굵은 선
+                    dv_font.DrawString("||", drawX + 8, drawY + (spacingY * 0.4f), color);
                 }
                 else if (downRoomID != 0 && room->nextMapID[DIR_DOWN] == downRoomID) {
-                    // 다른 방 얇은 통로
+                    // 👉 다른 방으로 이어지는 통로(문)면 얇은 선(|)
                     dv_font.DrawString("|", drawX + 4, drawY + (spacingY * 0.45f), doorColor);
                 }
             }

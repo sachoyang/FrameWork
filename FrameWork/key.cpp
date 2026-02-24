@@ -322,6 +322,14 @@ void Key::Update()
 		knight.JumpCut();
 	}
 
+	//if (GetAsyncKeyState('X') & 0x8000)
+	//{
+	//	knight.AttackStart();
+	//}
+	if (KeyDown('X'))
+	{
+		knight.AttackStart();
+	}
 
 	if(KeyDown('C') )
 	{
