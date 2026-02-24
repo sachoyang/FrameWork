@@ -4,6 +4,7 @@ Sprite g_Load;
 
 Sprite::Sprite(void)
 {
+	Texture = NULL;
 }
 
 Sprite::~Sprite(void)
@@ -24,6 +25,12 @@ bool Sprite::Create(const char* filename, bool bUseTransparency, D3DCOLOR Transp
 	hr = D3DXCreateTextureFromFileEx(dv_font.Device9 ,
 		filename , imagesinfo.Width , imagesinfo.Height , 1 , 0 , 	D3DFMT_UNKNOWN , D3DPOOL_MANAGED,
 		D3DX_DEFAULT, 	D3DX_DEFAULT, transparencycolor,	&imagesinfo , 	NULL, 	&Texture ) ; 
+	
+	// 만약 경로에 이미지가 없어서 로딩에 실패했다면?
+	if (FAILED(hr)) {
+		Texture = NULL; // 텍스처를 NULL로 만들고
+		return false;   // 그냥 조용히 돌아가라 (게임 튕김 방지!)
+	}
 
 	return TRUE;
 	
@@ -38,7 +45,9 @@ bool Sprite::Create(const char* filename, bool bUseTransparency, D3DCOLOR Transp
 }
 
 void Sprite::Draw( float dx , float dy , float sx , float sy , float sw , float sh, float centerX, float centerY ) // 화면의 dx, dy에
-{																								   // 그림의 sx, sy부터 sw, sh 까지 출력해라
+{				
+	if (Texture == NULL) return;
+														// 그림의 sx, sy부터 sw, sh 까지 출력해라
 	RECT srcRect = { sx , sy , sw , sh } ;
 
 	D3DXVECTOR3 position( (float)dx, (float)dy, 1.0f ) ;
@@ -58,6 +67,7 @@ void Sprite::Draw( float dx , float dy , float sx , float sy , float sw , float 
 
 void Sprite::Draw(float x, float y)		// 화면의 x, y 에 출력해라.
 {
+	if (Texture == NULL) return;
 	D3DXVECTOR3 pos;
 	pos.x = x;
 	pos.y = y;
@@ -99,7 +109,8 @@ void Sprite::Draw(float x, float y)		// 화면의 x, y 에 출력해라.
 //}
 
 void Sprite::Render( float x , float y , float radian, float sx, float sy, int pivotMode) // 회전, 확대 출력
-{                                                                       // sx -1 : 좌우반전, sy -1 = 상하반전
+{   
+	if (Texture == NULL) return;// sx -1 : 좌우반전, sy -1 = 상하반전
     RECT Rect ;                                                           // sx 0 : 없어짐, 1 : 그대로, 2 : x축으로 2배 확대
     ID3DXSprite* pSprite ;                                                // pivotMode 0: Left Top, 1: Center Mid
 

@@ -84,22 +84,29 @@ void GroundEnemy::Update()
         // 평상시 걷기
         pos.x += (dir == -1) ? speed : -speed;
 
-        // 🌟 벽 및 낭떠러지 감지 센서!
+        // 🌟 [수정] 1. 벽 감지 센서: 위아래 높이를 깎아서 '바닥'을 벽으로 오해하지 않게 만듭니다!
         RECT nextRc = m_rc;
-        nextRc.left += (dir == -1) ? 5 : -5; nextRc.right += (dir == -1) ? 5 : -5;
+        nextRc.top += 10;
+        nextRc.bottom -= 10;
+        nextRc.left += (dir == -1) ? 5 : -5;
+        nextRc.right += (dir == -1) ? 5 : -5;
 
-        RECT cliffRc = nextRc; // 낭떠러지 센서는 발 밑을 검사
-        cliffRc.top += 80; cliffRc.bottom += 80;
+        // 🌟 [수정] 2. 낭떠러지 감지 센서: 내 앞쪽 발밑 공간만 정확히 찝어서 검사합니다!
+        RECT cliffRc = m_rc;
+        cliffRc.left += (dir == -1) ? 20 : -20;
+        cliffRc.right += (dir == -1) ? 20 : -20;
+        cliffRc.top = m_rc.bottom + 5;
+        cliffRc.bottom = m_rc.bottom + 30;
 
         bool hitWall = false;
         bool hitFloor = false;
         RECT temp;
         for (auto& w : coll.m_Walls) {
-            if (IntersectRect(&temp, &nextRc, &w)) hitWall = true;  // 벽에 박음
-            if (IntersectRect(&temp, &m_rc, &w)) {                  // 바닥 착지
+            if (IntersectRect(&temp, &nextRc, &w)) hitWall = true;  // 진짜 벽에 박음
+            if (IntersectRect(&temp, &m_rc, &w)) {                  // 몸체가 바닥에 착지
                 pos.y = w.top - 40.0f; gravity = 0;
             }
-            if (IntersectRect(&temp, &cliffRc, &w)) hitFloor = true; // 앞에 바닥이 있음
+            if (IntersectRect(&temp, &cliffRc, &w)) hitFloor = true; // 앞에 밟을 바닥이 있음
         }
 
         // 벽에 막히거나, 앞에 낭떠러지(바닥 없음)면 뒤돌기!
@@ -136,6 +143,13 @@ void FlyEnemy::Update()
         pos.y += gravity; gravity += 0.5f;
         pos.x += velocity.x; velocity.x *= 0.9f;
 
+        // 🌟 [핵심 수정] 넉백 당하는 만큼 비행 기준점(startPos)도 같이 밀려나게 합니다!
+        // 이렇게 하면 순간이동하지 않고, 밀려난 그 자리에서부터 다시 8자 비행을 자연스럽게 이어갑니다.
+        if (!isDead) {
+            startPos.x += velocity.x;
+            startPos.y += gravity;
+        }
+
         // 바닥에 닿으면 멈춤
         RECT temp;
         for (auto& w : coll.m_Walls) {
@@ -143,7 +157,7 @@ void FlyEnemy::Update()
         }
     }
     else {
-        // 🌟 수학의 마법: 부드러운 ∞ (무한대 8자) 비행 궤도
+        // 수학의 마법: 부드러운 ∞ (무한대 8자) 비행 궤도
         DWORD t = GetTickCount() - spawnTime;
         float speed = 0.0015f;
 

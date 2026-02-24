@@ -177,7 +177,7 @@ void Knight::Update()
                 if (attackType == 2 && isAttackHit)
                 {
                     gravity = -13.0f; // 공중에서 위로 강하게 튕겨오름! (체공 시간 벌기)
-                    isAttackHit = false; // 연달아 무한 점프하지 않도록 판정 1회 소모
+                    //isAttackHit = false; // 연달아 무한 점프하지 않도록 판정 1회 소모
                 }
             }
         }

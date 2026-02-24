@@ -1734,6 +1734,9 @@ void MapManager::Update(double frame)
 
 					if (knight.attackType == 2) { // 하단 찍기 포고 점프!
 						knight.gravity = -13.0f;
+						// 강제로 공중 판정을 주고, 바닥에서 5픽셀 강제로 뜯어냅니다! (끼임 방지)
+						knight.grounded = false;
+						knight.pos.y -= 5.0f;
 					}
 				}
 			}
@@ -1748,13 +1751,14 @@ void MapManager::Update(double frame)
 		}
 
 		// (옵션) 시체가 된 지 3초 후 삭제
-		/*if (e->isDead && (GetTickCount() - e->hitStartTime > 3000)) {
+		if (e->isDead && (GetTickCount() - e->hitStartTime > 3000)) {
 			delete e;
 			it = m_Enemies.erase(it);
 		}
 		else {
 			++it;
-		}*/
+		}
+		//++it;
 	}
 }
 void MapManager::Draw()
