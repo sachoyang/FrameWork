@@ -5,6 +5,9 @@ UIManager uiMng;
 UIManager::UIManager()
 {
     m_bLargeMap = false; // 기본은 우측 상단 미니맵 모드
+    lastHp = 8;
+    breakingHeartIndex = -1;
+    breakStartTime = 0;
 }
 
 UIManager::~UIManager()
@@ -13,12 +16,31 @@ UIManager::~UIManager()
 
 void UIManager::Init()
 {
+    char FileName[256];
+    sprintf_s(FileName, "./resource/Img/ui/heart_full.png");
+    heartFull.Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/ui/heart_empty.png");
+    heartEmpty.Create(FileName, false, 0);
 	m_bLargeMap = false; // 게임 시작 시에는 항상 미니맵 모드로 시작
+
+    sprintf_s(FileName, "./resource/Img/UI/heart_break01.png"); heartBreak[0].Create(FileName, false, 0);
+    sprintf_s(FileName, "./resource/Img/UI/heart_break02.png"); heartBreak[1].Create(FileName, false, 0);
+    sprintf_s(FileName, "./resource/Img/UI/heart_break03.png"); heartBreak[2].Create(FileName, false, 0);
+
+	lastHp = knight.maxHp; // 초기 체력 상태 저장
 }
 
 void UIManager::Update()
 {
     // 나중에 체력 애니메이션 등이 생기면 여기서 처리
+    if (knight.hp < lastHp) 
+    {
+        breakingHeartIndex = knight.hp; // 방금 깎인 바로 그 위치의 하트!
+        breakStartTime = GetTickCount();
+    }
+    // (체력이 회복될 수도 있으니 동기화)
+    lastHp = knight.hp;
 }
 
 void UIManager::Draw()
@@ -29,6 +51,36 @@ void UIManager::Draw()
     DrawMinimap();
 
     // 2. 향후 체력바, 스킬 아이콘 등은 여기에 추가
+    // =========================================================
+    // 🌟 2. 기사 체력(HP) 그리기
+    // =========================================================
+    float startX = 30.0f; // 화면 왼쪽 여백
+    float startY = 30.0f; // 화면 위쪽 여백
+    float spacingX = 50.0f; // 하트 간격 (이미지 크기에 맞게 조절하세요!)
+
+    for (int i = 0; i < knight.maxHp; i++)
+    {
+        float drawX = startX + (i * spacingX);
+
+        if (i < knight.hp) {
+            // 온전한 하트
+            heartFull.Render(drawX, startY, 0, 1, 1);
+        }
+        else if (i == breakingHeartIndex) {
+            // 깨지는 중인 하트! (100ms마다 프레임 변경)
+            DWORD t = GetTickCount() - breakStartTime;
+            if (t < 100)      heartBreak[0].Render(drawX, startY, 0, 1, 1);
+            else if (t < 200) heartBreak[1].Render(drawX, startY, 0, 1, 1);
+            else if (t < 300) heartBreak[2].Render(drawX, startY, 0, 1, 1);
+            else {
+                heartEmpty.Render(drawX, startY, 0, 1, 1); // 다 깨지면 빈 하트로
+            }
+        }
+        else {
+            // 이미 다 깨져서 비어버린 하트
+            heartEmpty.Render(drawX, startY, 0, 1, 1);
+        }
+    }
 }
 
 void UIManager::DrawMinimap()

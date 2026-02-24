@@ -19,6 +19,7 @@ void Game::Init()
 	//player.Init();
 	sound.Init();
 	Gmanager.Init();
+	uiMng.Init();
 	// 데이타 베이스///////////////////
 	//sql.Init();
 }

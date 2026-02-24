@@ -67,25 +67,29 @@ void GroundEnemy::Update()
 {
     if (GetTickCount() - aniTime > 150) {
         aniCount++;
-        if (isDead) { if (aniCount > 1) aniCount = 1; } // 시체는 마지막 프레임 유지
+        if (isDead) { if (aniCount > 1) aniCount = 1; }
         else { if (aniCount > 2) aniCount = 0; }
         aniTime = GetTickCount();
     }
 
-    // 중력 적용
-    pos.y += gravity;
-    gravity += 0.5f; if (gravity > 10.0f) gravity = 10.0f;
+    // 시체가 땅에 안착했다면 물리 연산을 완전히 멈춤 (떨림 방지!)
+    bool isRestingCorpse = (isDead && gravity == 0 && abs(velocity.x) < 0.5f);
 
-    // x축 이동
-    if (isHit || isDead) {
-        pos.x += velocity.x;
-        velocity.x *= 0.9f;
-    }
-    else {
-        pos.x += (dir == -1) ? speed : -speed;
+    if (!isRestingCorpse) {
+        // 중력 적용
+        pos.y += gravity;
+        gravity += 0.5f; if (gravity > 10.0f) gravity = 10.0f;
+
+        // x축 이동
+        if (isHit || isDead) {
+            pos.x += velocity.x;
+            velocity.x *= 0.9f;
+        }
+        else {
+            pos.x += (dir == -1) ? speed : -speed;
+        }
     }
 
-    // 🌟 [핵심 수정] 살았든 죽었든 "무조건" 바닥 충돌 검사를 해야 땅으로 안 꺼집니다!
     RECT nextRc = m_rc;
     nextRc.top += 10; nextRc.bottom -= 10;
     nextRc.left += (dir == -1) ? 5 : -5; nextRc.right += (dir == -1) ? 5 : -5;
@@ -99,30 +103,24 @@ void GroundEnemy::Update()
     RECT temp;
 
     for (auto& w : coll.m_Walls) {
-        // 벽/낭떠러지 센서는 살아있을 때만 체크
         if (!isDead && IntersectRect(&temp, &nextRc, &w)) hitWall = true;
         if (!isDead && IntersectRect(&temp, &cliffRc, &w)) hitFloor = true;
 
-        // 🌟 바닥 착지는 살아있든 죽어있든(시체) 항상 적용!
         if (IntersectRect(&temp, &m_rc, &w)) {
-            // 발바닥이 벽 윗면 근처일 때만 착지 (통과 방지)
             if (gravity >= 0 && (m_rc.bottom - 20) <= w.top) {
                 pos.y = w.top - 40.0f;
                 gravity = 0;
-                if (isDead) velocity.x = 0; // 시체가 땅에 닿으면 미끄러짐 멈춤
+                if (isDead) velocity.x = 0; // 시체 미끄러짐 멈춤 (동결 시작)
             }
         }
     }
 
-    if (!isHit && !isDead) { // 살아있을 때만 뒤돌기
-        if (hitWall || (!hitFloor && gravity == 0)) {
-            dir *= -1;
-        }
+    if (!isHit && !isDead) {
+        if (hitWall || (!hitFloor && gravity == 0)) dir *= -1;
     }
 
     SetRect(&m_rc, pos.x - 30, pos.y - 40, pos.x + 30, pos.y + 40);
 }
-
 // ==========================================
 // [자식 2] 비행 몹 (Fly Enemy)
 // ==========================================
@@ -144,16 +142,20 @@ void FlyEnemy::Update()
         aniTime = GetTickCount();
     }
 
-    if (isDead || isHit) {
-        pos.y += gravity; gravity += 0.5f;
-        pos.x += velocity.x; velocity.x *= 0.9f;
+    bool isRestingCorpse = (isDead && gravity == 0 && abs(velocity.x) < 0.5f);
 
-        if (!isDead) {
-            startPos.x += velocity.x;
-            startPos.y += gravity;
+    if (isDead || isHit) {
+        // 🌟 [핵심 수정] 비행 몹 시체도 땅에 닿으면 동결
+        if (!isRestingCorpse) {
+            pos.y += gravity; gravity += 0.5f;
+            pos.x += velocity.x; velocity.x *= 0.9f;
+
+            if (!isDead) {
+                startPos.x += velocity.x;
+                startPos.y += gravity;
+            }
         }
 
-        // 🌟 [수정] 비행 몹 시체도 정확히 바닥에 안착하도록 조건 강화
         RECT temp;
         for (auto& w : coll.m_Walls) {
             if (IntersectRect(&temp, &m_rc, &w)) {
@@ -168,12 +170,10 @@ void FlyEnemy::Update()
     else {
         DWORD t = GetTickCount() - spawnTime;
         float speed = 0.0015f;
-
         float nextX = startPos.x + 250.0f * sin(t * speed);
         float nextY = startPos.y + 80.0f * sin(t * speed * 2.0f);
 
         if (nextX > pos.x) dir = -1; else dir = 1;
-
         pos.x = nextX; pos.y = nextY;
     }
 
