@@ -1,4 +1,4 @@
-#include "Include.h"
+ï»¿#include "Include.h"
 
 Knight knight;
 
@@ -16,12 +16,12 @@ Knight::Knight()
     grounded = false;
     dir = -1;
 
-	//´ë½Ã °ü·Ã ÃÊ±âÈ­
+	//ëŒ€ì‹œ ê´€ë ¨ ì´ˆê¸°í™”
     isDashing = false;
     canAirDash = true;
     dashStartTime = 0;
     dashCooldownTime = 0;
-    dashSpeed = 25.0f; // ´ë½Ã ¼Óµµ (°È±âº¸´Ù ÈÎ¾À ºü¸£°Ô)
+    dashSpeed = 25.0f; // ëŒ€ì‹œ ì†ë„ (ê±·ê¸°ë³´ë‹¤ í›¨ì”¬ ë¹ ë¥´ê²Œ)
 }
 
 Knight::~Knight()
@@ -46,7 +46,7 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/Lookdown01.png");
     Knightimg[5].Create(FileName, false, D3DCOLOR_XRGB(0, 0, 0));
 
-    // 6: Á¡ÇÁ ÁØºñ, 7: »ó½Â, 8: ²À´ë±â, 9: ÇÏ°­, 10: ÂøÁö
+    // 6: ì í”„ ì¤€ë¹„, 7: ìƒìŠ¹, 8: ê¼­ëŒ€ê¸°, 9: í•˜ê°•, 10: ì°©ì§€
     sprintf_s(FileName, "./resource/Img/knight1/jump01.png");
     Knightimg[6].Create(FileName, false, 0);
 
@@ -62,27 +62,34 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/fall02.png");
     Knightimg[10].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/knight1/dash01.png"); // ÁØºñ
+    sprintf_s(FileName, "./resource/Img/knight1/dash01.png"); // ì¤€ë¹„
     Knightimg[11].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/knight1/dash02.png"); // ´ë½Ã Áß
+    sprintf_s(FileName, "./resource/Img/knight1/dash02.png"); // ëŒ€ì‹œ ì¤‘
     Knightimg[12].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/knight1/dash03.png"); // °øÁß ´À³¦
+    sprintf_s(FileName, "./resource/Img/knight1/dash03.png"); // ê³µì¤‘ ëŠë‚Œ
     Knightimg[13].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/knight1/dash04.png"); // Á¤Áö
+    sprintf_s(FileName, "./resource/Img/knight1/dash04.png"); // ì •ì§€
     Knightimg[14].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/knight1/attack01.png"); // °ø°İ ÁØºñ
+    sprintf_s(FileName, "./resource/Img/knight1/attack01.png"); // ê³µê²© ì¤€ë¹„
     Knightimg[15].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/knight1/attack02.png"); // Ä® ÈÖµÎ¸§ (È÷Æ®¹Ú½º ¹ß»ı)
+    sprintf_s(FileName, "./resource/Img/knight1/attack02.png"); // ì¹¼ íœ˜ë‘ë¦„ (íˆíŠ¸ë°•ìŠ¤ ë°œìƒ)
     Knightimg[16].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/knight1/attack03.png"); // °ø°İ ¸¶¹«¸®
+    sprintf_s(FileName, "./resource/Img/knight1/attack03.png"); // ê³µê²© ë§ˆë¬´ë¦¬
     Knightimg[17].Create(FileName, false, 0);
 
+    sprintf_s(FileName, "./resource/Img/effect/hit.png");
+    hitEffect[0].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/effect/unhit.png");
+    unhitEffect[0].Create(FileName, false, 0);
+
+    isAttackHit = false;
     isAttacking = false;
     attackStartTime = 0;
     SetRect(&attackBox, 0, 0, 0, 0);
@@ -101,36 +108,36 @@ void Knight::Update()
     if (GetTickCount() - m_KnightAniTime > 10)
     {
         // ========================================================
-        // 0´Ü°è: °ø°İ »óÅÂ ¹× È÷Æ®¹Ú½º(AttackBox) ¾÷µ¥ÀÌÆ®
+        // 0ë‹¨ê³„: ê³µê²© ìƒíƒœ ë° íˆíŠ¸ë°•ìŠ¤(AttackBox) ì—…ë°ì´íŠ¸
         // ========================================================
         if (isAttacking)
         {
             DWORD attackTime = GetTickCount() - attackStartTime;
 
-            // °ø°İ Áö¼Ó ½Ã°£ (¿¹: 300ms = 0.3ÃÊ µ¿¾È °ø°İ)
+            // ê³µê²© ì§€ì† ì‹œê°„ (ì˜ˆ: 300ms = 0.3ì´ˆ ë™ì•ˆ ê³µê²©)
             if (attackTime > 300)
             {
                 isAttacking = false;
-                SetRect(&attackBox, 0, 0, 0, 0); // °ø°İÀÌ ³¡³ª¸é È÷Æ®¹Ú½º ¼Ò¸ê
+                SetRect(&attackBox, 0, 0, 0, 0); // ê³µê²©ì´ ëë‚˜ë©´ íˆíŠ¸ë°•ìŠ¤ ì†Œë©¸
             }
             else
             {
-                // ±â»ç°¡ ¹Ù¶óº¸´Â ¹æÇâ(dir)¿¡ µû¶ó È÷Æ®¹Ú½º »ı¼º À§Ä¡°¡ ´Ù¸§
-                // ±â»çÀÇ ¸öÅë(pos)À» ±âÁØÀ¸·Î ¾ÕÂÊ¿¡ ³×¸ğ³­ °ø°İ ÆÇÁ¤À» ¸¸µì´Ï´Ù.
-                if (dir == 1) // ¿ŞÂÊÀ» º¸°í ÀÖÀ» ¶§
+                // ê¸°ì‚¬ê°€ ë°”ë¼ë³´ëŠ” ë°©í–¥(dir)ì— ë”°ë¼ íˆíŠ¸ë°•ìŠ¤ ìƒì„± ìœ„ì¹˜ê°€ ë‹¤ë¦„
+                // ê¸°ì‚¬ì˜ ëª¸í†µ(pos)ì„ ê¸°ì¤€ìœ¼ë¡œ ì•ìª½ì— ë„¤ëª¨ë‚œ ê³µê²© íŒì •ì„ ë§Œë“­ë‹ˆë‹¤.
+                if (dir == 1) // ì™¼ìª½ì„ ë³´ê³  ìˆì„ ë•Œ
                 {
-                    attackBox.left = pos.x - 100; // »ç°Å¸® 90
+                    attackBox.left = pos.x - 160; // ì‚¬ê±°ë¦¬
                     attackBox.right = pos.x - 10;
                 }
-                else // ¿À¸¥ÂÊÀ» º¸°í ÀÖÀ» ¶§
+                else // ì˜¤ë¥¸ìª½ì„ ë³´ê³  ìˆì„ ë•Œ
                 {
                     attackBox.left = pos.x + 10;
-                    attackBox.right = pos.x + 100;  // »ç°Å¸® 90 
+                    attackBox.right = pos.x + 160;  // ì‚¬ê±°ë¦¬
                 }
 
-                // YÃà(»óÇÏ) ÆÇÁ¤ ¹üÀ§ (¸Ó¸® À§ºÎÅÍ ¹ß³¡ »ìÂ¦ À§±îÁö)
-                attackBox.top = pos.y - 30;
-                attackBox.bottom = pos.y + 20;
+                // Yì¶•(ìƒí•˜) íŒì • ë²”ìœ„ (ë¨¸ë¦¬ ìœ„ë¶€í„° ë°œë ì‚´ì§ ìœ„ê¹Œì§€)
+                attackBox.top = pos.y - 60;
+                attackBox.bottom = pos.y + 30;
             }
         }
         else
@@ -139,40 +146,40 @@ void Knight::Update()
         }
 
         // ========================================================
-        // 1´Ü°è: ¼öÆò(X) ÀÌµ¿ ¹× Ãæµ¹ Ã³¸® (°È±â + ´ë½Ã)
+        // 1ë‹¨ê³„: ìˆ˜í‰(X) ì´ë™ ë° ì¶©ëŒ ì²˜ë¦¬ (ê±·ê¸° + ëŒ€ì‹œ)
         // ========================================================
         float moveX = 0.0f;
 
-        // [´ë½Ã Áß]
+        // [ëŒ€ì‹œ ì¤‘]
         if (isDashing)
         {
-            if (GetTickCount() - dashStartTime > 200) // ´ë½Ã Áö¼Ó½Ã°£ ³¡
+            if (GetTickCount() - dashStartTime > 200) // ëŒ€ì‹œ ì§€ì†ì‹œê°„ ë
             {
                 isDashing = false;
                 gravity = 0;
             }
             else
             {
-                moveX = -(dir * dashSpeed); // ´ë½Ã ÀÌµ¿·® °è»ê
+                moveX = -(dir * dashSpeed); // ëŒ€ì‹œ ì´ë™ëŸ‰ ê³„ì‚°
             }
         }
-        // [°È±â »óÅÂ] (Key.cpp¿¡¼­ ÀÌ¹Ì pos.x¸¦ °Çµå·Á¼­ ¿ÔÀ¸¹Ç·Î º¯È­·®À» ÃßÀûÇØ¾ß ÇÔ)
-        // ÇÏÁö¸¸ Áö±İ ±¸Á¶»ó Key.cpp°¡ pos.x¸¦ Á÷Á¢ ¹Ù²Ù¹Ç·Î, 
-        // ¿©±â¼­ "ÀÌµ¿ ÈÄ À§Ä¡"°¡ º®ÀÌ¶ó¸é "ÀÌµ¿ Àü"À¸·Î µÇµ¹¸®´Â ¹æ½ÄÀ» ¾¹´Ï´Ù.
+        // [ê±·ê¸° ìƒíƒœ] (Key.cppì—ì„œ ì´ë¯¸ pos.xë¥¼ ê±´ë“œë ¤ì„œ ì™”ìœ¼ë¯€ë¡œ ë³€í™”ëŸ‰ì„ ì¶”ì í•´ì•¼ í•¨)
+        // í•˜ì§€ë§Œ ì§€ê¸ˆ êµ¬ì¡°ìƒ Key.cppê°€ pos.xë¥¼ ì§ì ‘ ë°”ê¾¸ë¯€ë¡œ, 
+        // ì—¬ê¸°ì„œ "ì´ë™ í›„ ìœ„ì¹˜"ê°€ ë²½ì´ë¼ë©´ "ì´ë™ ì „"ìœ¼ë¡œ ë˜ëŒë¦¬ëŠ” ë°©ì‹ì„ ì”ë‹ˆë‹¤.
 
-        // 1-1. ÀÏ´Ü ´ë½Ã ÀÌµ¿ Àû¿ë (°È±â´Â Key.cpp¿¡¼­ ÀÌ¹Ì Àû¿ëµÊ)
+        // 1-1. ì¼ë‹¨ ëŒ€ì‹œ ì´ë™ ì ìš© (ê±·ê¸°ëŠ” Key.cppì—ì„œ ì´ë¯¸ ì ìš©ë¨)
         if (isDashing) pos.x += moveX;
 
-        // 1-2. ÇöÀç À§Ä¡·Î ¹Ú½º °»½Å
+        // 1-2. í˜„ì¬ ìœ„ì¹˜ë¡œ ë°•ìŠ¤ ê°±ì‹ 
         m_rc.left = pos.x - 40;
         m_rc.top = pos.y - 40;
         m_rc.right = pos.x + imagesinfo.Width - 50;
         m_rc.bottom = pos.y + imagesinfo.Height - 70;
 
-        // 1-3. [¼öÆò Ãæµ¹ °Ë»ç] (¹Ù´Ú¿¡ °É¸®´Â °Í ¹æÁö À§ÇØ À§¾Æ·¡¸¦ ÁÙÀÓ!)
+        // 1-3. [ìˆ˜í‰ ì¶©ëŒ ê²€ì‚¬] (ë°”ë‹¥ì— ê±¸ë¦¬ëŠ” ê²ƒ ë°©ì§€ ìœ„í•´ ìœ„ì•„ë˜ë¥¼ ì¤„ì„!)
         RECT wallCheckRect = m_rc;
-        wallCheckRect.top += 10;    // ¸Ó¸® ÂÊ ¿©À¯ (ÃµÀå¿¡ ¸Ó¸® ¹Ú°í °ÉÀ» ¶§ °É¸² ¹æÁö)
-        wallCheckRect.bottom -= 10; // ¹ß ÂÊ ¿©À¯ (¹Ù´Ú¿¡ 1px ¹ÚÇôÀÖÀ» ¶§ °É¸² ¹æÁö)
+        wallCheckRect.top += 10;    // ë¨¸ë¦¬ ìª½ ì—¬ìœ  (ì²œì¥ì— ë¨¸ë¦¬ ë°•ê³  ê±¸ì„ ë•Œ ê±¸ë¦¼ ë°©ì§€)
+        wallCheckRect.bottom -= 10; // ë°œ ìª½ ì—¬ìœ  (ë°”ë‹¥ì— 1px ë°•í˜€ìˆì„ ë•Œ ê±¸ë¦¼ ë°©ì§€)
 
         bool isHitWall = false;
         RECT tempRect;
@@ -186,26 +193,26 @@ void Knight::Update()
             }
         }
 
-        // 1-4. º®¿¡ ºÎµúÇû´Ù¸é? -> Æ¨°Ü³»±â!
+        // 1-4. ë²½ì— ë¶€ë”ªí˜”ë‹¤ë©´? -> íŠ•ê²¨ë‚´ê¸°!
         if (isHitWall)
         {
             if (isDashing)
             {
-                // ´ë½Ã Áß º® Ãæµ¹ -> ´ë½Ã Á¾·á ¹× ¿ø»óº¹±¸
+                // ëŒ€ì‹œ ì¤‘ ë²½ ì¶©ëŒ -> ëŒ€ì‹œ ì¢…ë£Œ ë° ì›ìƒë³µêµ¬
                 isDashing = false;
                 pos.x -= moveX;
             }
             if(isMove)
             {
-                // °È±â Áß º® Ãæµ¹ -> Key.cpp°¡ ¿Å±ä °É Ãë¼ÒÇØ¾ß ÇÔ
-                // Key.cpp¿¡¼­ 3.0f¸¸Å­ ¿òÁ÷¿´´Ù°í °¡Á¤ÇÏ°í ¹İ´ë·Î ¹Ò
-                // (Á¤È®È÷ ÇÏ·Á¸é prevX¸¦ ÀúÀåÇØ¾ß ÇÏÁö¸¸, °£´ÜÈ÷ ¹İ´ë ¹æÇâÀ¸·Î ¹Ò)
+                // ê±·ê¸° ì¤‘ ë²½ ì¶©ëŒ -> Key.cppê°€ ì˜®ê¸´ ê±¸ ì·¨ì†Œí•´ì•¼ í•¨
+                // Key.cppì—ì„œ 3.0fë§Œí¼ ì›€ì§ì˜€ë‹¤ê³  ê°€ì •í•˜ê³  ë°˜ëŒ€ë¡œ ë°ˆ
+                // (ì •í™•íˆ í•˜ë ¤ë©´ prevXë¥¼ ì €ì¥í•´ì•¼ í•˜ì§€ë§Œ, ê°„ë‹¨íˆ ë°˜ëŒ€ ë°©í–¥ìœ¼ë¡œ ë°ˆ)
                 
-                if (dir == 1) pos.x += 3.0f; // ¿ŞÂÊ º¸°í ÀÖ¾úÀ¸¸é ¿À¸¥ÂÊÀ¸·Î ¹Ò
-                else pos.x -= 3.0f;          // ¿À¸¥ÂÊ º¸°í ÀÖ¾úÀ¸¸é ¿ŞÂÊÀ¸·Î ¹Ò
+                if (dir == 1) pos.x += 3.0f; // ì™¼ìª½ ë³´ê³  ìˆì—ˆìœ¼ë©´ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë°ˆ
+                else pos.x -= 3.0f;          // ì˜¤ë¥¸ìª½ ë³´ê³  ìˆì—ˆìœ¼ë©´ ì™¼ìª½ìœ¼ë¡œ ë°ˆ
             }
 
-            // À§Ä¡ º¹±¸ ÈÄ ¹Ú½º Àç°»½Å
+            // ìœ„ì¹˜ ë³µêµ¬ í›„ ë°•ìŠ¤ ì¬ê°±ì‹ 
             m_rc.left = pos.x - 40;
             m_rc.top = pos.y - 40;
             m_rc.right = pos.x + imagesinfo.Width - 50;
@@ -214,58 +221,58 @@ void Knight::Update()
 
 
         // ========================================================
-        // 2´Ü°è: ¼öÁ÷(Y) ÀÌµ¿ ¹× Ãæµ¹ Ã³¸® (Áß·Â + Á¡ÇÁ)
+        // 2ë‹¨ê³„: ìˆ˜ì§(Y) ì´ë™ ë° ì¶©ëŒ ì²˜ë¦¬ (ì¤‘ë ¥ + ì í”„)
         // ========================================================
 
-        // 2-1. Áß·Â Àû¿ë (´ë½Ã Áß¿£ ¹«½Ã)
+        // 2-1. ì¤‘ë ¥ ì ìš© (ëŒ€ì‹œ ì¤‘ì—” ë¬´ì‹œ)
         if (!isDashing)
         {
             if (!grounded) pos.y += gravity;
         }
 
-        // 2-2. YÃà ÀÌµ¿ ÈÄ ¹Ú½º °»½Å
+        // 2-2. Yì¶• ì´ë™ í›„ ë°•ìŠ¤ ê°±ì‹ 
         m_rc.left = pos.x - 40;
         m_rc.top = pos.y - 40;
         m_rc.right = pos.x + imagesinfo.Width - 50;
         m_rc.bottom = pos.y + imagesinfo.Height - 70;
 
-        // 2-3. [¼öÁ÷ Ãæµ¹ °Ë»ç]
+        // 2-3. [ìˆ˜ì§ ì¶©ëŒ ê²€ì‚¬]
         bool isLanded = false;
 
-        if (!isDashing) // ´ë½Ã Áß¿£ ¹Ù´Ú ÂøÁö ¾È ÇÔ (°øÁß ºÎ¾ç)
+        if (!isDashing) // ëŒ€ì‹œ ì¤‘ì—” ë°”ë‹¥ ì°©ì§€ ì•ˆ í•¨ (ê³µì¤‘ ë¶€ì–‘)
         {
             for (auto& wall : coll.m_Walls)
             {
                 if (IntersectRect(&tempRect, &m_rc, &wall))
                 {
-                    // ¹Ù´Ú ÂøÁö ÆÇÁ¤ (³»·Á¿À°í ÀÖ°í + ¹ßÀÌ º® À­¸é ±ÙÃ³)
+                    // ë°”ë‹¥ ì°©ì§€ íŒì • (ë‚´ë ¤ì˜¤ê³  ìˆê³  + ë°œì´ ë²½ ìœ—ë©´ ê·¼ì²˜)
                     if (gravity >= 0 && (m_rc.bottom - 30) < wall.top)
                     {
                         grounded = true;
-                        canAirDash = true; // °øÁß ´ë½Ã ¸®ÇÊ
+                        canAirDash = true; // ê³µì¤‘ ëŒ€ì‹œ ë¦¬í•„
                         isLanded = true;
                         gravity = 0;
 
-                        // [¶³¸² ¹æÁö +1.0f Àû¿ë]
+                        // [ë–¨ë¦¼ ë°©ì§€ +1.0f ì ìš©]
                         pos.y = (float)wall.top - (imagesinfo.Height - 70) + 1.0f;
 
-                        // À§Ä¡ º¸Á¤ ÈÄ ÃÖÁ¾ ¹Ú½º °»½Å
+                        // ìœ„ì¹˜ ë³´ì • í›„ ìµœì¢… ë°•ìŠ¤ ê°±ì‹ 
                         m_rc.left = pos.x - 40;
                         m_rc.top = pos.y - 40;
                         m_rc.right = pos.x + imagesinfo.Width - 50;
                         m_rc.bottom = pos.y + imagesinfo.Height - 70;
                         break;
                     }
-                    // ¸Ó¸® Âö±â ÆÇÁ¤ (¿Ã¶ó°¡°í ÀÖ°í + ¸Ó¸® ÂÊÀÌ ºÎµúÈû)
+                    // ë¨¸ë¦¬ ì°§ê¸° íŒì • (ì˜¬ë¼ê°€ê³  ìˆê³  + ë¨¸ë¦¬ ìª½ì´ ë¶€ë”ªí˜)
                     else if (gravity < 0)
                     {
-                        gravity = 0; // »ó½Â Èû Á¦°Å (¸Ó¸® Äô)
+                        gravity = 0; // ìƒìŠ¹ í˜ ì œê±° (ë¨¸ë¦¬ ì¿µ)
 
-                        // ¸Ó¸® À§Ä¡ º¸Á¤: º®ÀÇ ¹Ù´Ú(wall.bottom) ¹Ù·Î ¾Æ·¡·Î ³»¸²
-                        // m_rc.top = pos.y - 40 ÀÌ¹Ç·Î, pos.y = wall.bottom + 40
+                        // ë¨¸ë¦¬ ìœ„ì¹˜ ë³´ì •: ë²½ì˜ ë°”ë‹¥(wall.bottom) ë°”ë¡œ ì•„ë˜ë¡œ ë‚´ë¦¼
+                        // m_rc.top = pos.y - 40 ì´ë¯€ë¡œ, pos.y = wall.bottom + 40
                         pos.y = (float)wall.bottom + 40.0f;
 
-                        // ¹Ú½º °»½Å
+                        // ë°•ìŠ¤ ê°±ì‹ 
                         m_rc.left = pos.x - 40;
                         m_rc.top = pos.y - 40;
                         m_rc.right = pos.x + imagesinfo.Width - 50;
@@ -277,7 +284,7 @@ void Knight::Update()
 
         if (!isLanded) grounded = false;
 
-        // 2-4. Áß·Â °¡¼Ó
+        // 2-4. ì¤‘ë ¥ ê°€ì†
         if (!grounded && !isDashing)
         {
             gravity += 0.6f;
@@ -286,17 +293,17 @@ void Knight::Update()
 
 
         // ========================================================
-        // 3´Ü°è: ¾Ö´Ï¸ŞÀÌ¼Ç Ã³¸®
+        // 3ë‹¨ê³„: ì• ë‹ˆë©”ì´ì…˜ ì²˜ë¦¬
         // ========================================================
         if (GetTickCount() - m_KnightAniTime > 50)
         {
-            // °ø°İ ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ÃÖ¿ì¼±!
+            // ê³µê²© ì• ë‹ˆë©”ì´ì…˜ì´ ìµœìš°ì„ !
             if (isAttacking)
             {
                 DWORD attackTime = GetTickCount() - attackStartTime;
-                if (attackTime < 100)      m_KnightCount = 15; // 0.1ÃÊ: ÁØºñ
-                else if (attackTime < 200) m_KnightCount = 16; // 0.2ÃÊ: ÈÖµÎ¸§
-                else                       m_KnightCount = 17; // 0.3ÃÊ: ¸¶¹«¸®
+                if (attackTime < 100)      m_KnightCount = 15; // 0.1ì´ˆ: ì¤€ë¹„
+                else if (attackTime < 200) m_KnightCount = 16; // 0.2ì´ˆ: íœ˜ë‘ë¦„
+                else                       m_KnightCount = 17; // 0.3ì´ˆ: ë§ˆë¬´ë¦¬
             }
             else if (isDashing)
             {
@@ -335,50 +342,50 @@ void Knight::Update()
 //        if (!grounded) pos.y += gravity;
 //
 //        // Collision Check
-//        bool isCollided = false; // ÀÌ¹ø ÇÁ·¹ÀÓ¿¡ ¶¥¿¡ ´ê¾Ò´ÂÁö Ã¼Å©
+//        bool isCollided = false; // ì´ë²ˆ í”„ë ˆì„ì— ë•…ì— ë‹¿ì•˜ëŠ”ì§€ ì²´í¬
 //        RECT tempRect;
 //
-//        // coll.m_Walls ¸®½ºÆ®¸¦ ¼øÈ¸
+//        // coll.m_Walls ë¦¬ìŠ¤íŠ¸ë¥¼ ìˆœíšŒ
 //        for (auto& wall : coll.m_Walls)
 //        {
 //            if (IntersectRect(&tempRect, &m_rc, &wall))
 //            {
-//                // [ÂøÁö ÆÇÁ¤] ¶³¾îÁö´Â ÁßÀÌ°í(gravity >= 0), ¹ßÀÌ º® À­ºÎºĞ¿¡ °ÉÃÆÀ» ¶§
-//                // (m_rc.bottom - 20)Àº ¹ß¹Ù´Ú Á¶±İ À§, (wall.top + 20)Àº º® À­¸é Á¶±İ ¾Æ·¡
-//                // Áï, "¹ßÀÌ º® À­¸ğ¼­¸®¸¦ Å¸°í ³Ñ¾úÀ» ¶§"¸¸ ÂøÁö·Î ÀÎÁ¤
+//                // [ì°©ì§€ íŒì •] ë–¨ì–´ì§€ëŠ” ì¤‘ì´ê³ (gravity >= 0), ë°œì´ ë²½ ìœ—ë¶€ë¶„ì— ê±¸ì³¤ì„ ë•Œ
+//                // (m_rc.bottom - 20)ì€ ë°œë°”ë‹¥ ì¡°ê¸ˆ ìœ„, (wall.top + 20)ì€ ë²½ ìœ—ë©´ ì¡°ê¸ˆ ì•„ë˜
+//                // ì¦‰, "ë°œì´ ë²½ ìœ—ëª¨ì„œë¦¬ë¥¼ íƒ€ê³  ë„˜ì—ˆì„ ë•Œ"ë§Œ ì°©ì§€ë¡œ ì¸ì •
 //                if (gravity >= 0 && (m_rc.bottom - 30) < wall.top)
 //                {
-//                    // 1. ¶¥¿¡ ´êÀ½ Ã³¸®
+//                    // 1. ë•…ì— ë‹¿ìŒ ì²˜ë¦¬
 //                    grounded = true;
 //                    isCollided = true;
-//                    gravity = 0; // Áß·Â ÃÊ±âÈ­ (¾È ±×·¯¸é °è¼Ó »¡¶óÁü)
+//                    gravity = 0; // ì¤‘ë ¥ ì´ˆê¸°í™” (ì•ˆ ê·¸ëŸ¬ë©´ ê³„ì† ë¹¨ë¼ì§)
 //
-//                    // 2. À§Ä¡ º¸Á¤ (½º³À)
-//                    // Ä³¸¯ÅÍ¸¦ º® ¹Ù·Î À§·Î ²ø¾î¿Ã¸² (1px Á¤µµ °ãÄ¡°Ô ÇØ¼­ ´ÙÀ½ ÇÁ·¹ÀÓ¿¡µµ Ãæµ¹ À¯Áö)
+//                    // 2. ìœ„ì¹˜ ë³´ì • (ìŠ¤ëƒ…)
+//                    // ìºë¦­í„°ë¥¼ ë²½ ë°”ë¡œ ìœ„ë¡œ ëŒì–´ì˜¬ë¦¼ (1px ì •ë„ ê²¹ì¹˜ê²Œ í•´ì„œ ë‹¤ìŒ í”„ë ˆì„ì—ë„ ì¶©ëŒ ìœ ì§€)
 //                    pos.y = (float)wall.top - (imagesinfo.Height - 70) + 1.0f;
 //
-//                    // 3. º¸Á¤µÈ À§Ä¡·Î m_rc ´Ù½Ã °»½Å (Áß¿ä!)
+//                    // 3. ë³´ì •ëœ ìœ„ì¹˜ë¡œ m_rc ë‹¤ì‹œ ê°±ì‹  (ì¤‘ìš”!)
 //                    m_rc.left = pos.x - 40;
 //                    m_rc.top = pos.y - 40;
 //                    m_rc.right = pos.x + imagesinfo.Width - 50;
 //                    m_rc.bottom = pos.y + imagesinfo.Height - 70;
 //
-//                    break; // ¶¥ ÇÏ³ª¸¸ ¹âÀ¸¸é µÇ´Ï±î ·çÇÁ Á¾·á
+//                    break; // ë•… í•˜ë‚˜ë§Œ ë°Ÿìœ¼ë©´ ë˜ë‹ˆê¹Œ ë£¨í”„ ì¢…ë£Œ
 //                }
 //            }
 //        }
 //
-//        // Ãæµ¹ÇÑ º®ÀÌ ÇÏ³ªµµ ¾øÀ¸¸é °øÁß¿¡ ¶á °Í
+//        // ì¶©ëŒí•œ ë²½ì´ í•˜ë‚˜ë„ ì—†ìœ¼ë©´ ê³µì¤‘ì— ëœ¬ ê²ƒ
 //        if (isCollided == false)
 //        {
 //            grounded = false;
 //        }
 //
-//        // °øÁß¿¡ ÀÖÀ» ¶§¸¸ Áß·Â °¡¼Ó
+//        // ê³µì¤‘ì— ìˆì„ ë•Œë§Œ ì¤‘ë ¥ ê°€ì†
 //        if (!grounded)
 //        {
-//            gravity += 0.5f; // 0.8f´Â ³Ê¹« ºü¸¦ ¼ö ÀÖ¾î Á¶ÀıÇÔ
-//            if (gravity > 15.0f) gravity = 15.0f; // ÃÖ´ë ³«ÇÏ ¼Óµµ Á¦ÇÑ (¾ÈÀüÀåÄ¡)
+//            gravity += 0.5f; // 0.8fëŠ” ë„ˆë¬´ ë¹ ë¥¼ ìˆ˜ ìˆì–´ ì¡°ì ˆí•¨
+//            if (gravity > 15.0f) gravity = 15.0f; // ìµœëŒ€ ë‚™í•˜ ì†ë„ ì œí•œ (ì•ˆì „ì¥ì¹˜)
 //        }
 //
 //
@@ -411,13 +418,13 @@ void Knight::Update()
 //        ////m_KnightAniTime = GetTickCount();
 //
 //        // =========================================================
-//        // [¾Ö´Ï¸ŞÀÌ¼Ç »óÅÂ ¸Ó½Å] (¼Óµµ¿¡ µû¶ó ÀÌ¹ÌÁö ±³Ã¼)
+//        // [ì• ë‹ˆë©”ì´ì…˜ ìƒíƒœ ë¨¸ì‹ ] (ì†ë„ì— ë”°ë¼ ì´ë¯¸ì§€ êµì²´)
 //        // =========================================================
-//        if (GetTickCount() - m_KnightAniTime > 50) // ¾Ö´Ï¸ŞÀÌ¼Ç ¼Óµµ
+//        if (GetTickCount() - m_KnightAniTime > 50) // ì• ë‹ˆë©”ì´ì…˜ ì†ë„
 //        {
 //            if (grounded)
 //            {
-//                // [¶¥]
+//                // [ë•…]
 //                if (isMove)
 //                {
 //                    m_KnightCount++;
@@ -425,21 +432,21 @@ void Knight::Update()
 //                }
 //                else if (isLookup) m_KnightCount = 4;
 //                else if (isLookdown) m_KnightCount = 5;
-//                else m_KnightCount = 3; // ±âº» ´ë±â
+//                else m_KnightCount = 3; // ê¸°ë³¸ ëŒ€ê¸°
 //            }
 //            else
 //            {
-//                // [°øÁß] ¼öÁ÷ ¼Óµµ(gravity)¿¡ µû¶ó ÀÌ¹ÌÁö º¯°æ
-//                // gravity´Â À§·Î °¥¼ö·Ï À½¼ö(-), ¾Æ·¡·Î °¥¼ö·Ï ¾ç¼ö(+)
+//                // [ê³µì¤‘] ìˆ˜ì§ ì†ë„(gravity)ì— ë”°ë¼ ì´ë¯¸ì§€ ë³€ê²½
+//                // gravityëŠ” ìœ„ë¡œ ê°ˆìˆ˜ë¡ ìŒìˆ˜(-), ì•„ë˜ë¡œ ê°ˆìˆ˜ë¡ ì–‘ìˆ˜(+)
 //
-//                if (gravity < -12.0f)      m_KnightCount = 6; // Á¡ÇÁ ÁØºñ (ºü¸¥ »ó½Â)
-//                else if (gravity < -4.0f)  m_KnightCount = 7; // »ó½Â Áß
-//                else if (gravity < 4.0f)   m_KnightCount = 8; // ²À´ë±â (Ã¼°ø)
-//                else if (gravity < 12.0f)  m_KnightCount = 9; // ÇÏ°­ ½ÃÀÛ
-//                else                       m_KnightCount = 9; // ÂøÁö ÁØºñ(fall02´Â ÂøÁö ¼ø°£ ¿¬Ãâ¿ëÀÌ¶ó ÀÏ´Ü fall01 À¯Áö)
+//                if (gravity < -12.0f)      m_KnightCount = 6; // ì í”„ ì¤€ë¹„ (ë¹ ë¥¸ ìƒìŠ¹)
+//                else if (gravity < -4.0f)  m_KnightCount = 7; // ìƒìŠ¹ ì¤‘
+//                else if (gravity < 4.0f)   m_KnightCount = 8; // ê¼­ëŒ€ê¸° (ì²´ê³µ)
+//                else if (gravity < 12.0f)  m_KnightCount = 9; // í•˜ê°• ì‹œì‘
+//                else                       m_KnightCount = 9; // ì°©ì§€ ì¤€ë¹„(fall02ëŠ” ì°©ì§€ ìˆœê°„ ì—°ì¶œìš©ì´ë¼ ì¼ë‹¨ fall01 ìœ ì§€)
 //
-//                // Âü°í: fall02(ÂøÁö)´Â grounded°¡ true°¡ µÈ Á÷ÈÄ Àá±ñ º¸¿©Áà¾ß ÇØ¼­ ·ÎÁ÷ÀÌ º¹ÀâÇÏ¹Ç·Î 
-//                // ÀÏ´Ü ÇÏ°­ ÀÌ¹ÌÁö¸¦ °è¼Ó ¾²µµ·Ï Çß½À´Ï´Ù.
+//                // ì°¸ê³ : fall02(ì°©ì§€)ëŠ” groundedê°€ trueê°€ ëœ ì§í›„ ì ê¹ ë³´ì—¬ì¤˜ì•¼ í•´ì„œ ë¡œì§ì´ ë³µì¡í•˜ë¯€ë¡œ 
+//                // ì¼ë‹¨ í•˜ê°• ì´ë¯¸ì§€ë¥¼ ê³„ì† ì“°ë„ë¡ í–ˆìŠµë‹ˆë‹¤.
 //            }
 //            m_KnightAniTime = GetTickCount();
 //        }
@@ -454,11 +461,34 @@ void Knight::Draw()
         float drawingOffsetY = 0.0f;
         if (m_KnightCount == 5)
         {
-            // ÀÌ ¼ıÀÚ¸¦ Á¶ÀıÇØ¼­ ¹ßÀ» ¶¥¿¡ ¸ÂÃã 
-            // ÀÌ¹ÌÁö°¡ ³³ÀÛÇÑ ¸¸Å­ ´õÇØÁà¾ß ÇÔ. (¿¹: 10 ~ 30 »çÀÌ)
+            // ì´ ìˆ«ìë¥¼ ì¡°ì ˆí•´ì„œ ë°œì„ ë•…ì— ë§ì¶¤ 
+            // ì´ë¯¸ì§€ê°€ ë‚©ì‘í•œ ë§Œí¼ ë”í•´ì¤˜ì•¼ í•¨. (ì˜ˆ: 10 ~ 30 ì‚¬ì´)
             drawingOffsetY = 20.0f;
         }
         Knightimg[m_KnightCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
+
+  
+        // =======================================================
+        // 2. hit / unhit ìƒíƒœì— ë”°ë¥¸ ê³µê²© ì´í™íŠ¸ ê·¸ë¦¬ê¸°
+        // =======================================================
+        if (isAttacking)
+        {
+            float effectOffsetX = -30.0f;
+            float effectOffsetY = -10.0f;
+            float renderX = pos.x - CAM->GetX();
+            float renderY = pos.y - CAM->GetY() + effectOffsetY;
+
+            if (dir == 1) // ì™¼ìª½ì„ ë³´ê³  ì  ë•Œ
+            {
+                if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
+                else             unhitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
+            }
+            else // ì˜¤ë¥¸ìª½ì„ ë³´ê³  ì  ë•Œ (ë°˜ì „)
+            {
+                if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
+                else             unhitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
+            }
+        }
 
         if (grounded)
         {
@@ -471,62 +501,63 @@ void Knight::Draw()
 
         if (isAttacking)
         {
-            coll.BoxSow(attackBox, 0, 0, D3DCOLOR_ARGB(255, 255, 255, 0)); // ³ë¶õ»ö
+            coll.BoxSow(attackBox, 0, 0, D3DCOLOR_ARGB(255, 255, 255, 0)); // ë…¸ë€ìƒ‰
         }
     }
 }
 
-// Á¡ÇÁ ½ÃÀÛ ÇÔ¼ö (Key.cpp¿¡¼­ È£Ãâ)
+// ì í”„ ì‹œì‘ í•¨ìˆ˜ (Key.cppì—ì„œ í˜¸ì¶œ)
 void Knight::JumpStart()
 {
-    if (grounded) // ¶¥¿¡ ÀÖÀ» ¶§¸¸ Á¡ÇÁ °¡´É
+    if (grounded) // ë•…ì— ìˆì„ ë•Œë§Œ ì í”„ ê°€ëŠ¥
     {
-        // ÃÖ´ë Á¡ÇÁ·Â ¼³Á¤ (°ªÀÌ Å¬¼ö·Ï ³ôÀÌ ¶Ü)
+        // ìµœëŒ€ ì í”„ë ¥ ì„¤ì • (ê°’ì´ í´ìˆ˜ë¡ ë†’ì´ ëœ€)
         gravity = -20.0f;
         grounded = false;
 
-        // Á¡ÇÁ ¼Ò¸® Àç»ı (ÇÊ¿ä ½Ã)
+        // ì í”„ ì†Œë¦¬ ì¬ìƒ (í•„ìš” ì‹œ)
         // sound.Play("Jump");
     }
 }
 
-// °¡º¯ Á¡ÇÁ (Å° ¶ÃÀ» ¶§ ¼Óµµ ÀÚ¸£±â)
+// ê°€ë³€ ì í”„ (í‚¤ ë—ì„ ë•Œ ì†ë„ ìë¥´ê¸°)
 void Knight::JumpCut()
 {
-    // °øÁß¿¡¼­ »ó½Â ÁßÀÏ ¶§(À½¼ö)¸¸ ¼Óµµ¸¦ ±ğÀ½
+    // ê³µì¤‘ì—ì„œ ìƒìŠ¹ ì¤‘ì¼ ë•Œ(ìŒìˆ˜)ë§Œ ì†ë„ë¥¼ ê¹ìŒ
     if (!grounded && gravity < -5.0f)
     {
-        // ÇöÀç »ó½Â ¼Óµµ¸¦ Àı¹İÀ¸·Î ÁÙ¿©¹ö¸² -> ¶Ò ¶³¾îÁö´Â ´À³¦ ±¸Çö
+        // í˜„ì¬ ìƒìŠ¹ ì†ë„ë¥¼ ì ˆë°˜ìœ¼ë¡œ ì¤„ì—¬ë²„ë¦¼ -> ëš ë–¨ì–´ì§€ëŠ” ëŠë‚Œ êµ¬í˜„
         gravity *= 0.5f;
     }
 }
 
-// ´ë½Ã ½ÃÀÛ
+// ëŒ€ì‹œ ì‹œì‘
 void Knight::DashStart()
 {
     DWORD curTime = GetTickCount64();
 
-    // 1. ÄğÅ¸ÀÓ Ã¼Å© (0.5ÃÊ = 500ms)
+    // 1. ì¿¨íƒ€ì„ ì²´í¬ (0.5ì´ˆ = 500ms)
     if (curTime - dashCooldownTime < 500) return;
 
-    // 2. °øÁß »ç¿ë Á¦ÇÑ Ã¼Å©
+    // 2. ê³µì¤‘ ì‚¬ìš© ì œí•œ ì²´í¬
     if (!grounded && !canAirDash) return;
 
-    // 3. ´ë½Ã
+    // 3. ëŒ€ì‹œ
     isDashing = true;
     dashStartTime = curTime;
     dashCooldownTime = curTime;
-    gravity = 0; // Áß·Â Á¦°Å (ÀÏÁ÷¼± ÀÌµ¿)
+    gravity = 0; // ì¤‘ë ¥ ì œê±° (ì¼ì§ì„  ì´ë™)
 
-    // °øÁß¿¡¼­ ½è´Ù¸é ±âÈ¸ ¼ÒÁø
+    // ê³µì¤‘ì—ì„œ ì¼ë‹¤ë©´ ê¸°íšŒ ì†Œì§„
     if (!grounded) canAirDash = false;
 }
 
 void Knight::AttackStart()
 {
-    // ÀÌ¹Ì °ø°İ ÁßÀÌ°Å³ª ´ë½Ã ÁßÀÌ¸é ¹«½Ã
+    // ì´ë¯¸ ê³µê²© ì¤‘ì´ê±°ë‚˜ ëŒ€ì‹œ ì¤‘ì´ë©´ ë¬´ì‹œ
     if (isAttacking || isDashing) return;
 
     isAttacking = true;
+	isAttackHit = false; // ì•„ì§ ê³µê²©ì´ ì ì¤‘í•˜ì§€ ì•ŠìŒ
     attackStartTime = GetTickCount();
 }
