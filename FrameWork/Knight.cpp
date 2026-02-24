@@ -125,13 +125,6 @@ void Knight::Update()
 {
     if (GetTickCount() - m_KnightAniTime > 10)
     {
-        // 기사 넉백 물리 적용
-        if (isKnockback) {
-            pos.x += knockVelocity.x;
-            knockVelocity.x *= 0.85f; // 마찰력
-            if (abs(knockVelocity.x) < 0.5f) { knockVelocity.x = 0; isKnockback = false; }
-        }
-
         // 무적 시간 1.5초(1500ms) 해제 로직
         if (isInvincible && (GetTickCount() - invincibleTime > 1500)) {
             isInvincible = false;
@@ -187,9 +180,10 @@ void Knight::Update()
         }
 
         // ========================================================
-        // 1단계: 수평(X) 이동 및 충돌 처리 (걷기 + 대시)
+        // 1단계: 수평(X) 이동 및 충돌 처리 (걷기 + 대시 + 넉백)
         // ========================================================
         float moveX = 0.0f;
+		float knockMoveX = 0.0f; //넉백 이동량
 
         // [대시 중]
         if (isDashing)
@@ -204,13 +198,20 @@ void Knight::Update()
                 moveX = -(dir * dashSpeed); // 대시 이동량 계산
             }
         }
+
+        // [넉백 중 이동량 계산]
+        if (isKnockback) {
+            knockMoveX = knockVelocity.x;
+            knockVelocity.x *= 0.85f;
+            if (abs(knockVelocity.x) < 0.5f) { knockVelocity.x = 0; isKnockback = false; }
+        }
         // [걷기 상태] (Key.cpp에서 이미 pos.x를 건드려서 왔으므로 변화량을 추적해야 함)
         // 하지만 지금 구조상 Key.cpp가 pos.x를 직접 바꾸므로, 
         // 여기서 "이동 후 위치"가 벽이라면 "이동 전"으로 되돌리는 방식을 씁니다.
 
         // 1-1. 일단 대시 이동 적용 (걷기는 Key.cpp에서 이미 적용됨)
         if (isDashing) pos.x += moveX;
-
+		if (isKnockback) pos.x += knockMoveX; // 넉백 이동 적용
         // 1-2. 현재 위치로 박스 갱신
         m_rc.left = pos.x - 40;
         m_rc.top = pos.y - 40;
@@ -242,6 +243,10 @@ void Knight::Update()
                 // 대시 중 벽 충돌 -> 대시 종료 및 원상복구
                 isDashing = false;
                 pos.x -= moveX;
+            }
+            if (isKnockback) { // 넉백 중에 벽을 만났다면?
+                pos.x -= knockMoveX; // 파고든 만큼 다시 빼냅니다!
+                knockVelocity.x = 0; // 벽에 박았으니 밀려나는 힘 소멸
             }
             if(isMove)
             {
@@ -305,7 +310,7 @@ void Knight::Update()
                         break;
                     }
                     // 머리 찧기 판정 (올라가고 있고 + 머리 쪽이 부딪힘)
-                    else if (gravity < 0)
+                    else if (gravity < 0 && (m_rc.top + 30) > wall.bottom)
                     {
                         gravity = 0; // 상승 힘 제거 (머리 쿵)
 

@@ -1751,14 +1751,14 @@ void MapManager::Update(double frame)
 		}
 
 		// (옵션) 시체가 된 지 3초 후 삭제
-		if (e->isDead && (GetTickCount() - e->hitStartTime > 3000)) {
+		/*if (e->isDead && (GetTickCount() - e->hitStartTime > 3000)) {
 			delete e;
 			it = m_Enemies.erase(it);
 		}
 		else {
 			++it;
-		}
-		//++it;
+		}*/
+		++it;
 	}
 }
 void MapManager::Draw()

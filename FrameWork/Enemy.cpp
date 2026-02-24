@@ -47,7 +47,7 @@ void Enemy::Draw()
     }
 
     // 디버그용 박스
-    // coll.BoxSow(m_rc, 0, 0, D3DCOLOR_ARGB(255, 255, 0, 255));
+    coll.BoxSow(m_rc, 0, 0, D3DCOLOR_ARGB(255, 255, 0, 255));
 }
 
 
@@ -72,44 +72,49 @@ void GroundEnemy::Update()
         aniTime = GetTickCount();
     }
 
-    // 중력 및 넉백 적용
+    // 중력 적용
     pos.y += gravity;
     gravity += 0.5f; if (gravity > 10.0f) gravity = 10.0f;
 
+    // x축 이동
     if (isHit || isDead) {
         pos.x += velocity.x;
-        velocity.x *= 0.9f; // 마찰력으로 점점 느려짐
+        velocity.x *= 0.9f;
     }
     else {
-        // 평상시 걷기
         pos.x += (dir == -1) ? speed : -speed;
+    }
 
-        // 🌟 [수정] 1. 벽 감지 센서: 위아래 높이를 깎아서 '바닥'을 벽으로 오해하지 않게 만듭니다!
-        RECT nextRc = m_rc;
-        nextRc.top += 10;
-        nextRc.bottom -= 10;
-        nextRc.left += (dir == -1) ? 5 : -5;
-        nextRc.right += (dir == -1) ? 5 : -5;
+    // 🌟 [핵심 수정] 살았든 죽었든 "무조건" 바닥 충돌 검사를 해야 땅으로 안 꺼집니다!
+    RECT nextRc = m_rc;
+    nextRc.top += 10; nextRc.bottom -= 10;
+    nextRc.left += (dir == -1) ? 5 : -5; nextRc.right += (dir == -1) ? 5 : -5;
 
-        // 🌟 [수정] 2. 낭떠러지 감지 센서: 내 앞쪽 발밑 공간만 정확히 찝어서 검사합니다!
-        RECT cliffRc = m_rc;
-        cliffRc.left += (dir == -1) ? 20 : -20;
-        cliffRc.right += (dir == -1) ? 20 : -20;
-        cliffRc.top = m_rc.bottom + 5;
-        cliffRc.bottom = m_rc.bottom + 30;
+    RECT cliffRc = m_rc;
+    cliffRc.left += (dir == -1) ? 20 : -20; cliffRc.right += (dir == -1) ? 20 : -20;
+    cliffRc.top = m_rc.bottom + 5; cliffRc.bottom = m_rc.bottom + 30;
 
-        bool hitWall = false;
-        bool hitFloor = false;
-        RECT temp;
-        for (auto& w : coll.m_Walls) {
-            if (IntersectRect(&temp, &nextRc, &w)) hitWall = true;  // 진짜 벽에 박음
-            if (IntersectRect(&temp, &m_rc, &w)) {                  // 몸체가 바닥에 착지
-                pos.y = w.top - 40.0f; gravity = 0;
+    bool hitWall = false;
+    bool hitFloor = false;
+    RECT temp;
+
+    for (auto& w : coll.m_Walls) {
+        // 벽/낭떠러지 센서는 살아있을 때만 체크
+        if (!isDead && IntersectRect(&temp, &nextRc, &w)) hitWall = true;
+        if (!isDead && IntersectRect(&temp, &cliffRc, &w)) hitFloor = true;
+
+        // 🌟 바닥 착지는 살아있든 죽어있든(시체) 항상 적용!
+        if (IntersectRect(&temp, &m_rc, &w)) {
+            // 발바닥이 벽 윗면 근처일 때만 착지 (통과 방지)
+            if (gravity >= 0 && (m_rc.bottom - 20) <= w.top) {
+                pos.y = w.top - 40.0f;
+                gravity = 0;
+                if (isDead) velocity.x = 0; // 시체가 땅에 닿으면 미끄러짐 멈춤
             }
-            if (IntersectRect(&temp, &cliffRc, &w)) hitFloor = true; // 앞에 밟을 바닥이 있음
         }
+    }
 
-        // 벽에 막히거나, 앞에 낭떠러지(바닥 없음)면 뒤돌기!
+    if (!isHit && !isDead) { // 살아있을 때만 뒤돌기
         if (hitWall || (!hitFloor && gravity == 0)) {
             dir *= -1;
         }
@@ -139,36 +144,37 @@ void FlyEnemy::Update()
         aniTime = GetTickCount();
     }
 
-    if (isDead || isHit) { // 피격 및 추락
+    if (isDead || isHit) {
         pos.y += gravity; gravity += 0.5f;
         pos.x += velocity.x; velocity.x *= 0.9f;
 
-        // 🌟 [핵심 수정] 넉백 당하는 만큼 비행 기준점(startPos)도 같이 밀려나게 합니다!
-        // 이렇게 하면 순간이동하지 않고, 밀려난 그 자리에서부터 다시 8자 비행을 자연스럽게 이어갑니다.
         if (!isDead) {
             startPos.x += velocity.x;
             startPos.y += gravity;
         }
 
-        // 바닥에 닿으면 멈춤
+        // 🌟 [수정] 비행 몹 시체도 정확히 바닥에 안착하도록 조건 강화
         RECT temp;
         for (auto& w : coll.m_Walls) {
-            if (IntersectRect(&temp, &m_rc, &w)) { pos.y = w.top - 30; gravity = 0; velocity.x = 0; }
+            if (IntersectRect(&temp, &m_rc, &w)) {
+                if (gravity >= 0 && (m_rc.bottom - 20) <= w.top) {
+                    pos.y = w.top - 30.0f;
+                    gravity = 0;
+                    velocity.x = 0;
+                }
+            }
         }
     }
     else {
-        // 수학의 마법: 부드러운 ∞ (무한대 8자) 비행 궤도
         DWORD t = GetTickCount() - spawnTime;
         float speed = 0.0015f;
 
-        float nextX = startPos.x + 250.0f * sin(t * speed);          // 좌우 폭 250
-        float nextY = startPos.y + 80.0f * sin(t * speed * 2.0f);    // 상하 폭 80 (두 배 빠르게 진동하여 8자 형태가 됨)
+        float nextX = startPos.x + 250.0f * sin(t * speed);
+        float nextY = startPos.y + 80.0f * sin(t * speed * 2.0f);
 
-        // 방향 바라보기
         if (nextX > pos.x) dir = -1; else dir = 1;
 
-        pos.x = nextX;
-        pos.y = nextY;
+        pos.x = nextX; pos.y = nextY;
     }
 
     SetRect(&m_rc, pos.x - 30, pos.y - 30, pos.x + 30, pos.y + 30);
