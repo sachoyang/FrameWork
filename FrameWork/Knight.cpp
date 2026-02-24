@@ -83,15 +83,32 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/attack03.png"); // 공격 마무리
     Knightimg[17].Create(FileName, false, 0);
 
+    sprintf_s(FileName, "./resource/Img/knight1/attackup01.png"); Knightimg[18].Create(FileName, false, 0);
+    sprintf_s(FileName, "./resource/Img/knight1/attackup02.png"); Knightimg[19].Create(FileName, false, 0);
+    sprintf_s(FileName, "./resource/Img/knight1/attackup03.png"); Knightimg[20].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/attackdown01.png"); Knightimg[21].Create(FileName, false, 0);
+    sprintf_s(FileName, "./resource/Img/knight1/attackdown02.png"); Knightimg[22].Create(FileName, false, 0);
+    sprintf_s(FileName, "./resource/Img/knight1/attackdown03.png"); Knightimg[23].Create(FileName, false, 0);
+
     sprintf_s(FileName, "./resource/Img/effect/hit.png");
     hitEffect[0].Create(FileName, false, 0);
 
     sprintf_s(FileName, "./resource/Img/effect/unhit.png");
     unhitEffect[0].Create(FileName, false, 0);
 
+    sprintf_s(FileName, "./resource/Img/effect/hitdown.png");
+    hitEffect[1].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/effect/unhitdown.png");
+    unhitEffect[1].Create(FileName, false, 0);
+
+
+
     isAttackHit = false;
     isAttacking = false;
     attackStartTime = 0;
+    lastAttackTime = 0; // 쿨타임 초기화
     SetRect(&attackBox, 0, 0, 0, 0);
 
     m_rc.left = pos.x-40;
@@ -122,22 +139,34 @@ void Knight::Update()
             }
             else
             {
-                // 기사가 바라보는 방향(dir)에 따라 히트박스 생성 위치가 다름
-                // 기사의 몸통(pos)을 기준으로 앞쪽에 네모난 공격 판정을 만듭니다.
-                if (dir == 1) // 왼쪽을 보고 있을 때
+                // [히트박스 위치 계산]
+                if (attackType == 0) // 측면 공격
                 {
-                    attackBox.left = pos.x - 160; // 사거리
-                    attackBox.right = pos.x - 10;
+                    if (dir == -1) { // 오른쪽
+                        attackBox.left = pos.x + 10; attackBox.right = pos.x + 160;
+                    }
+                    else {         // 왼쪽 (dir == 1)
+                        attackBox.left = pos.x - 160; attackBox.right = pos.x - 10;
+                    }
+                    attackBox.top = pos.y - 70; attackBox.bottom = pos.y + 30;
                 }
-                else // 오른쪽을 보고 있을 때
+                else if (attackType == 1) // 상단 공격
                 {
-                    attackBox.left = pos.x + 10;
-                    attackBox.right = pos.x + 160;  // 사거리
+                    attackBox.left = pos.x - 60; attackBox.right = pos.x + 60;
+                    attackBox.top = pos.y - 160; attackBox.bottom = pos.y - 10; // 머리 위로 길게
+                }
+                else if (attackType == 2) // 하단 공격
+                {
+                    attackBox.left = pos.x - 60; attackBox.right = pos.x + 60;
+                    attackBox.top = pos.y + 10; attackBox.bottom = pos.y + 150; // 발 밑으로 길게
                 }
 
-                // Y축(상하) 판정 범위 (머리 위부터 발끝 살짝 위까지)
-                attackBox.top = pos.y - 60;
-                attackBox.bottom = pos.y + 30;
+                // [포고 점프] 하단 찍기 중에 무언가(적/오브젝트)를 맞췄다면?
+                if (attackType == 2 && isAttackHit)
+                {
+                    gravity = -13.0f; // 공중에서 위로 강하게 튕겨오름! (체공 시간 벌기)
+                    isAttackHit = false; // 연달아 무한 점프하지 않도록 판정 1회 소모
+                }
             }
         }
         else
@@ -301,9 +330,15 @@ void Knight::Update()
             if (isAttacking)
             {
                 DWORD attackTime = GetTickCount() - attackStartTime;
-                if (attackTime < 100)      m_KnightCount = 15; // 0.1초: 준비
-                else if (attackTime < 200) m_KnightCount = 16; // 0.2초: 휘두름
-                else                       m_KnightCount = 17; // 0.3초: 마무리
+                int frameOffset = 0;
+                if (attackTime < 100)      frameOffset = 0;
+                else if (attackTime < 200) frameOffset = 1;
+                else                       frameOffset = 2;
+
+                // 공격 타입에 따라 15, 18, 21번대 애니메이션을 각각 재생
+                if (attackType == 0)      m_KnightCount = 15 + frameOffset;
+                else if (attackType == 1) m_KnightCount = 18 + frameOffset;
+                else if (attackType == 2) m_KnightCount = 21 + frameOffset;
             }
             else if (isDashing)
             {
@@ -471,24 +506,58 @@ void Knight::Draw()
         // =======================================================
         // 2. hit / unhit 상태에 따른 공격 이펙트 그리기
         // =======================================================
+
         if (isAttacking)
         {
-            float effectOffsetX = -30.0f;
-            float effectOffsetY = -10.0f;
             float renderX = pos.x - CAM->GetX();
-            float renderY = pos.y - CAM->GetY() + effectOffsetY;
+            float renderY = pos.y - CAM->GetY();
 
-            if (dir == 1) // 왼쪽을 보고 쏠 때
+            if (attackType == 0) // [측면 공격]
             {
-                if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
-                else             unhitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
+                float effectOffsetX = 60.0f;
+                float effectOffsetY = -30.0f;
+
+                if (dir == -1) // 오른쪽 (반전 필요)
+                {
+                    if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
+                    else             unhitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
+                }
+                else // 왼쪽 (dir == 1, 원본)
+                {
+                    if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
+                    else             unhitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
+                }
             }
-            else // 오른쪽을 보고 쏠 때 (반전)
+            else // [상단 / 하단 공격] -> hitEffect[1] 사용
             {
-                if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
-                else             unhitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
+                float effectOffsetX = 0.0f; // 몸의 중심에서 나감
+                float effectOffsetY = (attackType == 1) ? -80.0f : 50.0f; // 위 공격은 마이너스, 아래는 플러스 좌표
+
+                // 기본이 하단 이펙트이므로, 상단 공격(1)일 때는 Y축 크기를 -1로 주어 위아래 반전시킴!
+                float scaleY = (attackType == 1) ? -1.0f : 1.0f;
+
+                if (isAttackHit) hitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
+                else             unhitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
             }
         }
+
+        //if (isAttacking)
+        //{
+        //    float effectOffsetX = -30.0f;
+        //    float effectOffsetY = -10.0f;
+        //    float renderX = pos.x - CAM->GetX();
+        //    float renderY = pos.y - CAM->GetY() + effectOffsetY;
+        //    if (dir == 1) // 왼쪽을 보고 쏠 때
+        //    {
+        //        if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
+        //        else             unhitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
+        //    }
+        //    else // 오른쪽을 보고 쏠 때 (반전)
+        //    {
+        //        if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
+        //        else             unhitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
+        //    }
+        //}
 
         if (grounded)
         {
@@ -554,10 +623,24 @@ void Knight::DashStart()
 
 void Knight::AttackStart()
 {
-    // 이미 공격 중이거나 대시 중이면 무시
     if (isAttacking || isDashing) return;
 
+    // 🌟 1. 전체 공격 쿨타임 체크 (500ms)
+    if (GetTickCount() - lastAttackTime < 500) return;
+
     isAttacking = true;
-	isAttackHit = false; // 아직 공격이 적중하지 않음
+    isAttackHit = false;
     attackStartTime = GetTickCount();
+    lastAttackTime = GetTickCount(); // 쿨타임 타이머 시작
+
+    // 🌟 2. 키 입력 조합으로 공격 타입 결정
+    if (!grounded && isLookdown) {
+        attackType = 2; // 공중 + 아래키 = 하단 찍기
+    }
+    else if (isLookup) {
+        attackType = 1; // 위키 = 상단 공격
+    }
+    else {
+        attackType = 0; // 일반 측면 공격
+    }
 }

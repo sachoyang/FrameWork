@@ -4,7 +4,7 @@
 class Knight
 {
 public:
-	Sprite Knightimg[20];
+	Sprite Knightimg[25];
 
 	Sprite hitEffect[2];
 	Sprite unhitEffect[2];
@@ -36,10 +36,12 @@ public:
 
 	float dashSpeed;        // 대시 속도
 
+	int attackType;			// 0 측면, 1 위, 2 아래
 	bool isAttacking;       // 현재 공격 중인가?
 	bool isAttackHit;
 
 	DWORD attackStartTime;  // 공격 시작 시간 (애니메이션 및 판정 지속시간 체크용)
+	DWORD lastAttackTime; // 공격 쿨타임 체크용
 	RECT attackBox;         // 공격 판정 범위 (칼의 히트박스)
 
 	void Init();
