@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Include.h"
 
 class Knight
@@ -16,45 +16,56 @@ public:
 	Knight();
 	~Knight();
 
-	int dir;
-
+	int hp;
+	const int maxHp = 8;
+	
 	D3DXIMAGE_INFO imagesinfo;
 	RECT m_rc;
 	D3DXVECTOR2 pos;
 
 	DWORD m_KnightAniTime;
 	int m_KnightCount;
-
+public:
+	int dir;
 	bool isMove;
 	bool isLookup, isLookdown;
 
-	bool isDashing;         // ÇöÀç ´ë½Ã ÁßÀÎ°¡?
-	bool canAirDash;        // °øÁß ´ë½Ã °¡´ÉÇÑ°¡? (Á¡ÇÁ ÈÄ 1È¸ Á¦ÇÑ)
+	bool isDashing;         // í˜„ì¬ ëŒ€ì‹œ ì¤‘ì¸ê°€?
+	bool canAirDash;        // ê³µì¤‘ ëŒ€ì‹œ ê°€ëŠ¥í•œê°€? (ì í”„ í›„ 1íšŒ ì œí•œ)
 
-	DWORD dashStartTime;    // ´ë½Ã ½ÃÀÛ ½Ã°£ (Áö¼Ó½Ã°£ Ã¼Å©¿ë)
-	DWORD dashCooldownTime; // ´ë½Ã ÄğÅ¸ÀÓ Ã¼Å©¿ë
+	DWORD dashStartTime;    // ëŒ€ì‹œ ì‹œì‘ ì‹œê°„ (ì§€ì†ì‹œê°„ ì²´í¬ìš©)
+	DWORD dashCooldownTime; // ëŒ€ì‹œ ì¿¨íƒ€ì„ ì²´í¬ìš©
 
-	float dashSpeed;        // ´ë½Ã ¼Óµµ
+	float dashSpeed;        // ëŒ€ì‹œ ì†ë„
 
-	int attackType;			// 0 Ãø¸é, 1 À§, 2 ¾Æ·¡
-	bool isAttacking;       // ÇöÀç °ø°İ ÁßÀÎ°¡?
+	int attackType;			// 0 ì¸¡ë©´, 1 ìœ„, 2 ì•„ë˜
+	bool isAttacking;       // í˜„ì¬ ê³µê²© ì¤‘ì¸ê°€?
 	bool isAttackHit;
 
-	DWORD attackStartTime;  // °ø°İ ½ÃÀÛ ½Ã°£ (¾Ö´Ï¸ŞÀÌ¼Ç ¹× ÆÇÁ¤ Áö¼Ó½Ã°£ Ã¼Å©¿ë)
-	DWORD lastAttackTime; // °ø°İ ÄğÅ¸ÀÓ Ã¼Å©¿ë
-	RECT attackBox;         // °ø°İ ÆÇÁ¤ ¹üÀ§ (Ä®ÀÇ È÷Æ®¹Ú½º)
+	DWORD attackStartTime;  // ê³µê²© ì‹œì‘ ì‹œê°„ (ì• ë‹ˆë©”ì´ì…˜ ë° íŒì • ì§€ì†ì‹œê°„ ì²´í¬ìš©)
+	DWORD lastAttackTime; // ê³µê²© ì¿¨íƒ€ì„ ì²´í¬ìš©
+	RECT attackBox;         // ê³µê²© íŒì • ë²”ìœ„ (ì¹¼ì˜ íˆíŠ¸ë°•ìŠ¤)
 
+	bool isInvincible;       // ë¬´ì  ìƒíƒœ
+	DWORD invincibleTime;    // ë¬´ì  ì‹œì‘ ì‹œê°„
+
+	bool isKnockback;        // ê¸°ì‚¬ ë„‰ë°± ìƒíƒœ
+	D3DXVECTOR2 knockVelocity; // ê¸°ì‚¬ ë°€ë ¤ë‚˜ëŠ” ì†ë„
+
+public:
 	void Init();
 	void Update();
 	void Draw();
 
-	// Á¡ÇÁ °ü·Ã ÇÔ¼ö
-	void JumpStart(); // ZÅ° ´©¸¦ ¶§ (Á¡ÇÁ ½ÃÀÛ)
-	void JumpCut();   // ZÅ° ¶¿ ¶§ (¼Óµµ ÁÙÀÌ±â)
-	// ´ë½Ã ½ÃÀÛ ÇÔ¼ö
+	// ì í”„ ê´€ë ¨ í•¨ìˆ˜
+	void JumpStart(); // Zí‚¤ ëˆ„ë¥¼ ë•Œ (ì í”„ ì‹œì‘)
+	void JumpCut();   // Zí‚¤ ë—„ ë•Œ (ì†ë„ ì¤„ì´ê¸°)
+	// ëŒ€ì‹œ ì‹œì‘ í•¨ìˆ˜
 	void DashStart();
-	// °ø°İ ½ÃÀÛ ÇÔ¼ö (XÅ° ´©¸¦ ¶§)
+	// ê³µê²© ì‹œì‘ í•¨ìˆ˜ (Xí‚¤ ëˆ„ë¥¼ ë•Œ)
 	void AttackStart();
+	// ë°ë¯¸ì§€ ì²˜ë¦¬ í•¨ìˆ˜
+	void TakeDamage(int damage, int hitDir); 
 };
 
 extern Knight knight;

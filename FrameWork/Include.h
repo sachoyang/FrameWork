@@ -56,8 +56,6 @@
 #include "Over.h"
 #include "CMng.h"
 
-//#include "Night.h"
-
 #include "Camera.h"
 
 #include "MapManager.h"
@@ -72,12 +70,9 @@
 #include "GameManager.h"
 
 #include "Bird.h"
+#include "Enemy.h"
 #include "Knight.h"
 #include "UIManager.h"
-#include "Enemy.h"
-
-
-
 
 // 데이타 베이스///////////////////
 #include "Mysql.h"

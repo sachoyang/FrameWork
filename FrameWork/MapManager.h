@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Include.h"
-#include <list> // list 사용을 위해 추가
 #include <vector>
 
 // =======================================================
@@ -54,6 +53,8 @@ struct MapChunk
 	int prefabID;
 };
 
+class Enemy;
+
 class MapManager
 {
 
@@ -65,6 +66,8 @@ public :
 
 	// std::map<int, MapChunk*> m_MapList;
 	MapChunk m_MapList[40];
+
+	std::list<Enemy*> m_Enemies; //현재 맵의 적 리스트
 
 	// UI에서 미니맵을 그릴 때 읽어갈 6x6 배열
 	int m_Grid[6][6];

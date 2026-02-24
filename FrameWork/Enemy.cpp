@@ -58,9 +58,8 @@ void GroundEnemy::Init(float x, float y)
 {
     pos.x = x; pos.y = y; hp = 3;
     char FileName[256];
-    // 💡 이미지 이름은 임시입니다. (나중에 수정하세요!)
-    for (int i = 0; i < 3; i++) { sprintf_s(FileName, "./resource/Img/mob/ground%02d.png", i + 1); img[i].Create(FileName, false, 0); }
-    for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/mob/ground_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
+    for (int i = 0; i < 3; i++) { sprintf_s(FileName, "./resource/Img/monster/ground%02d.png", i + 1); img[i].Create(FileName, false, 0); }
+    for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/ground_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
     SetRect(&m_rc, pos.x - 30, pos.y - 40, pos.x + 30, pos.y + 40);
 }
 
@@ -120,8 +119,8 @@ void FlyEnemy::Init(float x, float y)
     pos.x = x; pos.y = y; startPos = pos; hp = 3;
     spawnTime = GetTickCount();
     char FileName[256];
-    for (int i = 0; i < 4; i++) { sprintf_s(FileName, "./resource/Img/mob/fly%02d.png", i + 1); img[i].Create(FileName, false, 0); }
-    for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/mob/fly_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
+    for (int i = 0; i < 4; i++) { sprintf_s(FileName, "./resource/Img/monster/fly%02d.png", i + 1); img[i].Create(FileName, false, 0); }
+    for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/fly_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
 }
 
 void FlyEnemy::Update()

@@ -103,8 +103,9 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/effect/unhitdown.png");
     unhitEffect[1].Create(FileName, false, 0);
 
-
-
+    hp = 8;
+	isInvincible = false;
+	isKnockback = false;
     isAttackHit = false;
     isAttacking = false;
     attackStartTime = 0;
@@ -124,6 +125,17 @@ void Knight::Update()
 {
     if (GetTickCount() - m_KnightAniTime > 10)
     {
+        // 기사 넉백 물리 적용
+        if (isKnockback) {
+            pos.x += knockVelocity.x;
+            knockVelocity.x *= 0.85f; // 마찰력
+            if (abs(knockVelocity.x) < 0.5f) { knockVelocity.x = 0; isKnockback = false; }
+        }
+
+        // 무적 시간 1.5초(1500ms) 해제 로직
+        if (isInvincible && (GetTickCount() - invincibleTime > 1500)) {
+            isInvincible = false;
+        }
         // ========================================================
         // 0단계: 공격 상태 및 히트박스(AttackBox) 업데이트
         // ========================================================
@@ -493,84 +505,91 @@ void Knight::Draw()
 {
     if (Gmanager.m_GameStart == true)
     {
-        float drawingOffsetY = 0.0f;
-        if (m_KnightCount == 5)
-        {
-            // 이 숫자를 조절해서 발을 땅에 맞춤 
-            // 이미지가 납작한 만큼 더해줘야 함. (예: 10 ~ 30 사이)
-            drawingOffsetY = 20.0f;
+        // 🌟 무적 시간일 때 0.1초 단위로 깜빡이기 (짝수 틱에만 렌더링 무시)
+        if (isInvincible && ((GetTickCount() / 100) % 2 == 0)) {
+            // 이 프레임은 기사를 그리지 않고 넘김 (깜빡깜빡)
         }
-        Knightimg[m_KnightCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
-
-  
-        // =======================================================
-        // 2. hit / unhit 상태에 따른 공격 이펙트 그리기
-        // =======================================================
-
-        if (isAttacking)
+        else 
         {
-            float renderX = pos.x - CAM->GetX();
-            float renderY = pos.y - CAM->GetY();
-
-            if (attackType == 0) // [측면 공격]
+            float drawingOffsetY = 0.0f;
+            if (m_KnightCount == 5)
             {
-                float effectOffsetX = 60.0f;
-                float effectOffsetY = -30.0f;
+                // 이 숫자를 조절해서 발을 땅에 맞춤 
+                // 이미지가 납작한 만큼 더해줘야 함. (예: 10 ~ 30 사이)
+                drawingOffsetY = 20.0f;
+            }
+            Knightimg[m_KnightCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
 
-                if (dir == -1) // 오른쪽 (반전 필요)
+
+            // =======================================================
+            // 2. hit / unhit 상태에 따른 공격 이펙트 그리기
+            // =======================================================
+
+            if (isAttacking)
+            {
+                float renderX = pos.x - CAM->GetX();
+                float renderY = pos.y - CAM->GetY();
+
+                if (attackType == 0) // [측면 공격]
                 {
-                    if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
-                    else             unhitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
+                    float effectOffsetX = 60.0f;
+                    float effectOffsetY = -30.0f;
+
+                    if (dir == -1) // 오른쪽 (반전 필요)
+                    {
+                        if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
+                        else             unhitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
+                    }
+                    else // 왼쪽 (dir == 1, 원본)
+                    {
+                        if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
+                        else             unhitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
+                    }
                 }
-                else // 왼쪽 (dir == 1, 원본)
+                else // [상단 / 하단 공격] -> hitEffect[1] 사용
                 {
-                    if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
-                    else             unhitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
+                    float effectOffsetX = 0.0f; // 몸의 중심에서 나감
+                    float effectOffsetY = (attackType == 1) ? -80.0f : 50.0f; // 위 공격은 마이너스, 아래는 플러스 좌표
+
+                    // 기본이 하단 이펙트이므로, 상단 공격(1)일 때는 Y축 크기를 -1로 주어 위아래 반전시킴!
+                    float scaleY = (attackType == 1) ? -1.0f : 1.0f;
+
+                    if (isAttackHit) hitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
+                    else             unhitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
                 }
             }
-            else // [상단 / 하단 공격] -> hitEffect[1] 사용
+
+            //if (isAttacking)
+            //{
+            //    float effectOffsetX = -30.0f;
+            //    float effectOffsetY = -10.0f;
+            //    float renderX = pos.x - CAM->GetX();
+            //    float renderY = pos.y - CAM->GetY() + effectOffsetY;
+            //    if (dir == 1) // 왼쪽을 보고 쏠 때
+            //    {
+            //        if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
+            //        else             unhitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
+            //    }
+            //    else // 오른쪽을 보고 쏠 때 (반전)
+            //    {
+            //        if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
+            //        else             unhitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
+            //    }
+            //}
+
+            if (grounded)
             {
-                float effectOffsetX = 0.0f; // 몸의 중심에서 나감
-                float effectOffsetY = (attackType == 1) ? -80.0f : 50.0f; // 위 공격은 마이너스, 아래는 플러스 좌표
-
-                // 기본이 하단 이펙트이므로, 상단 공격(1)일 때는 Y축 크기를 -1로 주어 위아래 반전시킴!
-                float scaleY = (attackType == 1) ? -1.0f : 1.0f;
-
-                if (isAttackHit) hitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
-                else             unhitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
+                coll.BoxSow(m_rc, 0, -5, 0xffff0000);
             }
-        }
+            else
+            {
+                coll.BoxSow(m_rc, 0, -5);
+            }
 
-        //if (isAttacking)
-        //{
-        //    float effectOffsetX = -30.0f;
-        //    float effectOffsetY = -10.0f;
-        //    float renderX = pos.x - CAM->GetX();
-        //    float renderY = pos.y - CAM->GetY() + effectOffsetY;
-        //    if (dir == 1) // 왼쪽을 보고 쏠 때
-        //    {
-        //        if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
-        //        else             unhitEffect[0].Render(renderX + effectOffsetX, renderY, 0, 1, 1, 1);
-        //    }
-        //    else // 오른쪽을 보고 쏠 때 (반전)
-        //    {
-        //        if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
-        //        else             unhitEffect[0].Render(renderX - effectOffsetX, renderY, 0, -1, 1, 1);
-        //    }
-        //}
-
-        if (grounded)
-        {
-            coll.BoxSow(m_rc, 0, -5, 0xffff0000);
-        }
-        else
-        {
-            coll.BoxSow(m_rc, 0, -5);
-        }
-
-        if (isAttacking)
-        {
-            coll.BoxSow(attackBox, 0, 0, D3DCOLOR_ARGB(255, 255, 255, 0)); // 노란색
+            if (isAttacking)
+            {
+                coll.BoxSow(attackBox, 0, 0, D3DCOLOR_ARGB(255, 255, 255, 0)); // 노란색
+            }
         }
     }
 }
@@ -643,4 +662,21 @@ void Knight::AttackStart()
     else {
         attackType = 0; // 일반 측면 공격
     }
+}
+
+void Knight::TakeDamage(int damage, int hitDir)
+{
+    if (isInvincible || isDashing) return;
+
+    hp -= damage;
+    if (hp <= 0) hp = 0; // 나중에 게임오버 처리용
+
+    isInvincible = true;
+    invincibleTime = GetTickCount();
+
+    // 기사 넉백 (공중으로 띄우고 뒤로 밀어냄)
+    isKnockback = true;
+    knockVelocity.x = hitDir * 8.0f;
+    gravity = -8.0f;
+    grounded = false;
 }

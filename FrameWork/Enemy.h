@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include "Include.h"
-#include <math.h> // sin, cos 수학 함수용
 
-// 🌟 부모 클래스 (모든 적들의 공통 기능)
+// 부모 클래스 (모든 적들의 공통 기능)
 class Enemy
 {
 public:
@@ -25,8 +24,7 @@ public:
     int aniCount;
     DWORD aniTime;
 
-    Enemy() : hp(3), isDead(false), isHit(false), dir(1), gravity(0), type(1) {}
-    virtual ~Enemy() {}
+    Enemy() : hp(3), isDead(false), isHit(false), dir(1), gravity(0), type(1), aniCount(0), aniTime(0) {}    virtual ~Enemy() {}
 
     virtual void Init(float x, float y) = 0; // 자식들이 각자 구현할 초기화
     virtual void Update() = 0;               // 각자의 행동 패턴

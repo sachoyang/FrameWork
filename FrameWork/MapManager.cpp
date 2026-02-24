@@ -1596,6 +1596,23 @@ void MapManager::ChangeMap(int mapID)
 	if ((m_Prefabs[pID].typeID & DOOR_RIGHT) && m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0) {
 		SetRect(&rc, MW - thick, 0, MW + 50, MH); coll.AddWall(rc);
 	}
+
+	// 이전 맵 적들 메모리 정리
+	for (auto e : m_Enemies) delete e;
+	m_Enemies.clear();
+
+	// 8번 프리팹(시작방)일 때 테스트용 몹 스폰!
+	if (pID == 8) {
+		// 지상 몹 2마리
+		Enemy* g1 = new GroundEnemy(); g1->Init(400, m_pCurrentMapChunk->height - 200);
+		Enemy* g2 = new GroundEnemy(); g2->Init(800, m_pCurrentMapChunk->height - 200);
+		m_Enemies.push_back(g1);
+		m_Enemies.push_back(g2);
+
+		// 비행 몹 1마리 공중에
+		Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
+		m_Enemies.push_back(f1);
+	}
 }
 
 void MapManager::Update(double frame)
@@ -1701,6 +1718,44 @@ void MapManager::Update(double frame)
 			}
 		}
 	}
+
+	// 적 업데이트 및 전투(충돌) 처리
+	for (auto it = m_Enemies.begin(); it != m_Enemies.end(); ) {
+		Enemy* e = *it;
+		e->Update();
+
+		if (!e->isDead) {
+			RECT temp;
+			// 1. 기사가 적을 때림! (공격 히트박스 vs 적 몸체)
+			if (knight.isAttacking && !knight.isAttackHit) {
+				if (IntersectRect(&temp, &knight.attackBox, &e->m_rc)) {
+					knight.isAttackHit = true;
+					e->TakeDamage(1, knight.dir == 1 ? -1 : 1); // 때린 방향으로 넉백
+
+					if (knight.attackType == 2) { // 하단 찍기 포고 점프!
+						knight.gravity = -13.0f;
+					}
+				}
+			}
+
+			// 2. 적이 기사를 때림! (몸통 박치기)
+			if (!knight.isInvincible) {
+				if (IntersectRect(&temp, &knight.m_rc, &e->m_rc)) {
+					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
+					knight.TakeDamage(1, pushDir);
+				}
+			}
+		}
+
+		// (옵션) 시체가 된 지 3초 후 삭제
+		/*if (e->isDead && (GetTickCount() - e->hitStartTime > 3000)) {
+			delete e;
+			it = m_Enemies.erase(it);
+		}
+		else {
+			++it;
+		}*/
+	}
 }
 void MapManager::Draw()
 {
@@ -1723,6 +1778,10 @@ void MapManager::Draw()
 	{
 		// 카메라 좌표만큼 빼주기
 		m_pCurrentMapChunk->bgLayer[i].Render(0 - CAM->GetX(), 0 - CAM->GetY(), 0, 1, 1);
+	}
+
+	for (auto e : m_Enemies) {
+		e->Draw();
 	}
 
 	// =======================================================
