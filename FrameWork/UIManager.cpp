@@ -175,6 +175,33 @@ void UIManager::DrawMinimap()
 
                 // 3. 엣지 있는 사각형 테두리 그리기
                 DrawLineRect(cellX + padding, cellY + padding, cellSize - padding * 2, cellSize - padding * 2, lineColor);
+
+                // =========================================================
+                // 4. 연결된 길(통로) 뚫어주기!
+                // =========================================================
+                // ① 오른쪽 방이랑 연결되었는가?
+                if (x < 5) {
+                    int rightRoom = mapMng.m_Grid[y][x + 1];
+                    if (rightRoom == roomID) {
+                        // 같은 거대 방 내부면 벽을 터서 하나처럼 보이게 함
+                        DrawSolidRect(cellX + cellSize - padding, cellY + padding, padding * 2, cellSize - padding * 2, fillColor);
+                    }
+                    else if (mapMng.m_DoorRight[y][x]) {
+                        // 다른 방으로 향하는 문(다리)
+                        DrawSolidRect(cellX + cellSize - padding, cellY + cellSize / 2.0f - 2.0f, padding * 2, 4.0f, lineColor);
+                    }
+                }
+
+                // ② 아래쪽 방이랑 연결되었는가?
+                if (y < 5) {
+                    int downRoom = mapMng.m_Grid[y + 1][x];
+                    if (downRoom == roomID) {
+                        DrawSolidRect(cellX + padding, cellY + cellSize - padding, cellSize - padding * 2, padding * 2, fillColor);
+                    }
+                    else if (mapMng.m_DoorDown[y][x]) {
+                        DrawSolidRect(cellX + cellSize / 2.0f - 2.0f, cellY + cellSize - padding, 4.0f, padding * 2, lineColor);
+                    }
+                }
             }
         }
     }

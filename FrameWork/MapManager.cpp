@@ -3,6 +3,19 @@
 
 MapManager mapMng;
 
+int MapManager::GetRoomGridX(int roomID) {
+	for (int y = 0; y < 6; y++)
+		for (int x = 0; x < 6; x++)
+			if (m_Grid[y][x] == roomID) return x;
+	return 0;
+}
+int MapManager::GetRoomGridY(int roomID) {
+	for (int y = 0; y < 6; y++)
+		for (int x = 0; x < 6; x++)
+			if (m_Grid[y][x] == roomID) return y;
+	return 0;
+}
+
 MapManager::MapManager()
 {
 	m_Stage = 1;
@@ -1537,7 +1550,34 @@ void MapManager::CreateRandomMap()
 		{
 			m_MapList[39].bgLayer[i] = m_Prefabs[ROOM_BOSS].bgLayer[i];
 		}
-	}
+
+		// ==========================================================
+		// 🌟 [추가] 4단계: 맵 생성 완료 후 전체 그리드를 스캔하여 문(Door) 기록!
+		// ==========================================================
+		for (int y = 0; y < 6; y++) for (int x = 0; x < 6; x++) { m_DoorRight[y][x] = false; m_DoorDown[y][x] = false; }
+
+		for (int y = 0; y < 6; y++) {
+			for (int x = 0; x < 6; x++) {
+				int roomA = m_Grid[y][x];
+				if (roomA == 0) continue;
+
+				// 우측 방과 연결되었는가?
+				if (x < 5) {
+					int roomB = m_Grid[y][x + 1];
+					if (roomB != 0 && roomA != roomB) {
+						if (m_MapList[roomA].nextMapID[DIR_RIGHT] == roomB) m_DoorRight[y][x] = true;
+					}
+				}
+				// 아래쪽 방과 연결되었는가?
+				if (y < 5) {
+					int roomB = m_Grid[y + 1][x];
+					if (roomB != 0 && roomA != roomB) {
+						if (m_MapList[roomA].nextMapID[DIR_DOWN] == roomB) m_DoorDown[y][x] = true;
+					}
+				}
+			}
+		}
+	} // end of while loop for boss placement
 }
 
 // MapManager.cpp
@@ -1575,28 +1615,63 @@ void MapManager::ChangeMap(int mapID)
 		coll.AddWall(prefabWall);
 	}
 
+	//// =================================================================
+	//// 2. 막힌 문 자동 캡핑 (진행 불가 버그 완벽 차단)
+	//// =================================================================
+	//int MW = m_pCurrentMapChunk->width;
+	//int MH = m_pCurrentMapChunk->height;
+	//int thick = 100;
+
+	//// 프리팹 도면상으로는 문이 뚫려있는데, 실제 연결된 맵(nextMapID)이 0(없음)이라면?
+	//// 묻지도 따지지도 않고 그곳에 보이지 않는 거대한 철벽을 세워버립니다!
+	//if ((m_Prefabs[pID].typeID & DOOR_UP) && m_pCurrentMapChunk->nextMapID[DIR_UP] == 0) {
+	//	SetRect(&rc, 0, -50, MW, thick); coll.AddWall(rc);
+	//}
+	//if ((m_Prefabs[pID].typeID & DOOR_DOWN) && m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0) {
+	//	SetRect(&rc, 0, MH - thick, MW, MH + 50); coll.AddWall(rc);
+	//}
+	//if ((m_Prefabs[pID].typeID & DOOR_LEFT) && m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0) {
+	//	SetRect(&rc, -50, 0, thick, MH); coll.AddWall(rc);
+	//}
+	//if ((m_Prefabs[pID].typeID & DOOR_RIGHT) && m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0) {
+	//	SetRect(&rc, MW - thick, 0, MW + 50, MH); coll.AddWall(rc);
+	//}
 	// =================================================================
-	// 2. 막힌 문 자동 캡핑 (진행 불가 버그 완벽 차단)
+	// 🌟 2. 도어 소켓(Door Socket) 기반 자동 캡핑 엔진!
+	// (기획자님이 더 이상 프리팹에 테두리 벽을 만들 필요가 없습니다!)
 	// =================================================================
-	int MW = m_pCurrentMapChunk->width;
-	int MH = m_pCurrentMapChunk->height;
+	int currentRoomID = m_pCurrentMapChunk->id;
+	int rootX = GetRoomGridX(currentRoomID);
+	int rootY = GetRoomGridY(currentRoomID);
+	int gw = m_Prefabs[pID].gridW;
+	int gh = m_Prefabs[pID].gridH;
 	int thick = 100;
 
-	// 프리팹 도면상으로는 문이 뚫려있는데, 실제 연결된 맵(nextMapID)이 0(없음)이라면?
-	// 묻지도 따지지도 않고 그곳에 보이지 않는 거대한 철벽을 세워버립니다!
-	if ((m_Prefabs[pID].typeID & DOOR_UP) && m_pCurrentMapChunk->nextMapID[DIR_UP] == 0) {
-		SetRect(&rc, 0, -50, MW, thick); coll.AddWall(rc);
-	}
-	if ((m_Prefabs[pID].typeID & DOOR_DOWN) && m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0) {
-		SetRect(&rc, 0, MH - thick, MW, MH + 50); coll.AddWall(rc);
-	}
-	if ((m_Prefabs[pID].typeID & DOOR_LEFT) && m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0) {
-		SetRect(&rc, -50, 0, thick, MH); coll.AddWall(rc);
-	}
-	if ((m_Prefabs[pID].typeID & DOOR_RIGHT) && m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0) {
-		SetRect(&rc, MW - thick, 0, MW + 50, MH); coll.AddWall(rc);
-	}
+	for (int y = 0; y < gh; y++) {
+		for (int x = 0; x < gw; x++) {
+			int cx = rootX + x; // 그리드상 절대 X
+			int cy = rootY + y; // 그리드상 절대 Y
+			float px = x * SCREEN_WITH;  // 방 내부 픽셀 X
+			float py = y * SCREEN_HEIGHT; // 방 내부 픽셀 Y
 
+			// 윗면 막기 (천장)
+			if (cy == 0 || (m_Grid[cy - 1][cx] != currentRoomID && !m_DoorDown[cy - 1][cx])) {
+				SetRect(&rc, px, py - 50, px + SCREEN_WITH, py + thick); coll.AddWall(rc);
+			}
+			// 아랫면 막기 (바닥)
+			if (cy == 5 || (m_Grid[cy + 1][cx] != currentRoomID && !m_DoorDown[cy][cx])) {
+				SetRect(&rc, px, py + SCREEN_HEIGHT - thick, px + SCREEN_WITH, py + SCREEN_HEIGHT + 50); coll.AddWall(rc);
+			}
+			// 좌측면 막기 (왼쪽 벽)
+			if (cx == 0 || (m_Grid[cy][cx - 1] != currentRoomID && !m_DoorRight[cy][cx - 1])) {
+				SetRect(&rc, px - 50, py, px + thick, py + SCREEN_HEIGHT); coll.AddWall(rc);
+			}
+			// 우측면 막기 (오른쪽 벽)
+			if (cx == 5 || (m_Grid[cy][cx + 1] != currentRoomID && !m_DoorRight[cy][cx])) {
+				SetRect(&rc, px + SCREEN_WITH - thick, py, px + SCREEN_WITH + 50, py + SCREEN_HEIGHT); coll.AddWall(rc);
+			}
+		}
+	}
 	// 이전 맵 적들 메모리 정리
 	for (auto e : m_Enemies) delete e;
 	m_Enemies.clear();
@@ -1621,77 +1696,71 @@ void MapManager::Update(double frame)
 
 	int MW = m_pCurrentMapChunk->width;
 	int MH = m_pCurrentMapChunk->height;
+	int rX = GetRoomGridX(m_pCurrentMapChunk->id);
+	int rY = GetRoomGridY(m_pCurrentMapChunk->id);
 
-	// 1. 오른쪽으로 나갈 때 (-> 다음 방의 '왼쪽 문'으로 스폰됨)
-	if (knight.pos.x > MW)
-	{
-		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_RIGHT];
-		if (nextMap != 0)
-		{
+	// 기사가 방의 어느 '칸(Cell)'에 있는지 정확히 계산
+	float clampX = knight.pos.x; if (clampX < 0) clampX = 0; if (clampX >= MW) clampX = MW - 1;
+	float clampY = knight.pos.y; if (clampY < 0) clampY = 0; if (clampY >= MH) clampY = MH - 1;
+
+	int localX = (int)(clampX / SCREEN_WITH);
+	int localY = (int)(clampY / SCREEN_HEIGHT);
+	int gx = rX + localX; // 현재 있는 절대 그리드 X
+	int gy = rY + localY; // 현재 있는 절대 그리드 Y
+
+	// 해당 칸 안에서의 세부 픽셀 위치
+	float offsetX = clampX - (localX * SCREEN_WITH);
+	float offsetY = clampY - (localY * SCREEN_HEIGHT);
+
+	// 1. 오른쪽으로 나갈 때
+	if (knight.pos.x >= MW) {
+		if (gx < 5 && m_DoorRight[gy][gx]) { // 오른쪽으로 뚫린 문이 있다면?
+			int nextMap = m_Grid[gy][gx + 1];
 			ChangeMap(nextMap);
-			int pID = m_pCurrentMapChunk->prefabID;
-			// 다음 방(pID)의 "왼쪽 문" 스폰 좌표로 딱 맞춰서 이동!
-			knight.pos.x = m_Prefabs[pID].spawnX[DIR_LEFT];
-			knight.pos.y = m_Prefabs[pID].spawnY[DIR_LEFT];
-
+			int new_rY = GetRoomGridY(nextMap);
+			knight.pos.x = 50.0f;
+			knight.pos.y = (gy - new_rY) * SCREEN_HEIGHT + offsetY; // 🌟 들어간 높이 그대로 튀어나옴!
 			return;
 		}
-		else knight.pos.x = MW;
+		else knight.pos.x = MW - 1; // 막혀있으면 튕겨냄
 	}
-
-	// 2. 왼쪽으로 나갈 때 (-> 다음 방의 '오른쪽 문'으로 스폰됨)
-	else if (knight.pos.x < 0)
-	{
-		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_LEFT];
-		if (nextMap != 0)
-		{
+	// 2. 왼쪽으로 나갈 때
+	else if (knight.pos.x <= 0) {
+		if (gx > 0 && m_DoorRight[gy][gx - 1]) {
+			int nextMap = m_Grid[gy][gx - 1];
 			ChangeMap(nextMap);
-			int pID = m_pCurrentMapChunk->prefabID;
-			// 다음 방(pID)의 "오른쪽 문" 스폰 좌표로 딱 맞춰서 이동!
-			knight.pos.x = m_Prefabs[pID].spawnX[DIR_RIGHT];
-			knight.pos.y = m_Prefabs[pID].spawnY[DIR_RIGHT];
-
+			int new_rY = GetRoomGridY(nextMap);
+			knight.pos.x = m_pCurrentMapChunk->width - 50.0f;
+			knight.pos.y = (gy - new_rY) * SCREEN_HEIGHT + offsetY;
 			return;
 		}
-		else knight.pos.x = 0;
+		else knight.pos.x = 1;
 	}
-
-	// 3. 위로 올라갈 때 (-> 다음 방의 '아랫 문'으로 스폰됨)
-	if (knight.pos.y < 0)
-	{
-		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_UP];
-		if (nextMap != 0)
-		{
+	// 3. 위로 올라갈 때
+	else if (knight.pos.y <= 0) {
+		if (gy > 0 && m_DoorDown[gy - 1][gx]) {
+			int nextMap = m_Grid[gy - 1][gx];
 			ChangeMap(nextMap);
-			int pID = m_pCurrentMapChunk->prefabID;
-			knight.pos.x = m_Prefabs[pID].spawnX[DIR_DOWN];
-			knight.pos.y = m_Prefabs[pID].spawnY[DIR_DOWN];
-
-			// 솟아오르는 관성 유지 (기존처럼)
+			int new_rX = GetRoomGridX(nextMap);
+			knight.pos.x = (gx - new_rX) * SCREEN_WITH + offsetX; // 🌟 올라간 폭 그대로 튀어나옴!
+			knight.pos.y = m_pCurrentMapChunk->height - 150.0f;
 			knight.gravity = -12.0f;
-
 			return;
 		}
-		else knight.pos.y = 0;
+		else knight.pos.y = 1;
 	}
-
-	// 4. 아래로 떨어질 때 (-> 다음 방의 '윗 문'으로 스폰됨)
-	else if (knight.pos.y > MH)
-	{
-		int nextMap = m_pCurrentMapChunk->nextMapID[DIR_DOWN];
-		if (nextMap != 0)
-		{
+	// 4. 아래로 떨어질 때
+	else if (knight.pos.y >= MH) {
+		if (gy < 5 && m_DoorDown[gy][gx]) {
+			int nextMap = m_Grid[gy + 1][gx];
 			ChangeMap(nextMap);
-			int pID = m_pCurrentMapChunk->prefabID;
-			knight.pos.x = m_Prefabs[pID].spawnX[DIR_UP];
-			knight.pos.y = m_Prefabs[pID].spawnY[DIR_UP];
-
+			int new_rX = GetRoomGridX(nextMap);
+			knight.pos.x = (gx - new_rX) * SCREEN_WITH + offsetX;
+			knight.pos.y = 50.0f;
 			return;
 		}
-		else
-		{
-			knight.pos.y = MH - 100.0f;
-			knight.grounded = true;
+		else {
+			knight.pos.y = MH - 100.0f; knight.grounded = true;
 		}
 	}
 

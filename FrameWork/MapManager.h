@@ -72,6 +72,16 @@ public :
 	// UI에서 미니맵을 그릴 때 읽어갈 6x6 배열
 	int m_Grid[6][6];
 
+	// =======================================================
+	// 도어 소켓 시스템 변수 및 헬퍼 함수
+	// =======================================================
+	bool m_DoorRight[6][6]; // [y][x]와 [y][x+1] 사이의 문 여부
+	bool m_DoorDown[6][6];  // [y][x]와 [y+1][x] 사이의 문 여부
+
+	int GetRoomGridX(int roomID); // 이 방의 기준점(좌측 끝) X칸 구하기
+	int GetRoomGridY(int roomID); // 이 방의 기준점(상단 끝) Y칸 구하기
+
+
 	Sprite m_MapImg1_1[6];
 	Sprite m_MapImg1_2[45];
 
