@@ -655,502 +655,624 @@ void MapManager::Init()
 //	}
 //}
 
+//void MapManager::InitPrefabs()
+//{
+//	RECT rc;
+//	int thickness = 100;
+//	int pH = 30; // 발판 두께
+//
+//	// ====================================================================
+//	// [프리팹 1번] 위(UP) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);  // 좌벽
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우벽
+//		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc); // 천장(좌)
+//		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장(우)
+//
+//		// [발판 추가] 촘촘한 지그재그 & 중앙 보조 발판 (150px 간격)
+//		SetRect(&rc, 150, 1350, 400, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 850, 1200, 1100, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 450, 1050, 750, 1050 + pH); m_Prefabs[id].walls.push_back(rc); // 중앙
+//		SetRect(&rc, 100, 900, 350, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 850, 750, 1150, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 450, 600, 700, 600 + pH); m_Prefabs[id].walls.push_back(rc); // 중앙
+//		SetRect(&rc, 200, 450, 450, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc); // 출구 밑
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 2번] 아래(DOWN) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_DOWN;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 1;
+//		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc); // 좌
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우
+//		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥(좌)
+//		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥(우)
+//
+//		SetRect(&rc, 300, 500, 500, 500 + pH); m_Prefabs[id].walls.push_back(rc); // 보조 발판
+//		SetRect(&rc, 750, 500, 950, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 3번] 위, 아래(UP, DOWN) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP | DOOR_DOWN;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc); // 좌
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우
+//		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc); // 천장
+//		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
+//		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 웅덩이 구조 + 촘촘한 공중 섬
+//		SetRect(&rc, 0, 1150, 600, 1200); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - 600, 1000, MW, 1050); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, 850, 500, 900); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - 500, 650, MW, 700); m_Prefabs[id].walls.push_back(rc);
+//
+//		SetRect(&rc, 800, 1350, 1000, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1300, 1200, 1500, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 900, 1050, 1100, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1400, 850, 1600, 850 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1000, 650, 1200, 650 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1200, 450, 1450, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc); // 출구 밑
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 4번] 왼쪽(LEFT)만 뚫린 방 -> 🌟 보스 대기실로 변경!
+//	// 사이즈: 1칸 x 1칸 (1280 x 800)
+//	// 특징: 평탄한 지형, 정중앙에 보스방으로 가는 텔레포터 제단 존재
+//	// ====================================================================
+//	{
+//		int id = DOOR_LEFT; // 4
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 1;
+//		m_Prefabs[id].gridH = 1;
+//		m_Prefabs[id].width = SCREEN_WITH;
+//		m_Prefabs[id].height = SCREEN_HEIGHT;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//		char FileName[256];
+//		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_bossin.png");
+//		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
+//		// 1. 외곽선 세팅
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장 막음
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥 막음
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우측 막음
+//
+//		// 2. 왼쪽 문 뚫기
+//		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// 3. 지형: 정중앙에 텔레포터 제단 (살짝 솟아오른 형태)
+//		SetRect(&rc, MW / 2 - 150, floorY - 30, MW / 2 + 150, floorY); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 100, floorY - 60, MW / 2 + 100, floorY - 30); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 5번] 위, 왼쪽 (UP, LEFT)
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP | DOOR_LEFT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 촘촘한 나선형
+//		SetRect(&rc, 300, 1350, 600, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 800, 1200, 1100, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1300, 1050, 1600, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1800, 900, 2200, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1400, 750, 1650, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1000, 600, 1250, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 800, 450, 1050, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 6번] 아래, 왼쪽 (DOWN, LEFT) - 🌟 왼쪽 문이 위(TOP)에 있음
+//	// ====================================================================
+//	{
+//		int id = DOOR_DOWN | DOOR_LEFT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, 600); m_Prefabs[id].walls.push_back(rc); // 상단 문 (뚫림)
+//		SetRect(&rc, -50, 800, thickness, MH); m_Prefabs[id].walls.push_back(rc); // 하단 막음
+//
+//		// [발판 추가] 떨어지면서 밟기 (촘촘)
+//		SetRect(&rc, 100, 750, 350, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 500, 900, 800, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 250, 1050, 500, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 650, 1200, 950, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 300, 1350, 550, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 7번] 위, 아래, 왼쪽 (UP, DOWN, LEFT) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP | DOOR_DOWN | DOOR_LEFT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 촘촘한 구름 다리
+//		SetRect(&rc, 300, 1350, 600, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 750, 1200, 1050, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 100, 1050, MW / 2 + 400, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 200, 900, MW / 2 + 50, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, 750, MW / 2 + 450, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 300, 600, MW / 2 - 50, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 50, 450, MW / 2 + 350, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 8번] 오른쪽 (RIGHT) - 시작 방
+//	// ====================================================================
+//	{
+//		int id = DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 1;
+//		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc); // 문
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 9번] 위, 오른쪽 (UP, RIGHT)
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP | DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 촘촘한 좌우 이동
+//		SetRect(&rc, MW - 400, 1350, MW - 100, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 200, 1200, 500, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 600, 1050, 900, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 150, 900, 450, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2, 750, MW / 2 + 300, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 150, 600, 450, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 500, 450, 800, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 10번] 아래, 오른쪽 (DOWN, RIGHT) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_DOWN | DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 1;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 촘촘한 징검다리
+//		SetRect(&rc, 600, 600, 800, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1000, 500, 1200, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1400, 600, 1600, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1800, 500, 2000, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 11번] 위, 아래, 오른쪽 (UP, DOWN, RIGHT) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP | DOOR_DOWN | DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 수직 엘리베이터 (150 간격)
+//		SetRect(&rc, 600, 1350, 900, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 150, 1200, 450, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 700, 1050, 1000, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 200, 900, 500, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 650, 750, 950, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 150, 600, 450, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 600, 450, 900, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 12번] 왼쪽, 오른쪽 (LEFT, RIGHT) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_LEFT | DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 1;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 바리케이드 완화
+//		SetRect(&rc, 1000, 500, 1560, floorY); m_Prefabs[id].walls.push_back(rc); // 중앙 장애물 (낮춤)
+//		SetRect(&rc, 600, 600, 900, 630); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1660, 600, 1960, 630); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 13번] 위, 왼쪽, 오른쪽 (UP, LEFT, RIGHT) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP | DOOR_LEFT | DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 산맥 등반로 완화 (150 간격)
+//		SetRect(&rc, 900, 1350, 1660, floorY); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 500, 1200, 800, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1760, 1200, 2060, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 850, 1050, 1150, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1410, 1050, 1710, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1000, 900, 1300, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1260, 750, 1560, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1000, 600, 1300, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1150, 450, 1450, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 14번] 아래, 왼쪽, 오른쪽 (DOWN, LEFT, RIGHT) 
+//	// ====================================================================
+//	{
+//		int id = DOOR_DOWN | DOOR_LEFT | DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 1;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW / 2 - 300, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 300, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 촘촘한 흔들다리
+//		SetRect(&rc, 700, 650, 900, 650 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1050, 550, 1250, 550 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1400, 550, 1600, 550 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1750, 650, 1950, 650 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 15번] 상, 하, 좌, 우 모두 뚫림 
+//	// ====================================================================
+//	{
+//		int id = DOOR_UP | DOOR_DOWN | DOOR_LEFT | DOOR_RIGHT;
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
+//		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		SetRect(&rc, 0, -50, MW / 2 - 200, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 200, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
+//
+//		// [발판 추가] 거대하고 촘촘한 정거장
+//		SetRect(&rc, 1000, 1200, 1560, 1200 + pH); m_Prefabs[id].walls.push_back(rc); // 중앙 베이스
+//		SetRect(&rc, 1150, 1350, 1410, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+//
+//		SetRect(&rc, 300, 1300, 550, 1300 + pH); m_Prefabs[id].walls.push_back(rc); // 좌
+//		SetRect(&rc, 700, 1250, 950, 1250 + pH); m_Prefabs[id].walls.push_back(rc);
+//
+//		SetRect(&rc, 2000, 1300, 2250, 1300 + pH); m_Prefabs[id].walls.push_back(rc); // 우
+//		SetRect(&rc, 1600, 1250, 1850, 1250 + pH); m_Prefabs[id].walls.push_back(rc);
+//
+//		SetRect(&rc, 1000, 1050, 1250, 1050 + pH); m_Prefabs[id].walls.push_back(rc); // 위로 가는 길
+//		SetRect(&rc, 1300, 900, 1550, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1000, 750, 1250, 750 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1300, 600, 1550, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, 1000, 450, 1250, 450 + pH); m_Prefabs[id].walls.push_back(rc);
+//		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+//	}
+//
+//	// ====================================================================
+//	// [프리팹 16번] 진짜 보스방!
+//	// 조합: ROOM_BOSS (16)
+//	// 사이즈: 2칸 x 1칸 (2560 x 800) 넓은 결전의 무대
+//	// 특징: 사방이 꽉 막혀있음. 텔레포트 전용 방.
+//	// ====================================================================
+//	{
+//		int id = ROOM_BOSS; // 16
+//		m_Prefabs[id].typeID = id;
+//		m_Prefabs[id].gridW = 2; // 보스전은 넓게 2칸!
+//		m_Prefabs[id].gridH = 1;
+//		m_Prefabs[id].width = SCREEN_WITH * 2;
+//		m_Prefabs[id].height = SCREEN_HEIGHT;
+//		m_Prefabs[id].layerCount = 1;
+//
+//		// 🌟 보스방만의 특별한 배경 이미지가 있다면 여기에 세팅 (지금은 임시)
+//		char FileName[256];
+//		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_bossroom01.png");
+//		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
+//
+//		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+//
+//		// 1. 사방을 완벽히 차단 (아무데도 못 나감)
+//		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
+//		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);  // 천장
+//		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);  // 좌측 벽
+//		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우측 벽
+//
+//		// 2. 지형: 보스전용 완전 평지 (또는 필요에 따라 양쪽 끝에 회피용 발판 추가)
+//		SetRect(&rc, 350, 450, 550, 480); m_Prefabs[id].walls.push_back(rc); // 좌측 회피 발판
+//		SetRect(&rc, MW - 550, 450, MW - 350, 480); m_Prefabs[id].walls.push_back(rc); // 우측 회피 발판
+//	}
+//
+//	// ====================================================================
+//	// [자동 스폰 위치 계산기] (모든 1~15번 방 일괄 적용)
+//	// ====================================================================
+//	for (int i = 1; i <= 15; i++)
+//	{
+//		if (m_Prefabs[i].typeID == 0) continue;
+//
+//		float pWidth = (float)m_Prefabs[i].width;
+//		float pHeight = (float)m_Prefabs[i].height;
+//
+//		// 1. 위에서 떨어질 때 (중앙 상단)
+//		m_Prefabs[i].spawnX[DIR_UP] = pWidth / 2.0f;
+//		m_Prefabs[i].spawnY[DIR_UP] = 50.0f;
+//
+//		// 2. 아래에서 솟아오를 때 (중앙 하단)
+//		m_Prefabs[i].spawnX[DIR_DOWN] = pWidth / 2.0f;
+//		m_Prefabs[i].spawnY[DIR_DOWN] = pHeight - 150.0f;
+//
+//		// 3. 왼쪽 문으로 들어올 때 (대부분 좌측 하단 문)
+//		m_Prefabs[i].spawnX[DIR_LEFT] = 50.0f;
+//		m_Prefabs[i].spawnY[DIR_LEFT] = pHeight - 150.0f;
+//
+//		// 4. 오른쪽 문으로 들어올 때 (대부분 우측 하단 문)
+//		m_Prefabs[i].spawnX[DIR_RIGHT] = pWidth - 100.0f;
+//		m_Prefabs[i].spawnY[DIR_RIGHT] = pHeight - 150.0f;
+//	}
+//
+//	// [예외 처리] 왼쪽 문이 '상단'에 뚫려있는 6번 프리팹만 Y좌표 수정!
+//	m_Prefabs[6].spawnY[DIR_LEFT] = SCREEN_HEIGHT - 150.0f; // y = 650 (위쪽 칸)
+//}
+
 void MapManager::InitPrefabs()
 {
 	RECT rc;
-	int thickness = 100;
 	int pH = 30; // 발판 두께
 
-	// ====================================================================
-	// [프리팹 1번] 위(UP) 
-	// ====================================================================
-	{
-		int id = DOOR_UP;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);  // 좌벽
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우벽
-		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc); // 천장(좌)
-		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장(우)
-
-		// [발판 추가] 촘촘한 지그재그 & 중앙 보조 발판 (150px 간격)
-		SetRect(&rc, 150, 1350, 400, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 850, 1200, 1100, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 450, 1050, 750, 1050 + pH); m_Prefabs[id].walls.push_back(rc); // 중앙
-		SetRect(&rc, 100, 900, 350, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 850, 750, 1150, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 450, 600, 700, 600 + pH); m_Prefabs[id].walls.push_back(rc); // 중앙
-		SetRect(&rc, 200, 450, 450, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc); // 출구 밑
+	// 초기화
+	for (int i = 0; i < 40; i++) {
+		m_Prefabs[i].typeID = 0;
+		m_Prefabs[i].walls.clear();
 	}
 
 	// ====================================================================
-	// [프리팹 2번] 아래(DOWN) 
+	// 🌟 [도어 소켓 룰] 🌟
+	// 1. 좌/우 문: 항상 y = 700 위치에서 진입. (그래서 바닥 양옆에 300px짜리 발판이 무조건 있음)
+	// 2. 하단 문: 항상 x = 300 ~ 980 사이의 680px 거대 구멍으로 떨어짐.
+	// 3. 상단 문: 떨어질 때를 대비해 x = 490 ~ 790, y = 250 위치에 낙하 방지용 발판이 있음.
 	// ====================================================================
+
+	// [프리팹 1번] 1x1 기본 방
 	{
-		int id = DOOR_DOWN;
-		m_Prefabs[id].typeID = id;
+		int id = 1;
+		m_Prefabs[id].typeID = 1;
 		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 1;
 		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT;
 		m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map01.png", false, 0);
 
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+		// 🌟 도어 소켓 (안전 지대)
+		SetRect(&rc, 0, 700, 300, 700 + pH); m_Prefabs[id].walls.push_back(rc); // 좌측 문 앞
+		SetRect(&rc, 980, 700, 1280, 700 + pH); m_Prefabs[id].walls.push_back(rc); // 우측 문 앞
+		SetRect(&rc, 490, 250, 790, 250 + pH); m_Prefabs[id].walls.push_back(rc); // 상단 문 낙하 방지
 
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc); // 좌
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우
-		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥(좌)
-		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥(우)
-
-		SetRect(&rc, 300, 500, 500, 500 + pH); m_Prefabs[id].walls.push_back(rc); // 보조 발판
-		SetRect(&rc, 750, 500, 950, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		// 내부 지형 (자유롭게 디자인)
+		SetRect(&rc, 350, 500, 550, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 730, 500, 930, 500 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
 
-	// ====================================================================
-	// [프리팹 3번] 위, 아래(UP, DOWN) 
-	// ====================================================================
+	// [프리팹 2번] 1x2 수직 방 (엘리베이터)
 	{
-		int id = DOOR_UP | DOOR_DOWN;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc); // 좌
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우
-		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc); // 천장
-		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
-		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 웅덩이 구조 + 촘촘한 공중 섬
-		SetRect(&rc, 0, 1150, 600, 1200); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - 600, 1000, MW, 1050); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, 850, 500, 900); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - 500, 650, MW, 700); m_Prefabs[id].walls.push_back(rc);
-
-		SetRect(&rc, 800, 1350, 1000, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1300, 1200, 1500, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 900, 1050, 1100, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1400, 850, 1600, 850 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1000, 650, 1200, 650 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1200, 450, 1450, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc); // 출구 밑
-	}
-
-	// ====================================================================
-	// [프리팹 4번] 왼쪽(LEFT)만 뚫린 방 -> 🌟 보스 대기실로 변경!
-	// 사이즈: 1칸 x 1칸 (1280 x 800)
-	// 특징: 평탄한 지형, 정중앙에 보스방으로 가는 텔레포터 제단 존재
-	// ====================================================================
-	{
-		int id = DOOR_LEFT; // 4
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 1;
-		m_Prefabs[id].gridH = 1;
-		m_Prefabs[id].width = SCREEN_WITH;
-		m_Prefabs[id].height = SCREEN_HEIGHT;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-		char FileName[256];
-		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_bossin.png");
-		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
-		// 1. 외곽선 세팅
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc); // 천장 막음
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥 막음
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우측 막음
-
-		// 2. 왼쪽 문 뚫기
-		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// 3. 지형: 정중앙에 텔레포터 제단 (살짝 솟아오른 형태)
-		SetRect(&rc, MW / 2 - 150, floorY - 30, MW / 2 + 150, floorY); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 100, floorY - 60, MW / 2 + 100, floorY - 30); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 5번] 위, 왼쪽 (UP, LEFT)
-	// ====================================================================
-	{
-		int id = DOOR_UP | DOOR_LEFT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 촘촘한 나선형
-		SetRect(&rc, 300, 1350, 600, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 800, 1200, 1100, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1300, 1050, 1600, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1800, 900, 2200, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1400, 750, 1650, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1000, 600, 1250, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 800, 450, 1050, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 6번] 아래, 왼쪽 (DOWN, LEFT) - 🌟 왼쪽 문이 위(TOP)에 있음
-	// ====================================================================
-	{
-		int id = DOOR_DOWN | DOOR_LEFT;
-		m_Prefabs[id].typeID = id;
+		int id = 2;
+		m_Prefabs[id].typeID = 2;
 		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
 		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
 		m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map02.png", false, 0);
 
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+		// 🌟 도어 소켓 일괄 생성 (2개 칸 각각에 대해)
+		for (int gy = 0; gy < 2; gy++) {
+			float cy = gy * SCREEN_HEIGHT;
+			SetRect(&rc, 0, cy + 700, 300, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&rc, 980, cy + 700, 1280, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&rc, 490, cy + 250, 790, cy + 250 + pH); m_Prefabs[id].walls.push_back(rc);
+		}
 
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, 600); m_Prefabs[id].walls.push_back(rc); // 상단 문 (뚫림)
-		SetRect(&rc, -50, 800, thickness, MH); m_Prefabs[id].walls.push_back(rc); // 하단 막음
-
-		// [발판 추가] 떨어지면서 밟기 (촘촘)
-		SetRect(&rc, 100, 750, 350, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 500, 900, 800, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 250, 1050, 500, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 650, 1200, 950, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 300, 1350, 550, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
+		// 수직 연결 지형
+		SetRect(&rc, 300, 1300, 500, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 780, 1100, 980, 1100 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 300, 900, 500, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 540, 600, 740, 600 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
 
-	// ====================================================================
-	// [프리팹 7번] 위, 아래, 왼쪽 (UP, DOWN, LEFT) 
-	// ====================================================================
+	// [프리팹 3번] 2x1 수평 방 (긴 복도/웅덩이)
 	{
-		int id = DOOR_UP | DOOR_DOWN | DOOR_LEFT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 촘촘한 구름 다리
-		SetRect(&rc, 300, 1350, 600, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 750, 1200, 1050, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 100, 1050, MW / 2 + 400, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 200, 900, MW / 2 + 50, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, 750, MW / 2 + 450, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 300, 600, MW / 2 - 50, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 50, 450, MW / 2 + 350, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 8번] 오른쪽 (RIGHT) - 시작 방
-	// ====================================================================
-	{
-		int id = DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 1;
-		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc); // 문
-	}
-
-	// ====================================================================
-	// [프리팹 9번] 위, 오른쪽 (UP, RIGHT)
-	// ====================================================================
-	{
-		int id = DOOR_UP | DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 촘촘한 좌우 이동
-		SetRect(&rc, MW - 400, 1350, MW - 100, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 200, 1200, 500, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 600, 1050, 900, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 150, 900, 450, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2, 750, MW / 2 + 300, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 150, 600, 450, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 500, 450, 800, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 10번] 아래, 오른쪽 (DOWN, RIGHT) 
-	// ====================================================================
-	{
-		int id = DOOR_DOWN | DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
+		int id = 3;
+		m_Prefabs[id].typeID = 3;
 		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 1;
 		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT;
 		m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map03.png", false, 0);
 
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+		for (int gx = 0; gx < 2; gx++) {
+			float cx = gx * SCREEN_WITH;
+			SetRect(&rc, cx, 700, cx + 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&rc, cx + 980, 700, cx + 1280, 700 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&rc, cx + 490, 250, cx + 790, 250 + pH); m_Prefabs[id].walls.push_back(rc);
+		}
 
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 촘촘한 징검다리
-		SetRect(&rc, 600, 600, 800, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1000, 500, 1200, 500 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1400, 600, 1600, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1800, 500, 2000, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		// 웅덩이 위 흔들다리 지형
+		SetRect(&rc, 800, 600, 1000, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1180, 500, 1380, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1560, 600, 1760, 600 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
 
-	// ====================================================================
-	// [프리팹 11번] 위, 아래, 오른쪽 (UP, DOWN, RIGHT) 
-	// ====================================================================
+	// [프리팹 4번] 2x2 거대 방 (중앙 허브)
 	{
-		int id = DOOR_UP | DOOR_DOWN | DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW / 2 - 150, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 수직 엘리베이터 (150 간격)
-		SetRect(&rc, 600, 1350, 900, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 150, 1200, 450, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 700, 1050, 1000, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 200, 900, 500, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 650, 750, 950, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 150, 600, 450, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 600, 450, 900, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 12번] 왼쪽, 오른쪽 (LEFT, RIGHT) 
-	// ====================================================================
-	{
-		int id = DOOR_LEFT | DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 1;
-		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 바리케이드 완화
-		SetRect(&rc, 1000, 500, 1560, floorY); m_Prefabs[id].walls.push_back(rc); // 중앙 장애물 (낮춤)
-		SetRect(&rc, 600, 600, 900, 630); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1660, 600, 1960, 630); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 13번] 위, 왼쪽, 오른쪽 (UP, LEFT, RIGHT) 
-	// ====================================================================
-	{
-		int id = DOOR_UP | DOOR_LEFT | DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
+		int id = 4;
+		m_Prefabs[id].typeID = 4;
 		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
 		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
 		m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map04.png", false, 0);
 
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
+		for (int gy = 0; gy < 2; gy++) {
+			for (int gx = 0; gx < 2; gx++) {
+				float cx = gx * SCREEN_WITH; float cy = gy * SCREEN_HEIGHT;
+				SetRect(&rc, cx, cy + 700, cx + 300, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
+				SetRect(&rc, cx + 980, cy + 700, cx + 1280, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
+				SetRect(&rc, cx + 490, cy + 250, cx + 790, cy + 250 + pH); m_Prefabs[id].walls.push_back(rc);
+			}
+		}
 
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, -50, MW / 2 - 150, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 150, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 산맥 등반로 완화 (150 간격)
-		SetRect(&rc, 900, 1350, 1660, floorY); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 500, 1200, 800, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1760, 1200, 2060, 1200 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 850, 1050, 1150, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1410, 1050, 1710, 1050 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1000, 900, 1300, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1260, 750, 1560, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1000, 600, 1300, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1150, 450, 1450, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
+		// 거대 십자가 중앙 플랫폼
+		SetRect(&rc, 1000, 1100, 1560, 1100 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 600, 1300, 800, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1760, 1300, 1960, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1180, 900, 1380, 900 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
 
-	// ====================================================================
-	// [프리팹 14번] 아래, 왼쪽, 오른쪽 (DOWN, LEFT, RIGHT) 
-	// ====================================================================
-	{
-		int id = DOOR_DOWN | DOOR_LEFT | DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 1;
-		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW / 2 - 300, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 300, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 촘촘한 흔들다리
-		SetRect(&rc, 700, 650, 900, 650 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1050, 550, 1250, 550 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1400, 550, 1600, 550 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1750, 650, 1950, 650 + pH); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 15번] 상, 하, 좌, 우 모두 뚫림 
-	// ====================================================================
-	{
-		int id = DOOR_UP | DOOR_DOWN | DOOR_LEFT | DOOR_RIGHT;
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 2;
-		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT * 2;
-		m_Prefabs[id].layerCount = 1;
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		SetRect(&rc, 0, -50, MW / 2 - 200, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 200, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 0, floorY, MW / 2 - 200, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 + 200, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, 0, thickness, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, -50, SCREEN_HEIGHT, thickness, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, 0, MW + 50, SCREEN_HEIGHT); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW - thickness, SCREEN_HEIGHT, MW + 50, floorY - 200); m_Prefabs[id].walls.push_back(rc);
-
-		// [발판 추가] 거대하고 촘촘한 정거장
-		SetRect(&rc, 1000, 1200, 1560, 1200 + pH); m_Prefabs[id].walls.push_back(rc); // 중앙 베이스
-		SetRect(&rc, 1150, 1350, 1410, 1350 + pH); m_Prefabs[id].walls.push_back(rc);
-
-		SetRect(&rc, 300, 1300, 550, 1300 + pH); m_Prefabs[id].walls.push_back(rc); // 좌
-		SetRect(&rc, 700, 1250, 950, 1250 + pH); m_Prefabs[id].walls.push_back(rc);
-
-		SetRect(&rc, 2000, 1300, 2250, 1300 + pH); m_Prefabs[id].walls.push_back(rc); // 우
-		SetRect(&rc, 1600, 1250, 1850, 1250 + pH); m_Prefabs[id].walls.push_back(rc);
-
-		SetRect(&rc, 1000, 1050, 1250, 1050 + pH); m_Prefabs[id].walls.push_back(rc); // 위로 가는 길
-		SetRect(&rc, 1300, 900, 1550, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1000, 750, 1250, 750 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1300, 600, 1550, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1000, 450, 1250, 450 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, MW / 2 - 150, 300, MW / 2 + 150, 300 + pH); m_Prefabs[id].walls.push_back(rc);
-	}
-
-	// ====================================================================
-	// [프리팹 16번] 진짜 보스방!
-	// 조합: ROOM_BOSS (16)
-	// 사이즈: 2칸 x 1칸 (2560 x 800) 넓은 결전의 무대
-	// 특징: 사방이 꽉 막혀있음. 텔레포트 전용 방.
-	// ====================================================================
+	// [프리팹 16번] 보스방 (고정 2x1) 
 	{
 		int id = ROOM_BOSS; // 16
-		m_Prefabs[id].typeID = id;
-		m_Prefabs[id].gridW = 2; // 보스전은 넓게 2칸!
-		m_Prefabs[id].gridH = 1;
-		m_Prefabs[id].width = SCREEN_WITH * 2;
-		m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].typeID = 16;
+		m_Prefabs[id].gridW = 2; m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH * 2; m_Prefabs[id].height = SCREEN_HEIGHT;
 		m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map_bossroom01.png", false, 0);
 
-		// 🌟 보스방만의 특별한 배경 이미지가 있다면 여기에 세팅 (지금은 임시)
-		char FileName[256];
-		sprintf_s(FileName, "./resource/Img/map1/Ch1_maps/map_bossroom01.png");
-		m_Prefabs[id].bgLayer[0].Create(FileName, false, 0);
-
-		int MW = m_Prefabs[id].width; int MH = m_Prefabs[id].height; int floorY = MH - thickness;
-
-		// 1. 사방을 완벽히 차단 (아무데도 못 나감)
-		SetRect(&rc, 0, floorY, MW, MH + 50); m_Prefabs[id].walls.push_back(rc); // 바닥
-		SetRect(&rc, 0, -50, MW, thickness); m_Prefabs[id].walls.push_back(rc);  // 천장
-		SetRect(&rc, -50, 0, thickness, MH); m_Prefabs[id].walls.push_back(rc);  // 좌측 벽
-		SetRect(&rc, MW - thickness, 0, MW + 50, MH); m_Prefabs[id].walls.push_back(rc); // 우측 벽
-
-		// 2. 지형: 보스전용 완전 평지 (또는 필요에 따라 양쪽 끝에 회피용 발판 추가)
-		SetRect(&rc, 350, 450, 550, 480); m_Prefabs[id].walls.push_back(rc); // 좌측 회피 발판
-		SetRect(&rc, MW - 550, 450, MW - 350, 480); m_Prefabs[id].walls.push_back(rc); // 우측 회피 발판
+		// 보스방은 텔레포트 전용이므로 소켓이 필요 없고 통짜 바닥만 깝니다.
+		SetRect(&rc, 0, 700, 2560, 700 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
-
-	// ====================================================================
-	// [자동 스폰 위치 계산기] (모든 1~15번 방 일괄 적용)
-	// ====================================================================
-	for (int i = 1; i <= 15; i++)
-	{
-		if (m_Prefabs[i].typeID == 0) continue;
-
-		float pWidth = (float)m_Prefabs[i].width;
-		float pHeight = (float)m_Prefabs[i].height;
-
-		// 1. 위에서 떨어질 때 (중앙 상단)
-		m_Prefabs[i].spawnX[DIR_UP] = pWidth / 2.0f;
-		m_Prefabs[i].spawnY[DIR_UP] = 50.0f;
-
-		// 2. 아래에서 솟아오를 때 (중앙 하단)
-		m_Prefabs[i].spawnX[DIR_DOWN] = pWidth / 2.0f;
-		m_Prefabs[i].spawnY[DIR_DOWN] = pHeight - 150.0f;
-
-		// 3. 왼쪽 문으로 들어올 때 (대부분 좌측 하단 문)
-		m_Prefabs[i].spawnX[DIR_LEFT] = 50.0f;
-		m_Prefabs[i].spawnY[DIR_LEFT] = pHeight - 150.0f;
-
-		// 4. 오른쪽 문으로 들어올 때 (대부분 우측 하단 문)
-		m_Prefabs[i].spawnX[DIR_RIGHT] = pWidth - 100.0f;
-		m_Prefabs[i].spawnY[DIR_RIGHT] = pHeight - 150.0f;
-	}
-
-	// [예외 처리] 왼쪽 문이 '상단'에 뚫려있는 6번 프리팹만 Y좌표 수정!
-	m_Prefabs[6].spawnY[DIR_LEFT] = SCREEN_HEIGHT - 150.0f; // y = 650 (위쪽 칸)
 }
 
 //void MapManager::CreateRandomMap()
@@ -1292,63 +1414,334 @@ void MapManager::InitPrefabs()
 //	}
 //}
 
+//void MapManager::CreateRandomMap()
+//{
+//	bool bossPlaced = false;
+//	int mapGenAttempts = 0;
+//
+//	// 보스방이 우측(X >= 4)에 무사히 깔릴 때까지 맵 생성을 반복 (최대 50번 시도)
+//	while (!bossPlaced && mapGenAttempts < 50)
+//	{
+//		mapGenAttempts++;
+//
+//		// 1. 맵 초기화
+//		for (int i = 1; i < 40; i++) {
+//			for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
+//			m_MapList[i].prefabID = 0;
+//		}
+//		// 그리드 초기화 (0 = 빈 칸)
+//		for (int y = 0; y < 6; y++) {
+//			for (int x = 0; x < 6; x++) {
+//				m_Grid[y][x] = 0;
+//			}
+//		}
+//		// 2. 시작 방(1번) 배치: 오른쪽(DOOR_RIGHT)만 뚫린 8번 프리팹
+//		m_MapList[1].id = 1;
+//		m_MapList[1].prefabID = 8;
+//		m_MapList[1].width = m_Prefabs[8].width;
+//		m_MapList[1].height = m_Prefabs[8].height;
+//		m_MapList[1].layerCount = m_Prefabs[8].layerCount;
+//
+//		m_Grid[3][0] = 1; // 시작 위치: 좌측 중간
+//
+//		// 시작 방의 배경 이미지를 복사
+//		for (int i = 0; i < m_Prefabs[8].layerCount; i++) {
+//			m_MapList[1].bgLayer[i] = m_Prefabs[8].bgLayer[i];
+//		}
+//
+//		// 3. 큐(Queue) 생성 (연결해야 할 문들을 저장)
+//		struct OpenDoor { int rID, dir; };
+//		std::vector<OpenDoor> q;
+//		q.push_back({ 1, DIR_RIGHT }); // 1번 방의 오른쪽 문을 뚫어라!
+//
+//		int currentMapCount = 1;
+//		int maxMaps = 36;
+//		int failCount = 0;
+//
+//		// 4. 레고 블록 조립 시작
+//		while (!q.empty() && failCount < 1000 && currentMapCount < maxMaps)
+//		{
+//			failCount++;
+//
+//			// 큐에서 무작위 문 하나 꺼내기
+//			int qIdx = rand() % q.size();
+//			OpenDoor d = q[qIdx];
+//			q.erase(q.begin() + qIdx);
+//
+//			if (m_MapList[d.rID].nextMapID[d.dir] != 0) continue;
+//
+//			// 기준 방 원점 찾기
+//			int rx = -1, ry = -1;
+//			for (int y = 0; y < 6; y++) {
+//				for (int x = 0; x < 6; x++) {
+//					if (m_Grid[y][x] == d.rID) { rx = x; ry = y; break; }
+//				}
+//				if (rx != -1) break;
+//			}
+//			if (rx == -1) continue;
+//
+//			int gw_old = m_Prefabs[m_MapList[d.rID].prefabID].gridW;
+//			int gh_old = m_Prefabs[m_MapList[d.rID].prefabID].gridH;
+//
+//			// [핵심 수정 1] 새 방은 "어떤 비트마스크(DOOR)"를 가져야 하는가?
+//			int oppDoorBit = 0;
+//			if (d.dir == DIR_UP) oppDoorBit = DOOR_DOWN;
+//			if (d.dir == DIR_DOWN) oppDoorBit = DOOR_UP;
+//			if (d.dir == DIR_LEFT) oppDoorBit = DOOR_RIGHT;
+//			if (d.dir == DIR_RIGHT) oppDoorBit = DOOR_LEFT;
+//
+//			std::vector<int> validPrefabs;
+//			bool forceBoss = false;
+//
+//			int testTargetX = rx;
+//			if (d.dir == DIR_RIGHT) testTargetX = rx + gw_old;
+//			else if (d.dir == DIR_LEFT) testTargetX = rx - 1;
+//
+//			// X가 4 이상 다다르면 4번 프리팹(보스 대기실) 확정!
+//			if (!bossPlaced && testTargetX >= 4 && d.dir == DIR_RIGHT) {
+//				validPrefabs.push_back(4);
+//				forceBoss = true;
+//			}
+//			else {
+//				for (int newID = 1; newID <= 15; newID++) {
+//					if (newID == 4 || newID == 16) continue;
+//					if (m_Prefabs[newID].typeID == 0) continue;
+//
+//					// 🌟 짝이 맞는 문이 있는지 정확한 비트마스크로 검사!
+//					if ((m_Prefabs[newID].typeID & oppDoorBit) == 0) continue;
+//
+//					int gw_new = m_Prefabs[newID].gridW;
+//					int gh_new = m_Prefabs[newID].gridH;
+//
+//					int targetX = rx, targetY = ry;
+//					if (d.dir == DIR_UP) { targetY = ry - gh_new; targetX = rx; }
+//					if (d.dir == DIR_DOWN) { targetY = ry + gh_old; targetX = rx; }
+//					if (d.dir == DIR_LEFT) { targetX = rx - gw_new; targetY = ry; }
+//					if (d.dir == DIR_RIGHT) { targetX = rx + gw_old; targetY = ry; }
+//
+//					if (targetX < 0 || targetX + gw_new > 6 || targetY < 0 || targetY + gh_new > 6) continue;
+//
+//					bool spaceFree = true;
+//					for (int y = 0; y < gh_new; y++) {
+//						for (int x = 0; x < gw_new; x++) {
+//							if (m_Grid[targetY + y][targetX + x] != 0) spaceFree = false;
+//						}
+//					}
+//					if (!spaceFree) continue;
+//
+//					bool sealBroken = false;
+//					int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
+//					for (int checkD : dirs) {
+//						// 🌟 [핵심 수정 2] DIR을 DOOR 비트마스크로 안전하게 변환
+//						int checkDoorBit = 0;
+//						if (checkD == DIR_UP) checkDoorBit = DOOR_UP;
+//						if (checkD == DIR_DOWN) checkDoorBit = DOOR_DOWN;
+//						if (checkD == DIR_LEFT) checkDoorBit = DOOR_LEFT;
+//						if (checkD == DIR_RIGHT) checkDoorBit = DOOR_RIGHT;
+//
+//						if ((m_Prefabs[newID].typeID & checkDoorBit) != 0) {
+//							int adjX = targetX, adjY = targetY;
+//							if (checkD == DIR_UP) adjY = targetY - 1;
+//							if (checkD == DIR_DOWN) adjY = targetY + gh_new;
+//							if (checkD == DIR_LEFT) adjX = targetX - 1;
+//							if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
+//
+//							if (adjX < 0 || adjX >= 6 || adjY < 0 || adjY >= 6) {
+//								sealBroken = true; break;
+//							}
+//							if (m_Grid[adjY][adjX] != 0) {
+//								int adjRoom = m_Grid[adjY][adjX];
+//
+//								int adjOppDoorBit = 0;
+//								if (checkD == DIR_UP) adjOppDoorBit = DOOR_DOWN;
+//								if (checkD == DIR_DOWN) adjOppDoorBit = DOOR_UP;
+//								if (checkD == DIR_LEFT) adjOppDoorBit = DOOR_RIGHT;
+//								if (checkD == DIR_RIGHT) adjOppDoorBit = DOOR_LEFT;
+//
+//								if ((m_MapList[adjRoom].prefabID & adjOppDoorBit) == 0) {
+//									sealBroken = true; break; // 옆방이 꽉 막힌 벽이면 탈락!
+//								}
+//							}
+//						}
+//					}
+//					if (sealBroken) continue;
+//
+//					// 맵이 너무 커지지 않게 가지치기 제한
+//					int doorCount = 0;
+//					if (m_Prefabs[newID].typeID & DOOR_UP) doorCount++;
+//					if (m_Prefabs[newID].typeID & DOOR_DOWN) doorCount++;
+//					if (m_Prefabs[newID].typeID & DOOR_LEFT) doorCount++;
+//					if (m_Prefabs[newID].typeID & DOOR_RIGHT) doorCount++;
+//
+//					if (currentMapCount >= 25 && doorCount > 2) continue;
+//					if (currentMapCount >= 30 && doorCount > 1) continue;
+//
+//					validPrefabs.push_back(newID);
+//				}
+//			}
+//
+//			if (validPrefabs.empty()) continue;
+//
+//			// 5. 조건 통과! 새 방 배치
+//			int newPrefabID = validPrefabs[rand() % validPrefabs.size()];
+//			int gw_new = m_Prefabs[newPrefabID].gridW;
+//			int gh_new = m_Prefabs[newPrefabID].gridH;
+//
+//			int targetX = rx, targetY = ry;
+//			if (d.dir == DIR_UP) { targetY = ry - gh_new; targetX = rx; }
+//			if (d.dir == DIR_DOWN) { targetY = ry + gh_old; targetX = rx; }
+//			if (d.dir == DIR_LEFT) { targetX = rx - gw_new; targetY = ry; }
+//			if (d.dir == DIR_RIGHT) { targetX = rx + gw_old; targetY = ry; }
+//
+//			currentMapCount++;
+//			int newRoomID = currentMapCount;
+//
+//			for (int y = 0; y < gh_new; y++) {
+//				for (int x = 0; x < gw_new; x++) {
+//					m_Grid[targetY + y][targetX + x] = newRoomID;
+//				}
+//			}
+//
+//			m_MapList[newRoomID].id = newRoomID;
+//			m_MapList[newRoomID].prefabID = newPrefabID;
+//			m_MapList[newRoomID].width = m_Prefabs[newPrefabID].width;
+//			m_MapList[newRoomID].height = m_Prefabs[newPrefabID].height;
+//			m_MapList[newRoomID].layerCount = m_Prefabs[newPrefabID].layerCount;
+//			// 새로 만들어진 방의 배경 이미지도 완벽하게 복사해 옵니다!
+//			for (int i = 0; i < m_Prefabs[newPrefabID].layerCount; i++) {
+//				m_MapList[newRoomID].bgLayer[i] = m_Prefabs[newPrefabID].bgLayer[i];
+//			}
+//
+//			// 6. 새로 깔린 방의 모든 문을 확인하여, 이미 있는 방이면 연결하고 아니면 큐에 넣음
+//			int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
+//			for (int checkD : dirs) {
+//				int checkDoorBit = 0;
+//				if (checkD == DIR_UP) checkDoorBit = DOOR_UP;
+//				if (checkD == DIR_DOWN) checkDoorBit = DOOR_DOWN;
+//				if (checkD == DIR_LEFT) checkDoorBit = DOOR_LEFT;
+//				if (checkD == DIR_RIGHT) checkDoorBit = DOOR_RIGHT;
+//
+//				if ((m_Prefabs[newPrefabID].typeID & checkDoorBit) != 0) {
+//					int adjX = targetX, adjY = targetY;
+//					if (checkD == DIR_UP) adjY = targetY - 1;
+//					if (checkD == DIR_DOWN) adjY = targetY + gh_new;
+//					if (checkD == DIR_LEFT) adjX = targetX - 1;
+//					if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
+//
+//					if (adjX >= 0 && adjX < 6 && adjY >= 0 && adjY < 6 && m_Grid[adjY][adjX] != 0) {
+//						int adjRoom = m_Grid[adjY][adjX];
+//
+//						int adjOppDir = 0;
+//						if (checkD == DIR_UP) adjOppDir = DIR_DOWN;
+//						if (checkD == DIR_DOWN) adjOppDir = DIR_UP;
+//						if (checkD == DIR_LEFT) adjOppDir = DIR_RIGHT;
+//						if (checkD == DIR_RIGHT) adjOppDir = DIR_LEFT;
+//
+//						int adjOppDoorBit = 0;
+//						if (adjOppDir == DIR_UP) adjOppDoorBit = DOOR_UP;
+//						if (adjOppDir == DIR_DOWN) adjOppDoorBit = DOOR_DOWN;
+//						if (adjOppDir == DIR_LEFT) adjOppDoorBit = DOOR_LEFT;
+//						if (adjOppDir == DIR_RIGHT) adjOppDoorBit = DOOR_RIGHT;
+//
+//						// 옆 방에도 마주보는 문이 있다면 포탈 연결!
+//						if ((m_MapList[adjRoom].prefabID & adjOppDoorBit) != 0) {
+//							m_MapList[newRoomID].nextMapID[checkD] = adjRoom;
+//							m_MapList[adjRoom].nextMapID[adjOppDir] = newRoomID;
+//						}
+//					}
+//					else {
+//						q.push_back({ newRoomID, checkD }); // 연결할 빈 공간이 있다면 큐에 추가
+//					}
+//				}
+//			}
+//
+//			if (forceBoss) bossPlaced = true;
+//		}
+//
+//		// ==========================================================
+//		// [3단계 추가] 루프가 다 끝나고 맵이 완성된 후, 
+//		// m_MapList의 맨 마지막 칸(39번)을 "진짜 보스방" 전용으로 셋팅합니다!
+//		// ==========================================================
+//		m_MapList[39].id = 39;
+//		m_MapList[39].prefabID = ROOM_BOSS; // 16번 프리팹
+//		m_MapList[39].width = m_Prefabs[ROOM_BOSS].width;
+//		m_MapList[39].height = m_Prefabs[ROOM_BOSS].height;
+//		m_MapList[39].layerCount = m_Prefabs[ROOM_BOSS].layerCount;
+//
+//		for (int i = 0; i < m_Prefabs[ROOM_BOSS].layerCount; i++)
+//		{
+//			m_MapList[39].bgLayer[i] = m_Prefabs[ROOM_BOSS].bgLayer[i];
+//		}
+//
+//		// ==========================================================
+//		// 🌟 [추가] 4단계: 맵 생성 완료 후 전체 그리드를 스캔하여 문(Door) 기록!
+//		// ==========================================================
+//		for (int y = 0; y < 6; y++) for (int x = 0; x < 6; x++) { m_DoorRight[y][x] = false; m_DoorDown[y][x] = false; }
+//
+//		for (int y = 0; y < 6; y++) {
+//			for (int x = 0; x < 6; x++) {
+//				int roomA = m_Grid[y][x];
+//				if (roomA == 0) continue;
+//
+//				// 우측 방과 연결되었는가?
+//				if (x < 5) {
+//					int roomB = m_Grid[y][x + 1];
+//					if (roomB != 0 && roomA != roomB) {
+//						if (m_MapList[roomA].nextMapID[DIR_RIGHT] == roomB) m_DoorRight[y][x] = true;
+//					}
+//				}
+//				// 아래쪽 방과 연결되었는가?
+//				if (y < 5) {
+//					int roomB = m_Grid[y + 1][x];
+//					if (roomB != 0 && roomA != roomB) {
+//						if (m_MapList[roomA].nextMapID[DIR_DOWN] == roomB) m_DoorDown[y][x] = true;
+//					}
+//				}
+//			}
+//		}
+//	} // end of while loop for boss placement
+//}
+
 void MapManager::CreateRandomMap()
 {
 	bool bossPlaced = false;
 	int mapGenAttempts = 0;
 
-	// 보스방이 우측(X >= 4)에 무사히 깔릴 때까지 맵 생성을 반복 (최대 50번 시도)
 	while (!bossPlaced && mapGenAttempts < 50)
 	{
 		mapGenAttempts++;
 
-		// 1. 맵 초기화
 		for (int i = 1; i < 40; i++) {
 			for (int j = 0; j < 5; j++) m_MapList[i].nextMapID[j] = 0;
 			m_MapList[i].prefabID = 0;
 		}
-		// 그리드 초기화 (0 = 빈 칸)
-		for (int y = 0; y < 6; y++) {
-			for (int x = 0; x < 6; x++) {
-				m_Grid[y][x] = 0;
-			}
-		}
-		// 2. 시작 방(1번) 배치: 오른쪽(DOOR_RIGHT)만 뚫린 8번 프리팹
+		for (int y = 0; y < 6; y++) for (int x = 0; x < 6; x++) m_Grid[y][x] = 0;
+
 		m_MapList[1].id = 1;
-		m_MapList[1].prefabID = 8;
-		m_MapList[1].width = m_Prefabs[8].width;
-		m_MapList[1].height = m_Prefabs[8].height;
-		m_MapList[1].layerCount = m_Prefabs[8].layerCount;
+		m_MapList[1].prefabID = 1; // 🌟 시작방은 1x1 1번 프리팹 사용
+		m_MapList[1].width = m_Prefabs[1].width;
+		m_MapList[1].height = m_Prefabs[1].height;
+		m_MapList[1].layerCount = m_Prefabs[1].layerCount;
+		m_Grid[3][0] = 1;
 
-		m_Grid[3][0] = 1; // 시작 위치: 좌측 중간
+		for (int i = 0; i < m_Prefabs[1].layerCount; i++) m_MapList[1].bgLayer[i] = m_Prefabs[1].bgLayer[i];
 
-		// 시작 방의 배경 이미지를 복사
-		for (int i = 0; i < m_Prefabs[8].layerCount; i++) {
-			m_MapList[1].bgLayer[i] = m_Prefabs[8].bgLayer[i];
-		}
-
-		// 3. 큐(Queue) 생성 (연결해야 할 문들을 저장)
 		struct OpenDoor { int rID, dir; };
 		std::vector<OpenDoor> q;
-		q.push_back({ 1, DIR_RIGHT }); // 1번 방의 오른쪽 문을 뚫어라!
+		q.push_back({ 1, DIR_RIGHT });
 
 		int currentMapCount = 1;
-		int maxMaps = 36;
 		int failCount = 0;
 
-		// 4. 레고 블록 조립 시작
-		while (!q.empty() && failCount < 1000 && currentMapCount < maxMaps)
+		while (!q.empty() && failCount < 1000 && currentMapCount < 30)
 		{
 			failCount++;
-
-			// 큐에서 무작위 문 하나 꺼내기
 			int qIdx = rand() % q.size();
 			OpenDoor d = q[qIdx];
 			q.erase(q.begin() + qIdx);
 
 			if (m_MapList[d.rID].nextMapID[d.dir] != 0) continue;
 
-			// 기준 방 원점 찾기
 			int rx = -1, ry = -1;
 			for (int y = 0; y < 6; y++) {
 				for (int x = 0; x < 6; x++) {
@@ -1361,13 +1754,6 @@ void MapManager::CreateRandomMap()
 			int gw_old = m_Prefabs[m_MapList[d.rID].prefabID].gridW;
 			int gh_old = m_Prefabs[m_MapList[d.rID].prefabID].gridH;
 
-			// [핵심 수정 1] 새 방은 "어떤 비트마스크(DOOR)"를 가져야 하는가?
-			int oppDoorBit = 0;
-			if (d.dir == DIR_UP) oppDoorBit = DOOR_DOWN;
-			if (d.dir == DIR_DOWN) oppDoorBit = DOOR_UP;
-			if (d.dir == DIR_LEFT) oppDoorBit = DOOR_RIGHT;
-			if (d.dir == DIR_RIGHT) oppDoorBit = DOOR_LEFT;
-
 			std::vector<int> validPrefabs;
 			bool forceBoss = false;
 
@@ -1375,19 +1761,14 @@ void MapManager::CreateRandomMap()
 			if (d.dir == DIR_RIGHT) testTargetX = rx + gw_old;
 			else if (d.dir == DIR_LEFT) testTargetX = rx - 1;
 
-			// X가 4 이상 다다르면 4번 프리팹(보스 대기실) 확정!
+			// X좌표가 4 이상 다다르면, 보스 대기실(임시로 1번 방) 확정!
 			if (!bossPlaced && testTargetX >= 4 && d.dir == DIR_RIGHT) {
-				validPrefabs.push_back(4);
+				validPrefabs.push_back(1); // 🌟 보스 대기실 용도로 1번 방(1x1) 사용
 				forceBoss = true;
 			}
 			else {
-				for (int newID = 1; newID <= 15; newID++) {
-					if (newID == 4 || newID == 16) continue;
-					if (m_Prefabs[newID].typeID == 0) continue;
-
-					// 🌟 짝이 맞는 문이 있는지 정확한 비트마스크로 검사!
-					if ((m_Prefabs[newID].typeID & oppDoorBit) == 0) continue;
-
+				// 🌟 [핵심 변경] 비트마스크 검사 삭제! 무조건 남는 공간이 있으면 프리팹(1~4번) 투입!
+				for (int newID = 1; newID <= 4; newID++) {
 					int gw_new = m_Prefabs[newID].gridW;
 					int gh_new = m_Prefabs[newID].gridH;
 
@@ -1405,62 +1786,12 @@ void MapManager::CreateRandomMap()
 							if (m_Grid[targetY + y][targetX + x] != 0) spaceFree = false;
 						}
 					}
-					if (!spaceFree) continue;
-
-					bool sealBroken = false;
-					int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
-					for (int checkD : dirs) {
-						// 🌟 [핵심 수정 2] DIR을 DOOR 비트마스크로 안전하게 변환
-						int checkDoorBit = 0;
-						if (checkD == DIR_UP) checkDoorBit = DOOR_UP;
-						if (checkD == DIR_DOWN) checkDoorBit = DOOR_DOWN;
-						if (checkD == DIR_LEFT) checkDoorBit = DOOR_LEFT;
-						if (checkD == DIR_RIGHT) checkDoorBit = DOOR_RIGHT;
-
-						if ((m_Prefabs[newID].typeID & checkDoorBit) != 0) {
-							int adjX = targetX, adjY = targetY;
-							if (checkD == DIR_UP) adjY = targetY - 1;
-							if (checkD == DIR_DOWN) adjY = targetY + gh_new;
-							if (checkD == DIR_LEFT) adjX = targetX - 1;
-							if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
-
-							if (adjX < 0 || adjX >= 6 || adjY < 0 || adjY >= 6) {
-								sealBroken = true; break;
-							}
-							if (m_Grid[adjY][adjX] != 0) {
-								int adjRoom = m_Grid[adjY][adjX];
-
-								int adjOppDoorBit = 0;
-								if (checkD == DIR_UP) adjOppDoorBit = DOOR_DOWN;
-								if (checkD == DIR_DOWN) adjOppDoorBit = DOOR_UP;
-								if (checkD == DIR_LEFT) adjOppDoorBit = DOOR_RIGHT;
-								if (checkD == DIR_RIGHT) adjOppDoorBit = DOOR_LEFT;
-
-								if ((m_MapList[adjRoom].prefabID & adjOppDoorBit) == 0) {
-									sealBroken = true; break; // 옆방이 꽉 막힌 벽이면 탈락!
-								}
-							}
-						}
-					}
-					if (sealBroken) continue;
-
-					// 맵이 너무 커지지 않게 가지치기 제한
-					int doorCount = 0;
-					if (m_Prefabs[newID].typeID & DOOR_UP) doorCount++;
-					if (m_Prefabs[newID].typeID & DOOR_DOWN) doorCount++;
-					if (m_Prefabs[newID].typeID & DOOR_LEFT) doorCount++;
-					if (m_Prefabs[newID].typeID & DOOR_RIGHT) doorCount++;
-
-					if (currentMapCount >= 25 && doorCount > 2) continue;
-					if (currentMapCount >= 30 && doorCount > 1) continue;
-
-					validPrefabs.push_back(newID);
+					if (spaceFree) validPrefabs.push_back(newID);
 				}
 			}
 
 			if (validPrefabs.empty()) continue;
 
-			// 5. 조건 통과! 새 방 배치
 			int newPrefabID = validPrefabs[rand() % validPrefabs.size()];
 			int gw_new = m_Prefabs[newPrefabID].gridW;
 			int gh_new = m_Prefabs[newPrefabID].gridH;
@@ -1485,99 +1816,65 @@ void MapManager::CreateRandomMap()
 			m_MapList[newRoomID].width = m_Prefabs[newPrefabID].width;
 			m_MapList[newRoomID].height = m_Prefabs[newPrefabID].height;
 			m_MapList[newRoomID].layerCount = m_Prefabs[newPrefabID].layerCount;
-			// 새로 만들어진 방의 배경 이미지도 완벽하게 복사해 옵니다!
 			for (int i = 0; i < m_Prefabs[newPrefabID].layerCount; i++) {
 				m_MapList[newRoomID].bgLayer[i] = m_Prefabs[newPrefabID].bgLayer[i];
 			}
 
-			// 6. 새로 깔린 방의 모든 문을 확인하여, 이미 있는 방이면 연결하고 아니면 큐에 넣음
+			// 무조건 사방에 뚫을 수 있는 문을 큐에 던져넣음
 			int dirs[4] = { DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT };
 			for (int checkD : dirs) {
-				int checkDoorBit = 0;
-				if (checkD == DIR_UP) checkDoorBit = DOOR_UP;
-				if (checkD == DIR_DOWN) checkDoorBit = DOOR_DOWN;
-				if (checkD == DIR_LEFT) checkDoorBit = DOOR_LEFT;
-				if (checkD == DIR_RIGHT) checkDoorBit = DOOR_RIGHT;
+				int adjX = targetX, adjY = targetY;
+				if (checkD == DIR_UP) adjY = targetY - 1;
+				if (checkD == DIR_DOWN) adjY = targetY + gh_new;
+				if (checkD == DIR_LEFT) adjX = targetX - 1;
+				if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
 
-				if ((m_Prefabs[newPrefabID].typeID & checkDoorBit) != 0) {
-					int adjX = targetX, adjY = targetY;
-					if (checkD == DIR_UP) adjY = targetY - 1;
-					if (checkD == DIR_DOWN) adjY = targetY + gh_new;
-					if (checkD == DIR_LEFT) adjX = targetX - 1;
-					if (checkD == DIR_RIGHT) adjX = targetX + gw_new;
+				if (adjX >= 0 && adjX < 6 && adjY >= 0 && adjY < 6 && m_Grid[adjY][adjX] != 0) {
+					int adjRoom = m_Grid[adjY][adjX];
+					int adjOppDir = 0;
+					if (checkD == DIR_UP) adjOppDir = DIR_DOWN;
+					if (checkD == DIR_DOWN) adjOppDir = DIR_UP;
+					if (checkD == DIR_LEFT) adjOppDir = DIR_RIGHT;
+					if (checkD == DIR_RIGHT) adjOppDir = DIR_LEFT;
 
-					if (adjX >= 0 && adjX < 6 && adjY >= 0 && adjY < 6 && m_Grid[adjY][adjX] != 0) {
-						int adjRoom = m_Grid[adjY][adjX];
-
-						int adjOppDir = 0;
-						if (checkD == DIR_UP) adjOppDir = DIR_DOWN;
-						if (checkD == DIR_DOWN) adjOppDir = DIR_UP;
-						if (checkD == DIR_LEFT) adjOppDir = DIR_RIGHT;
-						if (checkD == DIR_RIGHT) adjOppDir = DIR_LEFT;
-
-						int adjOppDoorBit = 0;
-						if (adjOppDir == DIR_UP) adjOppDoorBit = DOOR_UP;
-						if (adjOppDir == DIR_DOWN) adjOppDoorBit = DOOR_DOWN;
-						if (adjOppDir == DIR_LEFT) adjOppDoorBit = DOOR_LEFT;
-						if (adjOppDir == DIR_RIGHT) adjOppDoorBit = DOOR_RIGHT;
-
-						// 옆 방에도 마주보는 문이 있다면 포탈 연결!
-						if ((m_MapList[adjRoom].prefabID & adjOppDoorBit) != 0) {
-							m_MapList[newRoomID].nextMapID[checkD] = adjRoom;
-							m_MapList[adjRoom].nextMapID[adjOppDir] = newRoomID;
-						}
-					}
-					else {
-						q.push_back({ newRoomID, checkD }); // 연결할 빈 공간이 있다면 큐에 추가
-					}
+					m_MapList[newRoomID].nextMapID[checkD] = adjRoom;
+					m_MapList[adjRoom].nextMapID[adjOppDir] = newRoomID;
+				}
+				else {
+					q.push_back({ newRoomID, checkD });
 				}
 			}
 
-			if (forceBoss) bossPlaced = true;
+			// 보스 대기실(forceBoss) 방에는 텔레포트 제단을 세우기 위해 임시로 100번 프리팹 ID 부여
+			if (forceBoss) {
+				m_MapList[newRoomID].prefabID = 100;
+				bossPlaced = true;
+			}
 		}
 
-		// ==========================================================
-		// [3단계 추가] 루프가 다 끝나고 맵이 완성된 후, 
-		// m_MapList의 맨 마지막 칸(39번)을 "진짜 보스방" 전용으로 셋팅합니다!
-		// ==========================================================
 		m_MapList[39].id = 39;
-		m_MapList[39].prefabID = ROOM_BOSS; // 16번 프리팹
+		m_MapList[39].prefabID = ROOM_BOSS;
 		m_MapList[39].width = m_Prefabs[ROOM_BOSS].width;
 		m_MapList[39].height = m_Prefabs[ROOM_BOSS].height;
 		m_MapList[39].layerCount = m_Prefabs[ROOM_BOSS].layerCount;
-
-		for (int i = 0; i < m_Prefabs[ROOM_BOSS].layerCount; i++)
-		{
+		for (int i = 0; i < m_Prefabs[ROOM_BOSS].layerCount; i++) {
 			m_MapList[39].bgLayer[i] = m_Prefabs[ROOM_BOSS].bgLayer[i];
 		}
 
-		// ==========================================================
-		// 🌟 [추가] 4단계: 맵 생성 완료 후 전체 그리드를 스캔하여 문(Door) 기록!
-		// ==========================================================
 		for (int y = 0; y < 6; y++) for (int x = 0; x < 6; x++) { m_DoorRight[y][x] = false; m_DoorDown[y][x] = false; }
-
 		for (int y = 0; y < 6; y++) {
 			for (int x = 0; x < 6; x++) {
 				int roomA = m_Grid[y][x];
 				if (roomA == 0) continue;
-
-				// 우측 방과 연결되었는가?
-				if (x < 5) {
-					int roomB = m_Grid[y][x + 1];
-					if (roomB != 0 && roomA != roomB) {
-						if (m_MapList[roomA].nextMapID[DIR_RIGHT] == roomB) m_DoorRight[y][x] = true;
-					}
+				if (x < 5 && m_Grid[y][x + 1] != 0 && roomA != m_Grid[y][x + 1]) {
+					if (m_MapList[roomA].nextMapID[DIR_RIGHT] == m_Grid[y][x + 1]) m_DoorRight[y][x] = true;
 				}
-				// 아래쪽 방과 연결되었는가?
-				if (y < 5) {
-					int roomB = m_Grid[y + 1][x];
-					if (roomB != 0 && roomA != roomB) {
-						if (m_MapList[roomA].nextMapID[DIR_DOWN] == roomB) m_DoorDown[y][x] = true;
-					}
+				if (y < 5 && m_Grid[y + 1][x] != 0 && roomA != m_Grid[y + 1][x]) {
+					if (m_MapList[roomA].nextMapID[DIR_DOWN] == m_Grid[y + 1][x]) m_DoorDown[y][x] = true;
 				}
 			}
 		}
-	} // end of while loop for boss placement
+	}
 }
 
 // MapManager.cpp
@@ -1637,8 +1934,7 @@ void MapManager::ChangeMap(int mapID)
 	//	SetRect(&rc, MW - thick, 0, MW + 50, MH); coll.AddWall(rc);
 	//}
 	// =================================================================
-	// 🌟 2. 도어 소켓(Door Socket) 기반 자동 캡핑 엔진!
-	// (기획자님이 더 이상 프리팹에 테두리 벽을 만들 필요가 없습니다!)
+	// 2. 도어 소켓(Door Socket) 기반 자동 캡핑 엔진!
 	// =================================================================
 	int currentRoomID = m_pCurrentMapChunk->id;
 	int rootX = GetRoomGridX(currentRoomID);
@@ -1676,17 +1972,40 @@ void MapManager::ChangeMap(int mapID)
 	for (auto e : m_Enemies) delete e;
 	m_Enemies.clear();
 
-	// 8번 프리팹(시작방)일 때 테스트용 몹 스폰!
-	if (pID == 8) {
-		// 지상 몹 2마리
-		Enemy* g1 = new GroundEnemy(); g1->Init(400, m_pCurrentMapChunk->height - 200);
-		Enemy* g2 = new GroundEnemy(); g2->Init(800, m_pCurrentMapChunk->height - 200);
-		m_Enemies.push_back(g1);
-		m_Enemies.push_back(g2);
+	//// 8번 프리팹(시작방)일 때 테스트용 몹 스폰!
+	//if (pID == 8) {
+	//	// 지상 몹 2마리
+	//	Enemy* g1 = new GroundEnemy(); g1->Init(400, m_pCurrentMapChunk->height - 200);
+	//	Enemy* g2 = new GroundEnemy(); g2->Init(800, m_pCurrentMapChunk->height - 200);
+	//	m_Enemies.push_back(g1);
+	//	m_Enemies.push_back(g2);
 
-		// 비행 몹 1마리 공중에
-		Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
-		m_Enemies.push_back(f1);
+	//	// 비행 몹 1마리 공중에
+	//	Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
+	//	m_Enemies.push_back(f1);
+	//}
+
+	// 🌟 [추가] 방 크기에 비례하여 다이나믹 몬스터 스폰!
+	if (pID != ROOM_BOSS && currentRoomID != 1) // 보스방과 처음 시작방(1번방)은 몬스터 생성 X
+	{
+		int gw = m_Prefabs[pID].gridW;
+		int gh = m_Prefabs[pID].gridH;
+
+		// 1. 지상 몹 (가로 칸 수당 2마리씩)
+		for (int i = 0; i < gw * 2; i++) {
+			Enemy* g = new GroundEnemy();
+			// 가로로 띄엄띄엄 배치, 높이는 제일 아래쪽 바닥 근처
+			g->Init(400.0f + (i * 600.0f), (gh * SCREEN_HEIGHT) - 150.0f);
+			m_Enemies.push_back(g);
+		}
+
+		// 2. 비행 몹 (세로 칸 수당 1마리씩)
+		for (int i = 0; i < gh; i++) {
+			Enemy* f = new FlyEnemy();
+			// 세로로 띄엄띄엄 공중에 배치
+			f->Init(600.0f, 200.0f + (i * 800.0f));
+			m_Enemies.push_back(f);
+		}
 	}
 }
 
