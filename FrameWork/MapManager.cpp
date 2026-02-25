@@ -1907,7 +1907,7 @@ void MapManager::CreateRandomMap()
 				}
 			}
 
-			if (forceBoss) { bossPlaced = true; }
+			if (forceBoss) { bossPlaced = true; break; }
 		}
 
 		m_MapList[39].id = 39;
@@ -2086,7 +2086,13 @@ void MapManager::ChangeMap(int mapID)
 	//	Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
 	//	m_Enemies.push_back(f1);
 	//}
-
+	if (currentRoomID == 1)
+	{
+		Enemy* testBoss = new BossEnemy(1);
+		// 화면 중앙 쯤, 바닥에 맞게 떨어지도록 좌표 설정
+		testBoss->Init(600.0f, m_pCurrentMapChunk->height - 300.0f);
+		m_Enemies.push_back(testBoss);
+	}
 	// 🌟 [추가] 방 크기에 비례하여 다이나믹 몬스터 스폰!
 	if (pID != ROOM_BOSS && currentRoomID != 1) // 보스방과 처음 시작방(1번방)은 몬스터 생성 X
 	{

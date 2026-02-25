@@ -90,8 +90,8 @@
 #include "Player2.h"
 #include "Bird.h"
 #include "Enemy.h"  
-#include "Knight.h" 
 #include "Boss.h"
+#include "Knight.h" 
 
 // =========================================
 // 3단계: 매니저 시스템 (엔티티들을 관리하는 애들)
