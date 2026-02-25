@@ -129,6 +129,9 @@
     <ClInclude Include="Enemy.h">
       <Filter>소스 파일\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="Boss.h">
+      <Filter>소스 파일\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="key.cpp">
@@ -195,6 +198,9 @@
       <Filter>소스 파일\UI</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
+      <Filter>소스 파일\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss.cpp">
       <Filter>소스 파일\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
