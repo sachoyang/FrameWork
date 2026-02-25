@@ -1,5 +1,40 @@
 ﻿#include "Include.h"
 
+// ==========================================
+// DirectX 그래픽 그리기 도우미 함수
+// ==========================================
+struct ColorVertex {
+    float x, y, z, rhw;
+    D3DCOLOR color;
+};
+
+// 속을 색상으로 꽉 채운 사각형 그리기
+void DrawSolidRect(float x, float y, float w, float h, D3DCOLOR color) {
+    ColorVertex vertices[] = {
+        { x,     y,     0.0f, 1.0f, color },
+        { x + w, y,     0.0f, 1.0f, color },
+        { x,     y + h, 0.0f, 1.0f, color },
+        { x + w, y + h, 0.0f, 1.0f, color }
+    };
+    dv_font.Device9->SetTexture(0, NULL);
+    dv_font.Device9->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    dv_font.Device9->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, sizeof(ColorVertex));
+}
+
+// 테두리 선만 있는 사각형 그리기
+void DrawLineRect(float x, float y, float w, float h, D3DCOLOR color) {
+    ColorVertex vertices[] = {
+        { x,     y,     0.0f, 1.0f, color },
+        { x + w, y,     0.0f, 1.0f, color },
+        { x + w, y + h, 0.0f, 1.0f, color },
+        { x,     y + h, 0.0f, 1.0f, color },
+        { x,     y,     0.0f, 1.0f, color }
+    };
+    dv_font.Device9->SetTexture(0, NULL);
+    dv_font.Device9->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+    dv_font.Device9->DrawPrimitiveUP(D3DPT_LINESTRIP, 4, vertices, sizeof(ColorVertex));
+}
+
 UIManager uiMng;
 
 UIManager::UIManager()
@@ -89,98 +124,63 @@ void UIManager::Draw()
 
 void UIManager::DrawMinimap()
 {
-    float startX = m_bLargeMap ? SCREEN_WITH / 2.0f - 180.0f : SCREEN_WITH - 230.0f;
-    float startY = m_bLargeMap ? SCREEN_HEIGHT / 2.0f - 180.0f : 40.0f;
-    float spacingX = m_bLargeMap ? 70.0f : 35.0f;
-    float spacingY = m_bLargeMap ? 70.0f : 35.0f;
+    // 맵 데이터가 없으면 패스
+    if (mapMng.m_pCurrentMapChunk == nullptr) return;
 
-    if (m_bLargeMap) 
-    {
-        dv_font.DrawString("== WORLD MAP ==", startX + 70, startY - 50, D3DCOLOR_ARGB(255, 255, 255, 0));
-    }
+    int currentRoomID = mapMng.m_pCurrentMapChunk->id;
 
-    for (int y = 0; y < 6; y++)
-    {
-        for (int x = 0; x < 6; x++)
-        {
-            int rID = mapMng.m_Grid[y][x];
-            if (rID == 0) continue;
+    // M키 토글 여부에 따라 지도의 크기와 위치 결정
+    float cellSize = m_bLargeMap ? 60.0f : 20.0f; // 큰 맵은 60px, 우상단 미니맵은 20px
+    float mapWidth = 6 * cellSize;
+    float mapHeight = 6 * cellSize;
 
-            MapChunk* room = &mapMng.m_MapList[rID];
+    // 미니맵은 우측 상단, 전체 맵은 화면 정중앙
+    // (기획자님 코드에 SCREEN_WITH 로 철자가 되어있어 그대로 사용합니다!)
+    float startX = m_bLargeMap ? (SCREEN_WITH - mapWidth) / 2.0f : SCREEN_WITH - mapWidth - 30.0f;
+    float startY = m_bLargeMap ? (SCREEN_HEIGHT - mapHeight) / 2.0f : 30.0f;
 
-            float drawX = startX + x * spacingX;
-            float drawY = startY + y * spacingY;
+    // 지도의 배경 (검은색 반투명 유리판 느낌 깔아주기)
+    DrawSolidRect(startX - 10, startY - 10, mapWidth + 20, mapHeight + 20, D3DCOLOR_ARGB(150, 0, 0, 0));
 
-            // =========================================================
-            // 1. 방 모양 결정 (모두 심플한 네모로 통일!)
-            // =========================================================
-            char roomChar[10] = "■";
+    for (int y = 0; y < 6; y++) {
+        for (int x = 0; x < 6; x++) {
+            int roomID = mapMng.m_Grid[y][x];
 
-            // 시작 방(S)과 보스 방(B)만 예외 처리
-            if (rID == 1) 
-            {
-                strcpy_s(roomChar, "S");
-            }
-            else if (room->prefabID == 4 || room->prefabID == 16) 
-            {
-                strcpy_s(roomChar, "B");
-            }
+            if (roomID > 0) { // 방이 존재하는 곳만 사각형 그리기
+                float cellX = startX + (x * cellSize);
+                float cellY = startY + (y * cellSize);
+                float padding = m_bLargeMap ? 4.0f : 2.0f; // 칸과 칸 사이 여백
 
-            // =========================================================
-            // 2. 색상 결정 
-            // =========================================================
-            D3DCOLOR color = D3DCOLOR_ARGB(255, 180, 180, 180); // 일반 방 (회색)
+                // 1. 방의 속성에 따라 기본 색상 세팅
+                D3DCOLOR fillColor = D3DCOLOR_ARGB(200, 100, 100, 100); // 안 가본 방 (어두운 회색)
+                D3DCOLOR lineColor = D3DCOLOR_ARGB(255, 200, 200, 200); // 테두리 (밝은 회색)
 
-            if (rID == 1) color = D3DCOLOR_ARGB(255, 100, 200, 255); // 시작 (파랑)
-            else if (room->prefabID == 4 || room->prefabID == 16) color = D3DCOLOR_ARGB(255, 255, 100, 100); // 보스 (빨강)
-
-            // 현재 위치는 빛나는 초록색
-            if (rID == mapMng.m_pCurrentMapChunk->id) 
-            {
-                color = D3DCOLOR_ARGB(255, 50, 255, 50);
-            }
-
-            // 기호 렌더링
-            dv_font.DrawString(roomChar, drawX, drawY, color);
-
-            // =========================================================
-            // 3. 맵 연결선 그리기
-            // =========================================================
-            D3DCOLOR doorColor = D3DCOLOR_ARGB(255, 100, 100, 100);
-
-            // [오른쪽 검사]
-            if (x + 1 < 6)
-            {
-                int rightRoomID = mapMng.m_Grid[y][x + 1];
-
-                if (rightRoomID == rID) 
-                {
-                    // 👉 나랑 같은 맵(큰 방)이면 굵은 선으로 끈끈하게 연결
-                    dv_font.DrawString(m_bLargeMap ? "===" : "==", drawX + (spacingX * 0.5f), drawY, color);
+                // 🔴 보스방 색상 세팅
+                if (roomID == 39) {
+                    fillColor = D3DCOLOR_ARGB(255, 150, 0, 0); // 진한 빨간색
+                    lineColor = D3DCOLOR_ARGB(255, 255, 50, 50);
                 }
-                else if (rightRoomID != 0 && room->nextMapID[DIR_RIGHT] == rightRoomID) 
-                {
-                    // 👉 다른 방으로 이어지는 통로(문)면 얇은 선(-)으로 연결
-                    dv_font.DrawString("-", drawX + (spacingX * 0.45f), drawY, doorColor);
-                }
-            }
 
-            // [아래쪽 검사]
-            if (y + 1 < 6)
-            {
-                int downRoomID = mapMng.m_Grid[y + 1][x];
+                // 🔵 현재 내 위치 방 색상 세팅
+                if (roomID == currentRoomID) {
+                    fillColor = D3DCOLOR_ARGB(255, 0, 150, 255); // 파란색
 
-                if (downRoomID == rID) 
-                {
-                    // 👉 나랑 같은 맵(큰 방)이면 굵은 선
-                    dv_font.DrawString("||", drawX + 8, drawY + (spacingY * 0.4f), color);
+                    // 현재 방은 반짝이는 형광 테두리 효과 (숨 쉬는 애니메이션)
+                    int alpha = 150 + (int)(sin(GetTickCount() * 0.01f) * 100);
+                    lineColor = D3DCOLOR_ARGB(alpha, 0, 255, 255);
                 }
-                else if (downRoomID != 0 && room->nextMapID[DIR_DOWN] == downRoomID) 
-                {
-                    // 👉 다른 방으로 이어지는 통로(문)면 얇은 선(|)
-                    dv_font.DrawString("|", drawX + 4, drawY + (spacingY * 0.45f), doorColor);
-                }
+
+                // 2. 사각형 내부 색칠하기
+                DrawSolidRect(cellX + padding, cellY + padding, cellSize - padding * 2, cellSize - padding * 2, fillColor);
+
+                // 3. 엣지 있는 사각형 테두리 그리기
+                DrawLineRect(cellX + padding, cellY + padding, cellSize - padding * 2, cellSize - padding * 2, lineColor);
             }
         }
+    }
+
+    // 전체 맵 모드일 때 상단에 안내 텍스트
+    if (m_bLargeMap) {
+        dv_font.DrawString("MAP [M]", startX, startY - 40, D3DCOLOR_ARGB(255, 255, 255, 255));
     }
 }
