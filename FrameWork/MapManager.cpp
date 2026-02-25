@@ -1293,11 +1293,11 @@ void MapManager::InitPrefabs()
 		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map_bossin.png", false, 0);
 
 		// 기본 도어 소켓 (왼쪽 문만 뚫릴 예정이므로 왼쪽만 깔아둬도 무방함)
-		SetRect(&rc, 0, 700, 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
+		// SetRect(&rc, 0, 700, 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
 
 		// 보스방 텔레포트 제단 (중앙)
-		SetRect(&rc, 490, 670, 790, 700); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 540, 640, 740, 670); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 490, 600, 790, 630); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 540, 570, 740, 600); m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 16번] 보스방 (고정 2x1) 
@@ -1309,7 +1309,7 @@ void MapManager::InitPrefabs()
 		m_Prefabs[id].layerCount = 1;
 		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map_bossroom01.png", false, 0);
 
-		// 보스방은 텔레포트 전용이므로 소켓이 필요 없고 통짜 바닥만 깝니다.
+		//보스방은 텔레포트 전용이므로 소켓이 필요 없고 통짜 바닥만 깝니다.
 		SetRect(&rc, 0, 700, 2560, 700 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
 }
@@ -1979,57 +1979,78 @@ void MapManager::ChangeMap(int mapID)
 	// 고급 도어 소켓 캡핑 엔진 (화면에 보이게 두께 30px 할당 & 구멍 뚫기)
 	// =================================================================
 	int currentRoomID = m_pCurrentMapChunk->id;
-	int rootX = GetRoomGridX(currentRoomID);
-	int rootY = GetRoomGridY(currentRoomID);
 	int gw = m_Prefabs[pID].gridW;
 	int gh = m_Prefabs[pID].gridH;
 	int MW = SCREEN_WITH;
 	int MH = SCREEN_HEIGHT;
+	// 🌟 [추가] 보스방(39번)은 그리드 바깥에 있으므로, 자동 캡핑을 무시하고 통짜 사방 벽을 세워줍니다!
+	if (currentRoomID == 39)
+	{
+		SetRect(&rc, -50, -50, MW * 2 + 50, 30); coll.AddWall(rc);
+		SetRect(&rc, -50, MH - 30, MW * 2 + 50, MH + 30); coll.AddWall(rc);
+		SetRect(&rc, -30, -50, 30, MH + 50); coll.AddWall(rc);
+		SetRect(&rc, MW * 2 - 30, -50, MW * 2 + 30, MH + 50); coll.AddWall(rc);
+	}
+	else if (currentRoomID == 38)
+	{
+		SetRect(&rc, -50, -50, gw * MW + 50, 30); coll.AddWall(rc); // 꽉 막힌 천장
+		SetRect(&rc, -50, gh * MH - 30, gw * MW + 50, gh * MH + 30); coll.AddWall(rc); // 꽉 막힌 바닥
+		SetRect(&rc, -30, -50, 30, gh * MH + 50); coll.AddWall(rc); // 꽉 막힌 좌측 벽
+		SetRect(&rc, gw * MW - 30, -50, gw * MW + 30, gh * MH + 50); coll.AddWall(rc); // 꽉 막힌 우측 벽
+	}
+	else 
+	{
+		int rootX = GetRoomGridX(currentRoomID);
+		int rootY = GetRoomGridY(currentRoomID);
 
-	for (int y = 0; y < gh; y++) {
-		for (int x = 0; x < gw; x++) {
-			int cx = rootX + x;
-			int cy = rootY + y;
-			float px = x * MW;
-			float py = y * MH;
+		for (int y = 0; y < gh; y++)
+		{
+			for (int x = 0; x < gw; x++)
+			{
+				int cx = rootX + x;
+				int cy = rootY + y;
+				float px = x * MW;
+				float py = y * MH;
 
-			// ⬆️ 윗면 막기 (천장)
-			if (cy == 0 || (m_Grid[cy - 1][cx] != currentRoomID && !m_DoorDown[cy - 1][cx])) {
-				SetRect(&rc, px - 50, py, px + MW + 50, py + 30); coll.AddWall(rc); // 완전 막힘
-			}
-			else if (cy > 0 && m_Grid[cy - 1][cx] != currentRoomID && m_DoorDown[cy - 1][cx]) {
-				SetRect(&rc, px - 50, py, px + 490, py + 30); coll.AddWall(rc);     // 뚫림 (좌측 천장)
-				SetRect(&rc, px + 790, py, px + MW + 50, py + 30); coll.AddWall(rc);// 뚫림 (우측 천장)
-			}
+				// ⬆️ 윗면 막기 (천장)
+				if (cy == 0 || (m_Grid[cy - 1][cx] != currentRoomID && !m_DoorDown[cy - 1][cx])) {
+					SetRect(&rc, px - 50, py, px + MW + 50, py + 30); coll.AddWall(rc); // 완전 막힘
+				}
+				else if (cy > 0 && m_Grid[cy - 1][cx] != currentRoomID && m_DoorDown[cy - 1][cx]) {
+					SetRect(&rc, px - 50, py, px + 490, py + 30); coll.AddWall(rc);     // 뚫림 (좌측 천장)
+					SetRect(&rc, px + 790, py, px + MW + 50, py + 30); coll.AddWall(rc);// 뚫림 (우측 천장)
+				}
 
-			// ⬇️ 아랫면 막기 (바닥)
-			if (cy == 5 || (m_Grid[cy + 1][cx] != currentRoomID && !m_DoorDown[cy][cx])) {
-				SetRect(&rc, px - 50, py + MH - 30, px + MW + 50, py + MH + 30); coll.AddWall(rc);
-			}
-			else if (cy < 5 && m_Grid[cy + 1][cx] != currentRoomID && m_DoorDown[cy][cx]) {
-				SetRect(&rc, px - 50, py + MH - 30, px + 490, py + MH + 30); coll.AddWall(rc);
-				SetRect(&rc, px + 790, py + MH - 30, px + MW + 50, py + MH + 30); coll.AddWall(rc);
-			}
+				// ⬇️ 아랫면 막기 (바닥)
+				if (cy == 5 || (m_Grid[cy + 1][cx] != currentRoomID && !m_DoorDown[cy][cx])) {
+					SetRect(&rc, px - 50, py + MH - 30, px + MW + 50, py + MH + 30); coll.AddWall(rc);
+				}
+				else if (cy < 5 && m_Grid[cy + 1][cx] != currentRoomID && m_DoorDown[cy][cx]) {
+					SetRect(&rc, px - 50, py + MH - 30, px + 490, py + MH + 30); coll.AddWall(rc);
+					SetRect(&rc, px + 790, py + MH - 30, px + MW + 50, py + MH + 30); coll.AddWall(rc);
+				}
 
-			// ⬅️ 좌측면 막기
-			if (cx == 0 || (m_Grid[cy][cx - 1] != currentRoomID && !m_DoorRight[cy][cx - 1])) {
-				SetRect(&rc, px - 30, py, px + 30, py + MH); coll.AddWall(rc);
-			}
-			else if (cx > 0 && m_Grid[cy][cx - 1] != currentRoomID && m_DoorRight[cy][cx - 1]) {
-				SetRect(&rc, px - 30, py - 50, px + 30, py + 450); coll.AddWall(rc); // 뚫림 (문 위쪽 벽)
-				SetRect(&rc, px - 30, py + 800, px + 30, py + MH + 50); coll.AddWall(rc); // 문 아래쪽 벽
-			}
+				// ⬅️ 좌측면 막기
+				if (cx == 0 || (m_Grid[cy][cx - 1] != currentRoomID && !m_DoorRight[cy][cx - 1])) {
+					SetRect(&rc, px - 30, py, px + 30, py + MH); coll.AddWall(rc);
+				}
+				else if (cx > 0 && m_Grid[cy][cx - 1] != currentRoomID && m_DoorRight[cy][cx - 1]) {
+					SetRect(&rc, px - 30, py - 50, px + 30, py + 450); coll.AddWall(rc); // 뚫림 (문 위쪽 벽)
+					SetRect(&rc, px - 30, py + 800, px + 30, py + MH + 50); coll.AddWall(rc); // 문 아래쪽 벽
+				}
 
-			// ➡️ 우측면 막기
-			if (cx == 5 || (m_Grid[cy][cx + 1] != currentRoomID && !m_DoorRight[cy][cx])) {
-				SetRect(&rc, px + MW - 30, py, px + MW + 30, py + MH); coll.AddWall(rc);
-			}
-			else if (cx < 5 && m_Grid[cy][cx + 1] != currentRoomID && m_DoorRight[cy][cx]) {
-				SetRect(&rc, px + MW - 30, py - 50, px + MW + 30, py + 450); coll.AddWall(rc);
-				SetRect(&rc, px + MW - 30, py + 800, px + MW + 30, py + MH + 50); coll.AddWall(rc);
+				// ➡️ 우측면 막기
+				if (cx == 5 || (m_Grid[cy][cx + 1] != currentRoomID && !m_DoorRight[cy][cx])) {
+					SetRect(&rc, px + MW - 30, py, px + MW + 30, py + MH); coll.AddWall(rc);
+				}
+				else if (cx < 5 && m_Grid[cy][cx + 1] != currentRoomID && m_DoorRight[cy][cx]) {
+					SetRect(&rc, px + MW - 30, py - 50, px + MW + 30, py + 450); coll.AddWall(rc);
+					SetRect(&rc, px + MW - 30, py + 800, px + MW + 30, py + MH + 50); coll.AddWall(rc);
+				}
 			}
 		}
 	}
+	
 	// 이전 맵 적들 메모리 정리
 	for (auto e : m_Enemies) delete e;
 	m_Enemies.clear();
@@ -2249,7 +2270,7 @@ void MapManager::Draw()
 		char debugPos[256];
 		sprintf_s(debugPos, "Knight Pos: X(%.1f), Y(%.1f)", knight.pos.x, knight.pos.y);
 		dv_font.DrawString(debugText, 0, 0);   //글자출력
-		dv_font.DrawString(debugPos, 0, 700);
+		dv_font.DrawString(debugPos, 0, 100);
 	}
 }
 
@@ -2264,20 +2285,24 @@ void MapManager::LoadDebugPrefab(int pID)
 
 	m_DebugPrefabID = pID;
 
-	// 2. 1번 맵을 강제로 현재 선택한 프리팹 도면으로 덮어씌움
-	m_MapList[1].id = 1;
-	m_MapList[1].prefabID = pID;
-	m_MapList[1].width = m_Prefabs[pID].width;
-	m_MapList[1].height = m_Prefabs[pID].height;
-	m_MapList[1].layerCount = m_Prefabs[pID].layerCount;
+	// =========================================================
+	// 🌟 [수정] 1번 방이 아닌, 38번 방(디버그 전용)을 사용합니다!
+	// =========================================================
+	int debugRoomID = 38;
+
+	m_MapList[debugRoomID].id = debugRoomID;
+	m_MapList[debugRoomID].prefabID = pID;
+	m_MapList[debugRoomID].width = m_Prefabs[pID].width;
+	m_MapList[debugRoomID].height = m_Prefabs[pID].height;
+	m_MapList[debugRoomID].layerCount = m_Prefabs[pID].layerCount;
 
 	for (int i = 0; i < m_Prefabs[pID].layerCount; i++)
 	{
-		m_MapList[1].bgLayer[i] = m_Prefabs[pID].bgLayer[i];
+		m_MapList[debugRoomID].bgLayer[i] = m_Prefabs[pID].bgLayer[i];
 	}
 
-	// 3. 1번 방으로 즉시 이동! (콜라이더 생성 및 카메라 세팅)
-	ChangeMap(1);
+	// 3. 38번 방으로 즉시 이동!
+	ChangeMap(debugRoomID);
 
 	// 4. 캐릭터를 맵의 가로 중앙 & 맨 위(공중)로 안전하게 스폰
 	knight.pos.x = m_Prefabs[pID].width / 2.0f;

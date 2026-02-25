@@ -104,9 +104,9 @@ void GameManager::Draw()
 	//map.numimg[0].Draw(95, 53);
 	char show[20];
 	itoa(m_SysTem.m_Save1, show, 10);
-	dv_font.DrawString(show, 200, 210);   //글자출력
+	//dv_font.DrawString(show, 200, 210);   //글자출력
 	itoa(m_SysTem.m_Save2, show, 10);
-	dv_font.DrawString(show, 200, 310);   //글자출력
+	//dv_font.DrawString(show, 200, 310);   //글자출력
 
 	for (auto Iter = myList.begin(); Iter != myList.end(); Iter++)
 	{
