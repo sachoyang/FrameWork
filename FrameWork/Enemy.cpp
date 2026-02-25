@@ -37,7 +37,8 @@ void Enemy::Draw()
     float renderX = pos.x - CAM->GetX();
     float renderY = pos.y - CAM->GetY();
 
-    if (isDead) {
+    if (isDead) 
+    {
         // 🌟 [핵심 수정] 살아있을 때와 죽었을 때의 이미지 높이 차이를 계산해서,
         // 시체의 발바닥(바닥)이 살아있을 때의 발바닥 위치와 정확히 일치하도록 아래로 내려줍니다!
         float liveHeight = img[0].imagesinfo.Height;
@@ -47,13 +48,15 @@ void Enemy::Draw()
         deadImg[aniCount].SetColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);
         deadImg[aniCount].Render(renderX, renderY + yOffset, 0, dir, 1, 1);
     }
-    else {
+    else 
+    {
         img[aniCount].SetColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);
         img[aniCount].Render(renderX, renderY, 0, dir, 1, 1);
     }
 
     // 디버그 박스
-    if (Gmanager.m_GameStart == true) {
+    if (Gmanager.m_GameStart == true) 
+    {
          coll.BoxSow(m_rc, 0, 0, D3DCOLOR_ARGB(255, 255, 0, 255)); 
     }
 }

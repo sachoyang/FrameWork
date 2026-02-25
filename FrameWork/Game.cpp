@@ -112,6 +112,10 @@ void Game::OnMessage( MSG* msg )
 		case 'M':
 			uiMng.m_bLargeMap = !uiMng.m_bLargeMap;
 			break;
+
+		case VK_OEM_2: // '/' 키
+			coll.isDebugDraw = !coll.isDebugDraw;
+			break;
 		}
 		break;
 	}

@@ -11,6 +11,8 @@ public :
 
 	std::list<RECT> m_Walls;
 
+	bool isDebugDraw;	//콜라이더 박스 스위치
+
 	void Init();
 	void Update();
 	void Draw();
