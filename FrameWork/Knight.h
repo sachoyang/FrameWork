@@ -57,6 +57,7 @@ public:
 	void Update();
 	void Draw();
 
+	void KnightMove(); // 이동 관련 함수 - 위치 콜라이더 갱신용
 	// 점프 관련 함수
 	void JumpStart(); // Z키 누를 때 (점프 시작)
 	void JumpCut();   // Z키 뗄 때 (속도 줄이기)

@@ -156,7 +156,8 @@ void UIManager::DrawMinimap()
                 D3DCOLOR lineColor = D3DCOLOR_ARGB(255, 200, 200, 200); // 테두리 (밝은 회색)
 
                 // 🔴 보스방 색상 세팅
-                if (roomID == 39) {
+                // 보스 대기실(5번 프리팹) 색상 세팅
+                if (mapMng.m_MapList[roomID].prefabID == 5) {
                     fillColor = D3DCOLOR_ARGB(255, 150, 0, 0); // 진한 빨간색
                     lineColor = D3DCOLOR_ARGB(255, 255, 50, 50);
                 }

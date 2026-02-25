@@ -1159,7 +1159,7 @@ void MapManager::InitPrefabs()
 	int pH = 30; // 발판 두께
 
 	// 초기화
-	for (int i = 0; i < 40; i++) {
+	for (int i = 0; i < 17; i++) {
 		m_Prefabs[i].typeID = 0;
 		m_Prefabs[i].walls.clear();
 	}
@@ -1181,8 +1181,8 @@ void MapManager::InitPrefabs()
 		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map01.png", false, 0);
 
 		// 🌟 도어 소켓 (안전 지대)
-		SetRect(&rc, 0, 700, 300, 700 + pH); m_Prefabs[id].walls.push_back(rc); // 좌측 문 앞
-		SetRect(&rc, 980, 700, 1280, 700 + pH); m_Prefabs[id].walls.push_back(rc); // 우측 문 앞
+		//SetRect(&rc, 0, 770, 300, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 좌측 문 앞
+		//SetRect(&rc, 980, 770, 1280, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 우측 문 앞
 		SetRect(&rc, 490, 250, 790, 250 + pH); m_Prefabs[id].walls.push_back(rc); // 상단 문 낙하 방지
 
 		// 내부 지형 (자유롭게 디자인)
@@ -1199,19 +1199,30 @@ void MapManager::InitPrefabs()
 		m_Prefabs[id].layerCount = 1;
 		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map02.png", false, 0);
 
-		// 🌟 도어 소켓 일괄 생성 (2개 칸 각각에 대해)
+		// 도어 소켓 일괄 생성 (2개 칸 각각에 대해)
 		for (int gy = 0; gy < 2; gy++) {
 			float cy = gy * SCREEN_HEIGHT;
-			SetRect(&rc, 0, cy + 700, 300, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
-			SetRect(&rc, 980, cy + 700, 1280, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
-			SetRect(&rc, 490, cy + 250, 790, cy + 250 + pH); m_Prefabs[id].walls.push_back(rc);
+			switch (gy)
+			{
+			case 0:
+				SetRect(&rc, 0, cy + 750, 300, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
+				SetRect(&rc, 980, cy + 750, 1280, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
+				break;
+			case 1:
+				break;
+			default:
+				break;
+			}
+			//SetRect(&rc, 0, cy + 770, 300, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
+			//SetRect(&rc, 980, cy + 770, 1280, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&rc, 530, cy + 250, 750, cy + 250 + pH); m_Prefabs[id].walls.push_back(rc);
 		}
 
 		// 수직 연결 지형
 		SetRect(&rc, 300, 1300, 500, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
 		SetRect(&rc, 780, 1100, 980, 1100 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 300, 900, 500, 900 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 540, 600, 740, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 300, 850, 500, 850 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 490, 550, 790, 550 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 3번] 2x1 수평 방 (긴 복도/웅덩이)
@@ -1225,8 +1236,8 @@ void MapManager::InitPrefabs()
 
 		for (int gx = 0; gx < 2; gx++) {
 			float cx = gx * SCREEN_WITH;
-			SetRect(&rc, cx, 700, cx + 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
-			SetRect(&rc, cx + 980, 700, cx + 1280, 700 + pH); m_Prefabs[id].walls.push_back(rc);
+			/*SetRect(&rc, cx, 700, cx + 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&rc, cx + 980, 700, cx + 1280, 700 + pH); m_Prefabs[id].walls.push_back(rc);*/
 			SetRect(&rc, cx + 490, 250, cx + 790, 250 + pH); m_Prefabs[id].walls.push_back(rc);
 		}
 
@@ -1248,8 +1259,19 @@ void MapManager::InitPrefabs()
 		for (int gy = 0; gy < 2; gy++) {
 			for (int gx = 0; gx < 2; gx++) {
 				float cx = gx * SCREEN_WITH; float cy = gy * SCREEN_HEIGHT;
-				SetRect(&rc, cx, cy + 700, cx + 300, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
-				SetRect(&rc, cx + 980, cy + 700, cx + 1280, cy + 700 + pH); m_Prefabs[id].walls.push_back(rc);
+				switch (gy)
+				{
+				case 0:
+					SetRect(&rc, cx, cy + 750, cx + 300, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
+					SetRect(&rc, cx + 980, cy + 750, cx + 1280, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
+					break;
+				case 1:
+					break;
+				default:
+					break;
+				}
+				//SetRect(&rc, cx, cy + 770, cx + 300, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
+				//SetRect(&rc, cx + 980, cy + 770, cx + 1280, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
 				SetRect(&rc, cx + 490, cy + 250, cx + 790, cy + 250 + pH); m_Prefabs[id].walls.push_back(rc);
 			}
 		}
@@ -1259,6 +1281,23 @@ void MapManager::InitPrefabs()
 		SetRect(&rc, 600, 1300, 800, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
 		SetRect(&rc, 1760, 1300, 1960, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
 		SetRect(&rc, 1180, 900, 1380, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+	}
+
+	// [프리팹 5번] 보스 대기실 (고정 1x1, 우측에 텔레포터)
+	{
+		int id = 5;
+		m_Prefabs[id].typeID = 5;
+		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map_bossin.png", false, 0);
+
+		// 기본 도어 소켓 (왼쪽 문만 뚫릴 예정이므로 왼쪽만 깔아둬도 무방함)
+		SetRect(&rc, 0, 700, 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
+
+		// 보스방 텔레포트 제단 (중앙)
+		SetRect(&rc, 490, 670, 790, 700); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 540, 640, 740, 670); m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 16번] 보스방 (고정 2x1) 
@@ -1718,7 +1757,7 @@ void MapManager::CreateRandomMap()
 		for (int y = 0; y < 6; y++) for (int x = 0; x < 6; x++) m_Grid[y][x] = 0;
 
 		m_MapList[1].id = 1;
-		m_MapList[1].prefabID = 1; // 🌟 시작방은 1x1 1번 프리팹 사용
+		m_MapList[1].prefabID = 1; // 시작방은 1x1 1번 프리팹 사용
 		m_MapList[1].width = m_Prefabs[1].width;
 		m_MapList[1].height = m_Prefabs[1].height;
 		m_MapList[1].layerCount = m_Prefabs[1].layerCount;
@@ -1751,6 +1790,10 @@ void MapManager::CreateRandomMap()
 			}
 			if (rx == -1) continue;
 
+			// =======================================================
+			// 보스 대기실(100)일 경우 1번 프리팹(1x1)의 규격을 빌려 쓰도록 방어!
+			// =======================================================
+
 			int gw_old = m_Prefabs[m_MapList[d.rID].prefabID].gridW;
 			int gh_old = m_Prefabs[m_MapList[d.rID].prefabID].gridH;
 
@@ -1762,12 +1805,12 @@ void MapManager::CreateRandomMap()
 			else if (d.dir == DIR_LEFT) testTargetX = rx - 1;
 
 			// X좌표가 4 이상 다다르면, 보스 대기실(임시로 1번 방) 확정!
-			if (!bossPlaced && testTargetX >= 4 && d.dir == DIR_RIGHT) {
-				validPrefabs.push_back(1); // 🌟 보스 대기실 용도로 1번 방(1x1) 사용
+			if (!bossPlaced && testTargetX >= 5 && d.dir == DIR_RIGHT) {
+				validPrefabs.push_back(5); // 보스 대기실 용도로 1번 방(1x1) 사용
 				forceBoss = true;
 			}
 			else {
-				// 🌟 [핵심 변경] 비트마스크 검사 삭제! 무조건 남는 공간이 있으면 프리팹(1~4번) 투입!
+				// [핵심 변경] 비트마스크 검사 삭제! 무조건 남는 공간이 있으면 프리팹(1~4번) 투입!
 				for (int newID = 1; newID <= 4; newID++) {
 					int gw_new = m_Prefabs[newID].gridW;
 					int gh_new = m_Prefabs[newID].gridH;
@@ -1845,11 +1888,7 @@ void MapManager::CreateRandomMap()
 				}
 			}
 
-			// 보스 대기실(forceBoss) 방에는 텔레포트 제단을 세우기 위해 임시로 100번 프리팹 ID 부여
-			if (forceBoss) {
-				m_MapList[newRoomID].prefabID = 100;
-				bossPlaced = true;
-			}
+			if (forceBoss) { bossPlaced = true; }
 		}
 
 		m_MapList[39].id = 39;
@@ -1918,7 +1957,6 @@ void MapManager::ChangeMap(int mapID)
 	//int MW = m_pCurrentMapChunk->width;
 	//int MH = m_pCurrentMapChunk->height;
 	//int thick = 100;
-
 	//// 프리팹 도면상으로는 문이 뚫려있는데, 실제 연결된 맵(nextMapID)이 0(없음)이라면?
 	//// 묻지도 따지지도 않고 그곳에 보이지 않는 거대한 철벽을 세워버립니다!
 	//if ((m_Prefabs[pID].typeID & DOOR_UP) && m_pCurrentMapChunk->nextMapID[DIR_UP] == 0) {
@@ -1936,35 +1974,59 @@ void MapManager::ChangeMap(int mapID)
 	// =================================================================
 	// 2. 도어 소켓(Door Socket) 기반 자동 캡핑 엔진!
 	// =================================================================
+
+	// =================================================================
+	// 🌟 2. 고급 도어 소켓 캡핑 엔진 (화면에 보이게 두께 30px 할당 & 구멍 뚫기)
+	// =================================================================
 	int currentRoomID = m_pCurrentMapChunk->id;
 	int rootX = GetRoomGridX(currentRoomID);
 	int rootY = GetRoomGridY(currentRoomID);
 	int gw = m_Prefabs[pID].gridW;
 	int gh = m_Prefabs[pID].gridH;
-	int thick = 100;
+	int MW = SCREEN_WITH;
+	int MH = SCREEN_HEIGHT;
 
 	for (int y = 0; y < gh; y++) {
 		for (int x = 0; x < gw; x++) {
-			int cx = rootX + x; // 그리드상 절대 X
-			int cy = rootY + y; // 그리드상 절대 Y
-			float px = x * SCREEN_WITH;  // 방 내부 픽셀 X
-			float py = y * SCREEN_HEIGHT; // 방 내부 픽셀 Y
+			int cx = rootX + x;
+			int cy = rootY + y;
+			float px = x * MW;
+			float py = y * MH;
 
-			// 윗면 막기 (천장)
+			// ⬆️ 윗면 막기 (천장)
 			if (cy == 0 || (m_Grid[cy - 1][cx] != currentRoomID && !m_DoorDown[cy - 1][cx])) {
-				SetRect(&rc, px, py - 50, px + SCREEN_WITH, py + thick); coll.AddWall(rc);
+				SetRect(&rc, px - 50, py, px + MW + 50, py + 30); coll.AddWall(rc); // 완전 막힘
 			}
-			// 아랫면 막기 (바닥)
+			else if (cy > 0 && m_Grid[cy - 1][cx] != currentRoomID && m_DoorDown[cy - 1][cx]) {
+				SetRect(&rc, px - 50, py, px + 490, py + 30); coll.AddWall(rc);     // 뚫림 (좌측 천장)
+				SetRect(&rc, px + 790, py, px + MW + 50, py + 30); coll.AddWall(rc);// 뚫림 (우측 천장)
+			}
+
+			// ⬇️ 아랫면 막기 (바닥)
 			if (cy == 5 || (m_Grid[cy + 1][cx] != currentRoomID && !m_DoorDown[cy][cx])) {
-				SetRect(&rc, px, py + SCREEN_HEIGHT - thick, px + SCREEN_WITH, py + SCREEN_HEIGHT + 50); coll.AddWall(rc);
+				SetRect(&rc, px - 50, py + MH - 30, px + MW + 50, py + MH + 30); coll.AddWall(rc);
 			}
-			// 좌측면 막기 (왼쪽 벽)
+			else if (cy < 5 && m_Grid[cy + 1][cx] != currentRoomID && m_DoorDown[cy][cx]) {
+				SetRect(&rc, px - 50, py + MH - 30, px + 490, py + MH + 30); coll.AddWall(rc);
+				SetRect(&rc, px + 790, py + MH - 30, px + MW + 50, py + MH + 30); coll.AddWall(rc);
+			}
+
+			// ⬅️ 좌측면 막기
 			if (cx == 0 || (m_Grid[cy][cx - 1] != currentRoomID && !m_DoorRight[cy][cx - 1])) {
-				SetRect(&rc, px - 50, py, px + thick, py + SCREEN_HEIGHT); coll.AddWall(rc);
+				SetRect(&rc, px - 30, py, px + 30, py + MH); coll.AddWall(rc);
 			}
-			// 우측면 막기 (오른쪽 벽)
+			else if (cx > 0 && m_Grid[cy][cx - 1] != currentRoomID && m_DoorRight[cy][cx - 1]) {
+				SetRect(&rc, px - 30, py - 50, px + 30, py + 450); coll.AddWall(rc); // 뚫림 (문 위쪽 벽)
+				SetRect(&rc, px - 30, py + 800, px + 30, py + MH + 50); coll.AddWall(rc); // 문 아래쪽 벽
+			}
+
+			// ➡️ 우측면 막기
 			if (cx == 5 || (m_Grid[cy][cx + 1] != currentRoomID && !m_DoorRight[cy][cx])) {
-				SetRect(&rc, px + SCREEN_WITH - thick, py, px + SCREEN_WITH + 50, py + SCREEN_HEIGHT); coll.AddWall(rc);
+				SetRect(&rc, px + MW - 30, py, px + MW + 30, py + MH); coll.AddWall(rc);
+			}
+			else if (cx < 5 && m_Grid[cy][cx + 1] != currentRoomID && m_DoorRight[cy][cx]) {
+				SetRect(&rc, px + MW - 30, py - 50, px + MW + 30, py + 450); coll.AddWall(rc);
+				SetRect(&rc, px + MW - 30, py + 800, px + MW + 30, py + MH + 50); coll.AddWall(rc);
 			}
 		}
 	}
@@ -2086,7 +2148,7 @@ void MapManager::Update(double frame)
 	// ==========================================================
 	// 5. 보스 대기실 텔레포트 상호작용
 	// ==========================================================
-	if (m_pCurrentMapChunk->prefabID == 4) // 현재 방이 4번(보스 대기실)일 때만 작동!
+	if (m_pCurrentMapChunk->prefabID == 5) // 현재 방이 4번(보스 대기실)일 때만 작동!
 	{
 		// 기사가 맵의 중앙(MW / 2) 부근 제단 위에 서 있는지 확인 (좌우 100픽셀 여유)
 		if (knight.pos.x >= MW / 2.0f - 100.0f && knight.pos.x <= MW / 2.0f + 100.0f)

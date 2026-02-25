@@ -112,10 +112,7 @@ void Knight::Init()
     lastAttackTime = 0; // 쿨타임 초기화
     SetRect(&attackBox, 0, 0, 0, 0);
 
-    m_rc.left = pos.x-40;
-    m_rc.top = pos.y-40;
-    m_rc.right = pos.x + imagesinfo.Width-50;
-    m_rc.bottom = pos.y + imagesinfo.Height-70;
+    KnightMove();
 }
 
 
@@ -213,10 +210,7 @@ void Knight::Update()
         if (isDashing) pos.x += moveX;
 		if (isKnockback) pos.x += knockMoveX; // 넉백 이동 적용
         // 1-2. 현재 위치로 박스 갱신
-        m_rc.left = pos.x - 40;
-        m_rc.top = pos.y - 40;
-        m_rc.right = pos.x + imagesinfo.Width - 50;
-        m_rc.bottom = pos.y + imagesinfo.Height - 70;
+        KnightMove();
 
         // 1-3. [수평 충돌 검사] (바닥에 걸리는 것 방지 위해 위아래를 줄임!)
         RECT wallCheckRect = m_rc;
@@ -259,10 +253,7 @@ void Knight::Update()
             }
 
             // 위치 복구 후 박스 재갱신
-            m_rc.left = pos.x - 40;
-            m_rc.top = pos.y - 40;
-            m_rc.right = pos.x + imagesinfo.Width - 50;
-            m_rc.bottom = pos.y + imagesinfo.Height - 70;
+            KnightMove();
         }
 
 
@@ -277,10 +268,7 @@ void Knight::Update()
         }
 
         // 2-2. Y축 이동 후 박스 갱신
-        m_rc.left = pos.x - 40;
-        m_rc.top = pos.y - 40;
-        m_rc.right = pos.x + imagesinfo.Width - 50;
-        m_rc.bottom = pos.y + imagesinfo.Height - 70;
+        KnightMove();
 
         // 2-3. [수직 충돌 검사]
         bool isLanded = false;
@@ -303,10 +291,8 @@ void Knight::Update()
                         pos.y = (float)wall.top - (imagesinfo.Height - 70) + 1.0f;
 
                         // 위치 보정 후 최종 박스 갱신
-                        m_rc.left = pos.x - 40;
-                        m_rc.top = pos.y - 40;
-                        m_rc.right = pos.x + imagesinfo.Width - 50;
-                        m_rc.bottom = pos.y + imagesinfo.Height - 70;
+                        KnightMove();
+
                         break;
                     }
                     // 머리 찧기 판정 (올라가고 있고 + 머리 쪽이 부딪힘)
@@ -319,10 +305,8 @@ void Knight::Update()
                         pos.y = (float)wall.bottom + 40.0f;
 
                         // 박스 갱신
-                        m_rc.left = pos.x - 40;
-                        m_rc.top = pos.y - 40;
-                        m_rc.right = pos.x + imagesinfo.Width - 50;
-                        m_rc.bottom = pos.y + imagesinfo.Height - 70;
+                        KnightMove();
+
                     }
                 }
             }
@@ -597,6 +581,14 @@ void Knight::Draw()
             }
         }
     }
+}
+
+void Knight::KnightMove()
+{
+    m_rc.left = pos.x - 30;
+    m_rc.top = pos.y - 40;
+    m_rc.right = pos.x + imagesinfo.Width - 40;
+    m_rc.bottom = pos.y + imagesinfo.Height - 70;
 }
 
 // 점프 시작 함수 (Key.cpp에서 호출)
