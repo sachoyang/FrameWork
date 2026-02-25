@@ -1976,7 +1976,7 @@ void MapManager::ChangeMap(int mapID)
 	// =================================================================
 
 	// =================================================================
-	// 🌟 2. 고급 도어 소켓 캡핑 엔진 (화면에 보이게 두께 30px 할당 & 구멍 뚫기)
+	// 고급 도어 소켓 캡핑 엔진 (화면에 보이게 두께 30px 할당 & 구멍 뚫기)
 	// =================================================================
 	int currentRoomID = m_pCurrentMapChunk->id;
 	int rootX = GetRoomGridX(currentRoomID);
@@ -2241,10 +2241,16 @@ void MapManager::Draw()
 	// =======================================================
 	// 디버그용: 현재 프리팹 번호 화면 출력
 	// =======================================================
-	char debugText[256];
-	sprintf_s(debugText, "Current Prefab ID : %d", m_pCurrentMapChunk->prefabID);
-
-	dv_font.DrawString(debugText, 0, 0);   //글자출력
+	if (coll.isDebugDraw)
+	{
+		char debugText[256];
+		sprintf_s(debugText, "Current Prefab ID : %d", m_pCurrentMapChunk->prefabID);
+		// 2. 좌측 하단: 현재 기사의 절대 좌표(X, Y) 출력 (새로 추가!)
+		char debugPos[256];
+		sprintf_s(debugPos, "Knight Pos: X(%.1f), Y(%.1f)", knight.pos.x, knight.pos.y);
+		dv_font.DrawString(debugText, 0, 0);   //글자출력
+		dv_font.DrawString(debugPos, 0, 700);
+	}
 }
 
 void MapManager::LoadDebugPrefab(int pID)

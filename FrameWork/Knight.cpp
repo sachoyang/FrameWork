@@ -62,6 +62,7 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/fall02.png");
     Knightimg[10].Create(FileName, false, 0);
 
+	// 대시 애니메이션 4프레임 (11~14)
     sprintf_s(FileName, "./resource/Img/knight1/dash01.png"); // 준비
     Knightimg[11].Create(FileName, false, 0);
 
@@ -74,6 +75,7 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/dash04.png"); // 정지
     Knightimg[14].Create(FileName, false, 0);
 
+	// 공격 애니메이션 3프레임 (15~17) + 상단 공격 3프레임 (18~20) + 하단 공격 3프레임 (21~23)
     sprintf_s(FileName, "./resource/Img/knight1/attack01.png"); // 공격 준비
     Knightimg[15].Create(FileName, false, 0);
 
@@ -641,7 +643,7 @@ void Knight::AttackStart()
 {
     if (isAttacking || isDashing) return;
 
-    // 🌟 1. 전체 공격 쿨타임 체크 (500ms)
+    // 1. 전체 공격 쿨타임 체크 (500ms)
     if (GetTickCount() - lastAttackTime < 500) return;
 
     isAttacking = true;
