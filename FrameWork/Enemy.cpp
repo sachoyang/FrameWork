@@ -157,8 +157,12 @@ void FlyEnemy::Update()
             pos.x += velocity.x; velocity.x *= 0.9f;
 
             if (!isDead) {
-                startPos.x += velocity.x;
-                startPos.y += gravity;
+                // 🌟 [핵심 수정] 넉백 당하는 동안 계속 흘러가는 시간에 맞춰 중심점(startPos)을 역산합니다!
+                // 이렇게 하면 무적(isHit)이 끝났을 때 텔레포트하지 않고 현재 위치에서 궤도를 자연스럽게 이어갑니다.
+                DWORD t = GetTickCount() - spawnTime;
+                float speed = 0.0015f;
+                startPos.x = pos.x - 250.0f * sin(t * speed);
+                startPos.y = pos.y - 80.0f * sin(t * speed * 2.0f);
             }
         }
 

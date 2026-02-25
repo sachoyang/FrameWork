@@ -1315,8 +1315,8 @@ void MapManager::InitPrefabs()
 		// SetRect(&rc, 0, 700, 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
 
 		// 보스방 텔레포트 제단 (중앙)
-		SetRect(&rc, 490, 600, 790, 630); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 540, 570, 740, 600); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 490, 550, 790, 580); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 540, 520, 740, 550); m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 16번] 보스방 (고정 2x1) 
