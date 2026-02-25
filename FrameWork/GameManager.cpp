@@ -112,4 +112,4 @@ void GameManager::Draw()
 	{
 		(*Iter)->Draw();
 	}
-}
+} 
