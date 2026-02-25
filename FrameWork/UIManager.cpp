@@ -157,7 +157,7 @@ void UIManager::DrawMinimap()
 
                 // 🔴 보스방 색상 세팅
                 // 보스 대기실(5번 프리팹) 색상 세팅
-                if (mapMng.m_MapList[roomID].prefabID == 5) {
+                if (mapMng.m_MapList[roomID].prefabID == 6) {
                     fillColor = D3DCOLOR_ARGB(255, 150, 0, 0); // 진한 빨간색
                     lineColor = D3DCOLOR_ARGB(255, 255, 50, 50);
                 }
@@ -175,7 +175,7 @@ void UIManager::DrawMinimap()
                 DrawSolidRect(cellX + padding, cellY + padding, cellSize - padding * 2, cellSize - padding * 2, fillColor);
 
                 // 3. 엣지 있는 사각형 테두리 그리기
-                DrawLineRect(cellX + padding, cellY + padding, cellSize - padding * 2, cellSize - padding * 2, lineColor);
+                //DrawLineRect(cellX + padding, cellY + padding, cellSize - padding * 2, cellSize - padding * 2, lineColor);
 
                 // =========================================================
                 // 4. 연결된 길(통로) 뚫어주기!

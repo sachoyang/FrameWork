@@ -1276,17 +1276,36 @@ void MapManager::InitPrefabs()
 			}
 		}
 
-		// 거대 십자가 중앙 플랫폼
+		// 플랫폼
 		SetRect(&rc, 1000, 1100, 1560, 1100 + pH); m_Prefabs[id].walls.push_back(rc);
 		SetRect(&rc, 600, 1300, 800, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
 		SetRect(&rc, 1760, 1300, 1960, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1180, 900, 1380, 900 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 250, 500, 550, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&rc, 1550, 500, 1850, 500 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
-
-	// [프리팹 5번] 보스 대기실 (고정 1x1, 우측에 텔레포터)
+	// [프리팹 5번] 1x1 기본 방 변형
 	{
 		int id = 5;
 		m_Prefabs[id].typeID = 5;
+		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 1;
+		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT;
+		m_Prefabs[id].layerCount = 1;
+		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map01.png", false, 0);
+
+		// 🌟 도어 소켓 (안전 지대)
+		//SetRect(&rc, 0, 770, 300, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 좌측 문 앞
+		//SetRect(&rc, 980, 770, 1280, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 우측 문 앞
+		SetRect(&rc, 490, 250, 790, 250 + pH); m_Prefabs[id].walls.push_back(rc); // 상단 문 낙하 방지
+
+		// 내부 지형 (자유롭게 디자인)
+		SetRect(&rc, 440, 500, 840, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		//SetRect(&rc, 200, 400, 400, 400 + pH); m_Prefabs[id].walls.push_back(rc);
+		//SetRect(&rc, 880, 400, 1080, 400 + pH); m_Prefabs[id].walls.push_back(rc);
+	}
+	// [프리팹 6번] 보스 대기실 (고정 1x1, 우측에 텔레포터)
+	{
+		int id = 6;
+		m_Prefabs[id].typeID = 6;
 		m_Prefabs[id].gridW = 1; m_Prefabs[id].gridH = 1;
 		m_Prefabs[id].width = SCREEN_WITH; m_Prefabs[id].height = SCREEN_HEIGHT;
 		m_Prefabs[id].layerCount = 1;
@@ -1791,7 +1810,7 @@ void MapManager::CreateRandomMap()
 			if (rx == -1) continue;
 
 			// =======================================================
-			// 보스 대기실(100)일 경우 1번 프리팹(1x1)의 규격을 빌려 쓰도록 방어!
+			// 보스 대기실(6)일 경우 1번 프리팹(1x1)의 규격을 빌려 쓰도록 방어!
 			// =======================================================
 
 			int gw_old = m_Prefabs[m_MapList[d.rID].prefabID].gridW;
@@ -1804,14 +1823,14 @@ void MapManager::CreateRandomMap()
 			if (d.dir == DIR_RIGHT) testTargetX = rx + gw_old;
 			else if (d.dir == DIR_LEFT) testTargetX = rx - 1;
 
-			// X좌표가 4 이상 다다르면, 보스 대기실(임시로 1번 방) 확정!
+			// X좌표가 5 이상 다다르면, 보스 대기실 확정!
 			if (!bossPlaced && testTargetX >= 5 && d.dir == DIR_RIGHT) {
-				validPrefabs.push_back(5); // 보스 대기실 용도로 1번 방(1x1) 사용
+				validPrefabs.push_back(6); // 보스 대기실 용도로 6번 방(1x1) 사용
 				forceBoss = true;
 			}
 			else {
 				// [핵심 변경] 비트마스크 검사 삭제! 무조건 남는 공간이 있으면 프리팹(1~4번) 투입!
-				for (int newID = 1; newID <= 4; newID++) {
+				for (int newID = 1; newID <= 5; newID++) {
 					int gw_new = m_Prefabs[newID].gridW;
 					int gh_new = m_Prefabs[newID].gridH;
 
@@ -2169,7 +2188,7 @@ void MapManager::Update(double frame)
 	// ==========================================================
 	// 5. 보스 대기실 텔레포트 상호작용
 	// ==========================================================
-	if (m_pCurrentMapChunk->prefabID == 5) // 현재 방이 4번(보스 대기실)일 때만 작동!
+	if (m_pCurrentMapChunk->prefabID == 6) // 현재 방이 6번(보스 대기실)일 때만 작동!
 	{
 		// 기사가 맵의 중앙(MW / 2) 부근 제단 위에 서 있는지 확인 (좌우 100픽셀 여유)
 		if (knight.pos.x >= MW / 2.0f - 100.0f && knight.pos.x <= MW / 2.0f + 100.0f)
@@ -2286,7 +2305,7 @@ void MapManager::LoadDebugPrefab(int pID)
 	m_DebugPrefabID = pID;
 
 	// =========================================================
-	// 🌟 [수정] 1번 방이 아닌, 38번 방(디버그 전용)을 사용합니다!
+	// 1번 방이 아닌, 38번 방(디버그 전용)을 사용합니다!
 	// =========================================================
 	int debugRoomID = 38;
 
