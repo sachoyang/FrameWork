@@ -12,22 +12,32 @@ BossEnemy::~BossEnemy() {}
 
 void BossEnemy::Init(float x, float y)
 {
+    // 1. 기본 위치 및 스펙
     pos.x = x;
     pos.y = y;
     hp = 15;
     dir = -1; // 왼쪽을 바라봄
 
-    // 🌟 [임시 이미지] 아직 보스 이미지가 없으니, 기존 지상 몹을 불러와 3배로 뻥튀기합니다!
+    // =======================================================
+    // 🌟 [핵심] 우주로 텔레포트 방지! (모든 변수 강제 0 초기화)
+    // =======================================================
+    velocity.x = 0.0f;
+    velocity.y = 0.0f;
+    gravity = 0.0f;
+    isDead = false;
+    isHit = false;
+    aniCount = 0;
+
+    // 2. 임시 이미지 할당 (파일 이름 ground01.png 확인 완료!)
     char FileName[256];
     for (int i = 0; i < 3; i++) {
         sprintf_s(FileName, "./resource/Img/monster/ground%02d.png", i + 1);
         img[i].Create(FileName, false, 0);
     }
 
-    // 🌟 히트박스를 기사의 3배 크기(180x240)로 거대하게 설정!
+    // 3. 3배 크기 히트박스 갱신
     SetRect(&m_rc, pos.x - 90, pos.y - 120, pos.x + 90, pos.y + 120);
 }
-
 void BossEnemy::TakeDamage(int damage, int hitDir)
 {
     if (isDead) return;
@@ -60,6 +70,8 @@ void BossEnemy::Update()
     gravity += 0.8f;
     if (gravity > 15.0f) gravity = 15.0f;
 
+    // 갱신
+    SetRect(&m_rc, pos.x - 90, pos.y - 120, pos.x + 90, pos.y + 120);
     // 2. 바닥 충돌 (미끄러짐 및 지형 착지)
     pos.x += velocity.x;
     velocity.x *= 0.9f;
@@ -71,6 +83,8 @@ void BossEnemy::Update()
             if (gravity >= 0 && (m_rc.bottom - 40) <= w.top) {
                 pos.y = w.top - 120.0f;
                 gravity = 0;
+
+                SetRect(&m_rc, pos.x - 90, pos.y - 120, pos.x + 90, pos.y + 120);
             }
         }
     }
@@ -106,6 +120,9 @@ void BossEnemy::Draw()
 
     // 보스는 전용으로 붉은색 히트박스 출력 (크기 확인용)
     if (Gmanager.m_GameStart) {
+        char bossTxt[32] = "BOSS";
+        // 머리(renderY - 150) 위치 쯤에 빨간색으로 글자 출력
+        dv_font.DrawString(bossTxt, renderX - 20, renderY - 150, D3DCOLOR_ARGB(255, 255, 0, 0));
         coll.BoxSow(m_rc, 0, 0, D3DCOLOR_ARGB(255, 255, 0, 0));
     }
 }

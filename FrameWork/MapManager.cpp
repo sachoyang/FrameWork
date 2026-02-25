@@ -2086,7 +2086,7 @@ void MapManager::ChangeMap(int mapID)
 	//	Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
 	//	m_Enemies.push_back(f1);
 	//}
-	if (currentRoomID == 1)
+	if (currentRoomID == 1||currentRoomID==38)
 	{
 		Enemy* testBoss = new BossEnemy(1);
 		// 화면 중앙 쯤, 바닥에 맞게 떨어지도록 좌표 설정
@@ -2283,20 +2283,48 @@ void MapManager::Draw()
 	for (auto e : m_Enemies) {
 		e->Draw();
 	}
-
 	// =======================================================
-	// 디버그용: 현재 프리팹 번호 화면 출력
+	// 🌟 디버그용 텍스트 출력 모음
 	// =======================================================
 	if (coll.isDebugDraw)
 	{
-		char debugText[256];
-		sprintf_s(debugText, "Current Prefab ID : %d", m_pCurrentMapChunk->prefabID);
-		// 2. 좌측 하단: 현재 기사의 절대 좌표(X, Y) 출력 (새로 추가!)
+		char debugPrefab[256];
+		sprintf_s(debugPrefab, "Current Prefab ID : %d", m_pCurrentMapChunk->prefabID);
+		dv_font.DrawString(debugPrefab, 0, 0, D3DCOLOR_ARGB(255, 255, 255, 0));
+
 		char debugPos[256];
 		sprintf_s(debugPos, "Knight Pos: X(%.1f), Y(%.1f)", knight.pos.x, knight.pos.y);
-		dv_font.DrawString(debugText, 0, 0);   //글자출력
-		dv_font.DrawString(debugPos, 0, 100);
+		dv_font.DrawString(debugPos, 0, 100, D3DCOLOR_ARGB(255, 0, 255, 255));
+
+		// =======================================================
+		// 🚨 [추가] 보스 실종사건 추적기!
+		// =======================================================
+		char debugEnemy[256];
+		sprintf_s(debugEnemy, "Room ID: %d | Enemy Count : %zu", m_pCurrentMapChunk->id, m_Enemies.size());
+		dv_font.DrawString(debugEnemy, 0, 150, D3DCOLOR_ARGB(255, 100, 255, 100)); // 연두색
+
+		// 몬스터 리스트에 누군가 존재한다면 0번(보스)의 상태를 출력!
+		if (!m_Enemies.empty())
+		{
+			Enemy* e = m_Enemies.front();
+			char bossPos[256];
+			sprintf_s(bossPos, "Boss X(%.1f), Y(%.1f) / Dead(%d)", e->pos.x, e->pos.y, e->isDead);
+			dv_font.DrawString(bossPos, 0, 200, D3DCOLOR_ARGB(255, 255, 100, 100)); // 빨간색
+		}
 	}
+	// =======================================================
+	// 디버그용: 현재 프리팹 번호 화면 출력
+	// =======================================================
+	//if (coll.isDebugDraw)
+	//{
+	//	char debugText[256];
+	//	sprintf_s(debugText, "Current Prefab ID : %d", m_pCurrentMapChunk->prefabID);
+	//	// 2. 좌측 하단: 현재 기사의 절대 좌표(X, Y) 출력 (새로 추가!)
+	//	char debugPos[256];
+	//	sprintf_s(debugPos, "Knight Pos: X(%.1f), Y(%.1f)", knight.pos.x, knight.pos.y);
+	//	dv_font.DrawString(debugText, 0, 0);   //글자출력
+	//	dv_font.DrawString(debugPos, 0, 100);
+	//}
 }
 
 void MapManager::LoadDebugPrefab(int pID)
