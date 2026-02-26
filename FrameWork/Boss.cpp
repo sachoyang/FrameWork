@@ -4,7 +4,7 @@ BossEnemy::BossEnemy(int id)
 {
     type = 3; // 보스 전용 타입
     bossID = id;
-    hp = 15;
+    hp = 20;
     state = B_STATE_SLEEP; // 처음엔 무조건 잠들어 있음
 }
 
@@ -46,8 +46,8 @@ void BossEnemy::Init(float x, float y)
         roarImg[i].Create(FileName, false, 0);
     }
 
-    // 3. 3배 크기 히트박스 갱신
-    SetRect(&m_rc, pos.x - 100, pos.y - 130, pos.x + 100, pos.y + 130);
+    // 히트박스 갱신
+    BossSetRect();
 }
 void BossEnemy::TakeDamage(int damage, int hitDir)
 {
@@ -83,6 +83,11 @@ bool BossEnemy::CanDealDamage()
     return true;
 }
 
+void BossEnemy::BossSetRect()
+{
+    SetRect(&m_rc, pos.x - 100, pos.y - 120, pos.x + 150, pos.y + 130);
+}
+
 void BossEnemy::Update()
 {
     // 1. 거대한 몸집에 맞는 무거운 중력 적용
@@ -91,7 +96,7 @@ void BossEnemy::Update()
     if (gravity > 15.0f) gravity = 15.0f;
 
     // 갱신
-    SetRect(&m_rc, pos.x - 90, pos.y - 120, pos.x + 90, pos.y + 120);
+    BossSetRect();
     // 2. 바닥 충돌 (미끄러짐 및 지형 착지)
     pos.x += velocity.x;
     velocity.x *= 0.9f;
@@ -104,7 +109,7 @@ void BossEnemy::Update()
                 pos.y = w.top - 120.0f;
                 gravity = 0;
 
-                SetRect(&m_rc, pos.x - 90, pos.y - 120, pos.x + 90, pos.y + 120);
+                BossSetRect();
             }
         }
     }
@@ -129,7 +134,7 @@ void BossEnemy::Update()
     }
 
     // 히트박스 갱신
-    SetRect(&m_rc, pos.x - 90, pos.y - 120, pos.x + 90, pos.y + 120);
+    BossSetRect();
 
     // 3. 뼈대만 있는 상태 머신 (Step 3에서 채울 예정)
     switch (state)

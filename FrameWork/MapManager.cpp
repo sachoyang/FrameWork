@@ -1935,8 +1935,6 @@ void MapManager::CreateRandomMap()
 	}
 }
 
-// MapManager.cpp
-
 void MapManager::ChangeMap(int mapID)
 {
 	// 맵을 36개까지 쓰기로 했으니, 제한을 40으로
@@ -2089,7 +2087,7 @@ void MapManager::ChangeMap(int mapID)
 	// =================================================================
 	// 진짜 보스방(39번) 진입 시: 감시자의 기사 3형제 스폰 & 컷신 시작!
 	// =================================================================
-	if (currentRoomID == 39)
+	if (currentRoomID == 39||currentRoomID == 38)
 	{
 		// 렌더링 순서(Z-Order)를 위해 배경 쪽에 있는 애들부터 먼저 스폰(Draw)합니다.
 
