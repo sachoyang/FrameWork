@@ -28,6 +28,14 @@ public:
 	Sprite walkImg[6]; // 걷기 애니메이션 (6프레임)
 	Sprite roarImg[4]; // 포효 애니메이션 (4프레임)
 
+    // 공격 및 구르기 애니메이션 배열
+    Sprite swingImg[11];   // 0~5(가로베기), 6~10(세로베기)
+    Sprite rollImg[7];     // 0(준비), 1~4(구르기), 5~6(멈춤)
+
+    // 보스 전용 공격 판정 박스
+    RECT attackBox;
+    bool isAttacking;
+
     BossEnemy(int id);
     virtual ~BossEnemy();
 

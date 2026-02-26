@@ -2257,17 +2257,37 @@ void MapManager::Update(double frame)
 				}
 			}
 
-			// 2. 적이 기사를 때림! (몸통 박치기)
+			// 2. 적이 기사를 때림! (몸통 박치기 & 보스 무기 공격)
 			if (!knight.isInvincible) {
-				// 잠들어 있는 보스인지 확인하는 방어 코드
+				bool isHitByBoss = false;
+
+				// 🌟 A. 보스의 무기 공격(attackBox)에 맞았는가?
+				if (e->type == 3) {
+					BossEnemy* b = (BossEnemy*)e;
+					if (b->isAttacking && IntersectRect(&temp, &knight.m_rc, &b->attackBox)) {
+						isHitByBoss = true;
+					}
+				}
+
+				// 🌟 B. 일반적인 몸통 박치기에 맞았는가?
 				if (e->CanDealDamage() && IntersectRect(&temp, &knight.m_rc, &e->m_rc)) {
+					isHitByBoss = true;
+
+					//// 돌진 중인 보스와 부딪히면 보스를 강제로 멈추게 함!
+					//if (e->type == 3) {
+					//	BossEnemy* b = (BossEnemy*)e;
+					//	if (b->state == B_STATE_ROLL_DASH) {
+					//		b->ChangeState(B_STATE_IDLE); // 보스 돌진 정지!
+					//		b->velocity.x = (b->dir == 1) ? 10.0f : -10.0f; // 살짝 튕겨남
+					//	}
+					//}
+				}
+
+				// 맞았다면 데미지 적용!
+				if (isHitByBoss) {
 					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
 					knight.TakeDamage(1, pushDir);
 				}
-				/*if (IntersectRect(&temp, &knight.m_rc, &e->m_rc)) {
-					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
-					knight.TakeDamage(1, pushDir);
-				}*/
 			}
 		}
 
@@ -2389,8 +2409,16 @@ void MapManager::LoadDebugPrefab(int pID)
 	ChangeMap(debugRoomID);
 
 	// 4. 캐릭터를 맵의 가로 중앙 & 맨 위(공중)로 안전하게 스폰
-	knight.pos.x = m_Prefabs[pID].width / 2.0f;
-	knight.pos.y = 50.0f;
+	if (pID == 16) // 불러온 프리팹이 보스방일 경우
+	{
+		knight.pos.x = 1000.0f;
+		knight.pos.y = m_Prefabs[pID].height - 250.0f;
+	}
+	else
+	{
+		knight.pos.x = m_Prefabs[pID].width / 2.0f;
+		knight.pos.y = 50.0f;
+	}
 	knight.gravity = 0;
 	knight.isDashing = false;
 	knight.grounded = false;
