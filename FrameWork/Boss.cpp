@@ -102,7 +102,7 @@ void BossEnemy::ChangeState(int newState)
 
 bool BossEnemy::CanDealDamage()
 {
-    if (state == B_STATE_SLEEP || state == B_STATE_DIE) {
+    if (state == B_STATE_SLEEP || state == B_STATE_DIE || state == B_STATE_AWAKE_ROAR) {
         return false; // 자고 있으면 타격 판정 없음!
     }
     return true;
