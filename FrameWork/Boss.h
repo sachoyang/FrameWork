@@ -23,6 +23,11 @@ public:
     // 추가 변수 (탱탱볼 바운스 카운트 등 추후 사용)
     int bounceCount;
 
+    // 보스 전용 애니메이션 스프라이트
+	Sprite sleepImg;
+	Sprite walkImg[6]; // 걷기 애니메이션 (6프레임)
+	Sprite roarImg[4]; // 포효 애니메이션 (4프레임)
+
     BossEnemy(int id);
     virtual ~BossEnemy();
 
@@ -33,4 +38,7 @@ public:
 
     // 상태를 안전하게 변경하는 헬퍼 함수
     void ChangeState(int newState);
+
+    // 자고있을때 데미지 주지 않음.
+    bool CanDealDamage() override;
 };

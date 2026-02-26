@@ -122,6 +122,16 @@ void Knight::Init()
 
 void Knight::Update()
 {
+    if (isCutscene) {
+        isMove = false;
+        isDashing = false;
+        isAttacking = false;
+        // (이 상태에서 중력 연산과 충돌 처리만 정상적으로 진행되도록 둡니다)
+    }
+    else
+    {
+
+    }
     if (GetTickCount() - m_KnightAniTime > 10)
     {
         // 무적 시간 1.5초(1500ms) 해제 로직

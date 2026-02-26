@@ -32,6 +32,8 @@ public:
     // 공통 렌더링 및 데미지 함수
     virtual void Draw();
     virtual void TakeDamage(int damage, int hitDir);
+
+    virtual bool CanDealDamage() { return true; }
 };
 
 // 지상 몹 (1번)

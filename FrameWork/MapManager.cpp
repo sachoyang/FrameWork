@@ -2002,7 +2002,7 @@ void MapManager::ChangeMap(int mapID)
 	int gh = m_Prefabs[pID].gridH;
 	int MW = SCREEN_WITH;
 	int MH = SCREEN_HEIGHT;
-	// 🌟 [추가] 보스방(39번)은 그리드 바깥에 있으므로, 자동 캡핑을 무시하고 통짜 사방 벽을 세워줍니다!
+	// 보스방(39번)은 그리드 바깥에 있으므로, 자동 캡핑을 무시하고 통짜 사방 벽을 세워줍니다!
 	if (currentRoomID == 39)
 	{
 		SetRect(&rc, -50, -50, MW * 2 + 50, 30); coll.AddWall(rc);
@@ -2086,14 +2086,36 @@ void MapManager::ChangeMap(int mapID)
 	//	Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
 	//	m_Enemies.push_back(f1);
 	//}
-	if (currentRoomID == 1||currentRoomID==38)
+	// =================================================================
+	// 진짜 보스방(39번) 진입 시: 감시자의 기사 3형제 스폰 & 컷신 시작!
+	// =================================================================
+	if (currentRoomID == 39)
 	{
-		Enemy* testBoss = new BossEnemy(1);
-		// 화면 중앙 쯤, 바닥에 맞게 떨어지도록 좌표 설정
-		testBoss->Init(600.0f, m_pCurrentMapChunk->height - 300.0f);
-		m_Enemies.push_back(testBoss);
+		// 렌더링 순서(Z-Order)를 위해 배경 쪽에 있는 애들부터 먼저 스폰(Draw)합니다.
+
+		// 1. 왼쪽 보스 (2번, 잠듦)
+		BossEnemy* b2 = new BossEnemy(2);
+		b2->Init(800.0f, m_pCurrentMapChunk->height - 200.0f);
+		b2->ChangeState(B_STATE_SLEEP);
+		m_Enemies.push_back(b2);
+
+		// 2. 오른쪽 보스 (3번, 잠듦)
+		BossEnemy* b3 = new BossEnemy(3);
+		b3->Init(2000.0f, m_pCurrentMapChunk->height - 200.0f);
+		b3->ChangeState(B_STATE_SLEEP);
+		m_Enemies.push_back(b3);
+
+		// 3. 가운데 보스 (1번, 깨어남!) -> 가장 마지막에 그려서 화면 맨 앞에 오게 함
+		BossEnemy* b1 = new BossEnemy(1);
+		b1->Init(1400.0f, m_pCurrentMapChunk->height - 200.0f);
+		b1->ChangeState(B_STATE_AWAKE_ROAR);
+		m_Enemies.push_back(b1);
+
+		// 기사 컷신 모드 돌입 (키보드 조작 불가)
+		knight.isCutscene = true;
 	}
-	// 🌟 [추가] 방 크기에 비례하여 다이나믹 몬스터 스폰!
+
+	// 방 크기에 비례하여 다이나믹 몬스터 스폰!
 	if (pID != ROOM_BOSS && currentRoomID != 1) // 보스방과 처음 시작방(1번방)은 몬스터 생성 X
 	{
 		int gw = m_Prefabs[pID].gridW;
@@ -2239,10 +2261,15 @@ void MapManager::Update(double frame)
 
 			// 2. 적이 기사를 때림! (몸통 박치기)
 			if (!knight.isInvincible) {
-				if (IntersectRect(&temp, &knight.m_rc, &e->m_rc)) {
+				// 잠들어 있는 보스인지 확인하는 방어 코드
+				if (e->CanDealDamage() && IntersectRect(&temp, &knight.m_rc, &e->m_rc)) {
 					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
 					knight.TakeDamage(1, pushDir);
 				}
+				/*if (IntersectRect(&temp, &knight.m_rc, &e->m_rc)) {
+					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
+					knight.TakeDamage(1, pushDir);
+				}*/
 			}
 		}
 
@@ -2284,7 +2311,7 @@ void MapManager::Draw()
 		e->Draw();
 	}
 	// =======================================================
-	// 🌟 디버그용 텍스트 출력 모음
+	// 디버그용 텍스트 출력 모음
 	// =======================================================
 	if (coll.isDebugDraw)
 	{
@@ -2297,7 +2324,7 @@ void MapManager::Draw()
 		dv_font.DrawString(debugPos, 0, 100, D3DCOLOR_ARGB(255, 0, 255, 255));
 
 		// =======================================================
-		// 🚨 [추가] 보스 실종사건 추적기!
+		// 보스 실종사건 추적기!
 		// =======================================================
 		char debugEnemy[256];
 		sprintf_s(debugEnemy, "Room ID: %d | Enemy Count : %zu", m_pCurrentMapChunk->id, m_Enemies.size());
