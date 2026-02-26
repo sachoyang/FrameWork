@@ -34,6 +34,7 @@ public:
     virtual void TakeDamage(int damage, int hitDir);
 
     virtual bool CanDealDamage() { return true; }
+    virtual bool IsTargetable() { return true; }
 };
 
 // 지상 몹 (1번)

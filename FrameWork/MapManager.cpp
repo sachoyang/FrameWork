@@ -2087,10 +2087,10 @@ void MapManager::ChangeMap(int mapID)
 	// =================================================================
 	// 진짜 보스방(39번) 진입 시: 감시자의 기사 3형제 스폰 & 컷신 시작!
 	// =================================================================
-	if (currentRoomID == 39||currentRoomID == 38)
+	if (currentRoomID == 39||(currentRoomID == 38)&&pID==ROOM_BOSS)
 	{
 		// 렌더링 순서(Z-Order)를 위해 배경 쪽에 있는 애들부터 먼저 스폰(Draw)합니다.
-
+		knight.pos.x = 1000.0f;
 		// 1. 왼쪽 보스 (2번, 잠듦)
 		BossEnemy* b2 = new BossEnemy(2);
 		b2->Init(800.0f, m_pCurrentMapChunk->height - 200.0f);
@@ -2227,7 +2227,7 @@ void MapManager::Update(double frame)
 				int bossRoomID = 16;
 
 				// 진짜 보스방(16번)의 정중앙 공중에 스폰시켜서 멋지게 떨어지도록 연출
-				knight.pos.x = m_Prefabs[bossRoomID].width / 2.0f;
+				knight.pos.x = 1000.0f;
 				knight.pos.y = m_Prefabs[bossRoomID].height - 250.0f;
 
 				return; // 맵이 바뀌었으니 이번 프레임 Update 즉시 종료
@@ -2244,7 +2244,7 @@ void MapManager::Update(double frame)
 			RECT temp;
 			// 1. 기사가 적을 때림! (공격 히트박스 vs 적 몸체)
 			if (knight.isAttacking && !knight.isAttackHit) {
-				if (IntersectRect(&temp, &knight.attackBox, &e->m_rc)) {
+				if (e->IsTargetable()&&IntersectRect(&temp, &knight.attackBox, &e->m_rc)) {
 					knight.isAttackHit = true;
 					e->TakeDamage(1, knight.dir == 1 ? -1 : 1); // 때린 방향으로 넉백
 
@@ -2322,19 +2322,25 @@ void MapManager::Draw()
 		dv_font.DrawString(debugPos, 0, 100, D3DCOLOR_ARGB(255, 0, 255, 255));
 
 		// =======================================================
-		// 보스 실종사건 추적기!
+		// 🚨 [추가] 보스 3형제 실시간 HP & 상태 스캐너!
 		// =======================================================
-		char debugEnemy[256];
-		sprintf_s(debugEnemy, "Room ID: %d | Enemy Count : %zu", m_pCurrentMapChunk->id, m_Enemies.size());
-		dv_font.DrawString(debugEnemy, 0, 150, D3DCOLOR_ARGB(255, 100, 255, 100)); // 연두색
-
-		// 몬스터 리스트에 누군가 존재한다면 0번(보스)의 상태를 출력!
-		if (!m_Enemies.empty())
+		int textY = 400; // 화면 위쪽부터 아래로 출력
+		for (auto e : m_Enemies)
 		{
-			Enemy* e = m_Enemies.front();
-			char bossPos[256];
-			sprintf_s(bossPos, "Boss X(%.1f), Y(%.1f) / Dead(%d)", e->pos.x, e->pos.y, e->isDead);
-			dv_font.DrawString(bossPos, 0, 200, D3DCOLOR_ARGB(255, 255, 100, 100)); // 빨간색
+			if (e->type == 3) // 몬스터가 보스(type 3)일 경우
+			{
+				BossEnemy* b = (BossEnemy*)e;
+				char bossInfo[256];
+
+				// ID, 현재 체력, 현재 상태(Sleep, Roar 등)를 출력
+				sprintf_s(bossInfo, "[Boss %d] HP : %d / State : %d", b->bossID, b->hp, b->state);
+
+				// 1번(가운데)은 빨간색, 2번/3번(배경)은 회색빛으로 글씨 색깔도 센스있게!
+				D3DCOLOR textColor = (b->bossID == 1) ? D3DCOLOR_ARGB(255, 255, 100, 100) : D3DCOLOR_ARGB(255, 150, 150, 150);
+
+				dv_font.DrawString(bossInfo, 10, textY, textColor);
+				textY += 30; // 다음 줄로 내림
+			}
 		}
 	}
 	// =======================================================

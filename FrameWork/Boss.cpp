@@ -15,7 +15,7 @@ void BossEnemy::Init(float x, float y)
     // 1. 기본 위치 및 스펙
     pos.x = x;
     pos.y = y;
-    hp = 15;
+    hp = 20;
     dir = 1; // 왼쪽을 바라봄
 
     // =======================================================
@@ -82,7 +82,13 @@ bool BossEnemy::CanDealDamage()
     }
     return true;
 }
-
+bool BossEnemy::IsTargetable()
+{
+    if (state == B_STATE_SLEEP) {
+        return false; // 자고 있으면 타격 판정 아예 없음!
+    }
+    return true;
+}
 void BossEnemy::BossSetRect()
 {
     SetRect(&m_rc, pos.x - 100, pos.y - 120, pos.x + 150, pos.y + 130);
@@ -106,7 +112,7 @@ void BossEnemy::Update()
         if (IntersectRect(&temp, &m_rc, &w)) {
             // 발바닥 착지 (히트박스가 크기 때문에 120px 오프셋 필요)
             if (gravity >= 0 && (m_rc.bottom - 40) <= w.top) {
-                pos.y = w.top - 120.0f;
+                pos.y = w.top - 30.0f;
                 gravity = 0;
 
                 BossSetRect();

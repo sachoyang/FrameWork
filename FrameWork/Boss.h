@@ -41,5 +41,7 @@ public:
 
     // 자고있을때 데미지 주지 않음.
     bool CanDealDamage() override;
+    bool IsTargetable() override;
+
 	void BossSetRect();
 };
