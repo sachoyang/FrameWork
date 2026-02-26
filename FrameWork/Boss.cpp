@@ -112,7 +112,7 @@ void BossEnemy::Update()
         if (IntersectRect(&temp, &m_rc, &w)) {
             // 발바닥 착지 (히트박스가 크기 때문에 120px 오프셋 필요)
             if (gravity >= 0 && (m_rc.bottom - 40) <= w.top) {
-                pos.y = w.top - 30.0f;
+                pos.y = w.top - 120.0f;
                 gravity = 0;
 
                 BossSetRect();
