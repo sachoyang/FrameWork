@@ -2324,6 +2324,38 @@ void MapManager::Update(double frame)
 		}*/
 		++it;
 	}
+
+	// =======================================================
+	// 다중 보스전 (페이즈) 관리 시스템
+	// =======================================================
+	if (m_pCurrentMapChunk->prefabID == 16 || m_pCurrentMapChunk->id == 39) // 보스방일 때만
+	{
+		BossEnemy* b1 = nullptr;
+		BossEnemy* b2 = nullptr;
+		BossEnemy* b3 = nullptr;
+
+		// 방에 있는 보스 3형제 정보 수집
+		for (auto e : m_Enemies) {
+			if (e->type == 3) {
+				BossEnemy* b = (BossEnemy*)e;
+				if (b->bossID == 1) b1 = b;
+				else if (b->bossID == 2) b2 = b;
+				else if (b->bossID == 3) b3 = b;
+			}
+		}
+
+		// 페이즈 2: 1번 보스의 체력이 반피(10) 이하이고, 2번 보스가 자고 있다면 기상!
+		if (b1 && b1->hp <= 10 && b2 && b2->state == B_STATE_SLEEP) {
+			b2->ChangeState(B_STATE_AWAKE_ROAR);
+		}
+
+		// 페이즈 3: 1번과 2번 중 아무나 한 명이라도 죽었을 때, 3번 보스가 자고 있다면 기상!
+		bool isAnyBossDead = (b1 && b1->state == B_STATE_DIE) || (b2 && b2->state == B_STATE_DIE);
+
+		if (isAnyBossDead && b3 && b3->state == B_STATE_SLEEP) {
+			b3->ChangeState(1 /*B_STATE_AWAKE_ROAR*/);
+		}
+	}
 }
 void MapManager::Draw()
 {
@@ -2348,8 +2380,32 @@ void MapManager::Draw()
 		m_pCurrentMapChunk->bgLayer[i].Render(0 - CAM->GetX(), 0 - CAM->GetY(), 0, 1, 1);
 	}
 
+	// =======================================================
+	// 1. 배경 쪽에 깔려야 할 '시체' 및 '수면 상태' 먼저 렌더링
+	// =======================================================
 	for (auto e : m_Enemies) {
-		e->Draw();
+		if (e->type == 3) {
+			BossEnemy* b = (BossEnemy*)e;
+			// 보스가 죽었거나(시체) 자고 있다면 먼저 그린다!
+			if (b->state == B_STATE_DIE || b->state == B_STATE_SLEEP) e->Draw();
+		}
+		else if (e->isDead) {
+			e->Draw(); // 일반 몹 시체
+		}
+	}
+
+	// =======================================================
+	// 2. 화면 앞쪽에 그려져야 할 '살아있는 적' 나중에 렌더링 (덮어쓰기)
+	// =======================================================
+	for (auto e : m_Enemies) {
+		if (e->type == 3) {
+			BossEnemy* b = (BossEnemy*)e;
+			// 보스가 살아있고 깨어있다면 나중에 그려서 화면 맨 앞으로 뺀다!
+			if (b->state != B_STATE_DIE && b->state != B_STATE_SLEEP) e->Draw();
+		}
+		else if (!e->isDead) {
+			e->Draw(); // 일반 살아있는 몹
+		}
 	}
 	// =======================================================
 	// 디버그용 텍스트 출력 모음
@@ -2365,7 +2421,7 @@ void MapManager::Draw()
 		dv_font.DrawString(debugPos, 0, 100, D3DCOLOR_ARGB(255, 0, 255, 255));
 
 		// =======================================================
-		// 🚨 [추가] 보스 3형제 실시간 HP & 상태 스캐너!
+		// 보스 3형제 실시간 HP & 상태 스캐너!
 		// =======================================================
 		int textY = 400; // 화면 위쪽부터 아래로 출력
 		for (auto e : m_Enemies)

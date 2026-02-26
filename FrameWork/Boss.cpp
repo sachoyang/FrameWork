@@ -57,17 +57,25 @@ void BossEnemy::Init(float x, float y)
         sprintf_s(FileName, "./resource/Img/boss/swing%02d.png", i + 1);
         swingImg[i].Create(FileName, false, 0);
     }
+
     // Roll (구르기 7장) 로드
     for (int i = 0; i < 7; i++) {
         sprintf_s(FileName, "./resource/Img/boss/roll%02d.png", i + 1);
         rollImg[i].Create(FileName, false, 0);
     }
+
+    for (int i = 0; i < 8; i++) {
+        sprintf_s(FileName, "./resource/Img/boss/die%02d.png", i + 1); // 파일명 확인 (die01.png)
+        dieImg[i].Create(FileName, false, 0);
+    }
+
     // 히트박스 갱신
     BossSetRect();
 }
 void BossEnemy::TakeDamage(int damage, int hitDir)
 {
-    if (isDead) return;
+    // 🌟 [수정] 이미 죽었거나, 시체 상태(DIE)면 데미지를 받지 않음
+    if (isDead || state == B_STATE_DIE) return;
     if (state == B_STATE_SLEEP) return; // 자고 있을 땐 데미지를 입지 않음 (무적)
 
     hp -= damage;
@@ -78,8 +86,9 @@ void BossEnemy::TakeDamage(int damage, int hitDir)
 
     if (hp <= 0) {
         hp = 0;
-        isDead = true;
+        // isDead = true;
         // 사망 시 처리 (추후 2페이즈 호출 등)
+        ChangeState(B_STATE_DIE);
     }
 }
 
@@ -93,14 +102,14 @@ void BossEnemy::ChangeState(int newState)
 
 bool BossEnemy::CanDealDamage()
 {
-    if (state == B_STATE_SLEEP) {
+    if (state == B_STATE_SLEEP || state == B_STATE_DIE) {
         return false; // 자고 있으면 타격 판정 없음!
     }
     return true;
 }
 bool BossEnemy::IsTargetable()
 {
-    if (state == B_STATE_SLEEP) {
+    if (state == B_STATE_SLEEP || state == B_STATE_DIE) {
         return false; // 자고 있으면 타격 판정 아예 없음!
     }
     return true;
@@ -393,6 +402,18 @@ void BossEnemy::Update()
     case B_STATE_ROLL_BACK: // 후퇴 (임시)
         ChangeState(B_STATE_IDLE);
         break;
+
+    case B_STATE_DIE:
+        velocity.x = 0; // 죽으면 이동 멈춤
+
+        // 0.2초마다 프레임 넘김 (총 8프레임)
+        if (GetTickCount() - aniTime > 200) {
+            if (aniCount < 7) {
+                aniCount++; // 7번(die08) 까지만 올라가고 멈춤!
+            }
+            aniTime = GetTickCount();
+        }
+        break;
     }
 }
 
@@ -428,6 +449,7 @@ void BossEnemy::Draw()
 	else if (state == B_STATE_IDLE) currentImg = &stopImg[aniCount];
     else if (state == B_STATE_MELEE) currentImg = &swingImg[aniCount];
     else if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE) currentImg = &rollImg[aniCount];
+    else if (state == B_STATE_DIE) currentImg = &dieImg[aniCount];
 
     currentImg->color = color;
     //currentImg->SetColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);

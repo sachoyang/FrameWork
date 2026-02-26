@@ -10,7 +10,8 @@ enum BOSS_STATE {
     B_STATE_MELEE,          // 근접 2연타 (가로 -> 세로)
     B_STATE_ROLL_DASH,      // 지상 구르기 돌진
     B_STATE_ROLL_BOUNCE,    // 탱탱볼 점프 돌진
-    B_STATE_ROLL_BACK       // 뒤로 구르기 (거리 벌리기)
+    B_STATE_ROLL_BACK,       // 뒤로 구르기 (거리 벌리기)
+    B_STATE_DIE,
 };
 
 class BossEnemy : public Enemy
@@ -32,6 +33,7 @@ public:
     // 공격 및 구르기 애니메이션 배열
     Sprite swingImg[11];   // 0~5(가로베기), 6~10(세로베기)
     Sprite rollImg[7];     // 0(준비), 1~4(구르기), 5~6(멈춤)
+    Sprite dieImg[8];
 
     // 보스 전용 공격 판정 박스
     RECT attackBox;
