@@ -30,6 +30,12 @@ void BossEnemy::Init(float x, float y)
 
     char FileName[256];
 
+    // 0. 대기 이미지 로드
+    for (int i = 0; i < 3; i++) {
+        sprintf_s(FileName, "./resource/Img/boss/boss_stop%02d.png", i + 1);
+        stopImg[i].Create(FileName, false, 0);
+    }
+
     // 1. 수면 이미지 로드 (보스 ID에 따라 sleep01, 02, 03 배정)
     sprintf_s(FileName, "./resource/Img/boss/boss_sleep%02d.png", bossID);
     sleepImg.Create(FileName, false, 0);
@@ -115,7 +121,12 @@ void BossEnemy::Update()
     BossSetRect();
     // 2. 바닥 충돌 (미끄러짐 및 지형 착지)
     pos.x += velocity.x;
-    velocity.x *= 0.9f;
+
+    // 탱탱볼(바운스) 상태일 때는 공중에서 마찰력을 무시합니다!
+    if (state != B_STATE_ROLL_BOUNCE) 
+    {
+        velocity.x *= 0.9f;
+    }
 
     RECT temp;
     for (auto& w : coll.m_Walls) {
@@ -146,7 +157,7 @@ void BossEnemy::Update()
         else if (elapsed < 1500) aniCount = 2; // 포효 1
         else aniCount = 3;                     // 포효 2
     }
-    else if (state == B_STATE_WALK || state == B_STATE_IDLE) {
+    else if (state == B_STATE_WALK) {
         // 🌟 걷기 애니메이션 재생 (0.15초마다 프레임 넘김)
         if (GetTickCount() - aniTime > 150) {
             aniCount++;
@@ -158,7 +169,7 @@ void BossEnemy::Update()
     // 히트박스 갱신
     BossSetRect();
 
-    // 3. 뼈대만 있는 상태 머신 (Step 3에서 채울 예정)
+    // 3.  상태 머신
     switch (state)
     {
     case B_STATE_SLEEP:
@@ -180,7 +191,14 @@ void BossEnemy::Update()
         // 방향 전환
         dir = lookDir;
 
-        if (elapsed > 500) // 0.5초 대기 후 행동 결정
+        // IDLE 커스텀 애니메이션 (3프레임 반복)
+        if (GetTickCount() - aniTime > 300) { // 0.12초마다 그림 변경 (원하는 속도로 조절하세요)
+            aniCount++;
+            if (aniCount > 2) aniCount = 0; // 0, 1, 2, 3
+            aniTime = GetTickCount();
+        }
+
+        if (elapsed > 1000) // 1초 대기 후 행동 결정
         {
             if (distToKnight <= 300.0f) {
                 // 근접 시 확률: 60% 가로/세로베기, 20% 구르기 돌진, 20% 뒤로 구르기
@@ -198,11 +216,23 @@ void BossEnemy::Update()
                 else if (randPattern < 70) ChangeState(B_STATE_ROLL_DASH);
                 else {
                     ChangeState(B_STATE_ROLL_BOUNCE);
+                    bounceCount = 0;
+                    gravity = -25.0f;
 
-                    // 🌟 탱탱볼 시작! 위로 강하게 솟구치며 기사 쪽으로 포물선을 그립니다.
-                    bounceCount = 0;         // 바운스 횟수 0으로 초기화
-                    gravity = -22.0f;        // 위로 엄청 높게 점프! (-)
-                    velocity.x = (dir == 1) ? -12.0f : 12.0f; // 기사 쪽으로 이동
+                    // =======================================================
+                    // [목표 타겟팅 계산] 기사 위치까지의 거리를 체공 시간(약 50프레임)으로 나눔
+                    // =======================================================
+                    float diffX = knight.pos.x - pos.x;
+                    float targetV = diffX / 50.0f;
+
+                    // 최소/최대 속도 제한 (최소 10 ~ 최대 25)
+                    if (targetV >= 0 && targetV < 10.0f) targetV = 10.0f; // 제자리 점프 방지 (최소 우측)
+                    if (targetV < 0 && targetV > -10.0f) targetV = -10.0f; // 제자리 점프 방지 (최소 좌측)
+                    if (targetV > 25.0f) targetV = 25.0f;   // 빛의 속도로 날아가는 것 방지
+                    if (targetV < -25.0f) targetV = -25.0f;
+
+                    velocity.x = targetV; // 계산된 속도 적용!
+                    dir = (velocity.x < 0) ? 1 : -1; // 날아가는 방향으로 이미지 반전
                 }
             }
         }
@@ -307,6 +337,12 @@ void BossEnemy::Update()
         break;
 
     case B_STATE_ROLL_BOUNCE:
+        // =======================================================
+        // 🌟 [핵심] 공중에 있는 동안 마찰력을 무시하고 좌우 속도를 강제 유지!
+        // 이 숫자를 15.0f -> 20.0f 등으로 키우면 좌우로 엄청나게 길게 날아갑니다.
+        // =======================================================
+        //velocity.x = (dir == 1) ? -16.0f : 16.0f;
+
         // 1. 구르기 애니메이션 재생 (무한 루프)
         if (GetTickCount() - aniTime > 80) {
             aniCount++;
@@ -317,34 +353,39 @@ void BossEnemy::Update()
         // 2. 당구공처럼 벽에 튕기기!
         if (dir == 1 && pos.x <= 150.0f) {
             pos.x = 150.0f; // 벽에 파고들지 않게 꺼내줌
-            dir = -1;       // 반대쪽을 보게 함
-            velocity.x = 12.0f; // 반대쪽으로 튕겨 나감
+            velocity.x = -velocity.x; // 왼쪽 벽에 박으면 우측으로 튕김
+            dir = -1;       // 방향을 꺾어주면 위의 velocity.x 강제 유지 코드 덕에 반대로 튕겨 날아감!
         }
         else if (dir == -1 && pos.x >= SCREEN_WITH * 2 - 150.0f) {
             pos.x = SCREEN_WITH * 2 - 150.0f;
+            velocity.x = -velocity.x; // 오른쪽 벽에 박으면 좌측으로 튕김
             dir = 1;
-            velocity.x = -12.0f;
         }
 
-        // 3. 바닥에 닿았을 때의 처리 (핵심!)
-        // 물리 엔진이 바닥에 닿으면 gravity를 0으로 만든다는 점을 이용합니다.
+        // 3. 바닥에 닿았을 때의 처리 (착지)
         if (gravity == 0)
         {
-            bounceCount++; // 바닥에 닿았으니 바운스 횟수 1 증가
+            bounceCount++;
 
             if (bounceCount >= 3) {
                 // 🌟 3번 통통 튀겼으면 멈추고 일어납니다.
                 ChangeState(B_STATE_IDLE);
-                velocity.x = 0; // 구르기 멈춤
+                velocity.x = 0;
             }
             else {
-                // 🌟 아직 덜 튀겼다면 다시 하늘로 솟구칩니다!
-                gravity = -22.0f;
+                // 🌟 바닥에 닿자마자 기사 위치를 스캔하여 궤도를 수정하며 다시 솟구침!
+                gravity = -25.0f;
 
-                // 튀어오를 때마다 기사가 있는 쪽으로 방향을 꺾어서 유도탄처럼 추적합니다.
-                int newLookDir = (knight.pos.x < pos.x) ? 1 : -1;
-                dir = newLookDir;
-                velocity.x = (dir == 1) ? -12.0f : 12.0f;
+                float diffX = knight.pos.x - pos.x;
+                float targetV = diffX / 50.0f;
+
+                if (targetV >= 0 && targetV < 10.0f) targetV = 10.0f;
+                if (targetV < 0 && targetV > -10.0f) targetV = -10.0f;
+                if (targetV > 25.0f) targetV = 25.0f;
+                if (targetV < -25.0f) targetV = -25.0f;
+
+                velocity.x = targetV;
+                dir = (velocity.x < 0) ? 1 : -1;
             }
         }
         break;
@@ -384,11 +425,10 @@ void BossEnemy::Draw()
     if (state == B_STATE_SLEEP) currentImg = &sleepImg;
     else if (state == B_STATE_AWAKE_ROAR) currentImg = &roarImg[aniCount];
     else if (state == B_STATE_WALK) currentImg = &walkImg[aniCount];
-    else if (state == B_STATE_IDLE) currentImg = &walkImg[0]; // 대기할 땐 걷기 1번 프레임
+	else if (state == B_STATE_IDLE) currentImg = &stopImg[aniCount];
     else if (state == B_STATE_MELEE) currentImg = &swingImg[aniCount];
-    else if (state == B_STATE_ROLL_DASH) currentImg = &rollImg[aniCount];
     else if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE) currentImg = &rollImg[aniCount];
-    
+
     currentImg->color = color;
     //currentImg->SetColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);
     currentImg->Render(renderX, renderY, 0, dir, scale, scale);

@@ -27,6 +27,7 @@ public:
 	Sprite sleepImg;
 	Sprite walkImg[6]; // 걷기 애니메이션 (6프레임)
 	Sprite roarImg[4]; // 포효 애니메이션 (4프레임)
+    Sprite stopImg[3]; //대기 이미지
 
     // 공격 및 구르기 애니메이션 배열
     Sprite swingImg[11];   // 0~5(가로베기), 6~10(세로베기)
