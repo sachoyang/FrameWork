@@ -105,11 +105,19 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/effect/unhitdown.png");
     unhitEffect[1].Create(FileName, false, 0);
 
+    sprintf_s(FileName, "./resource/Img/knight1/bossstart01.png");
+    bossStartImg[0].Create(FileName, false, 0);
+
+    sprintf_s(FileName, "./resource/Img/knight1/bossstart02.png");
+    bossStartImg[1].Create(FileName, false, 0);
     hp = 8;
 	isInvincible = false;
 	isKnockback = false;
     isAttackHit = false;
     isAttacking = false;
+	isCutscene = false;
+    m_StartAniCount = 0;
+    m_StartAniTime = 0;
     attackStartTime = 0;
     lastAttackTime = 0; // 쿨타임 초기화
     SetRect(&attackBox, 0, 0, 0, 0);
@@ -134,6 +142,15 @@ void Knight::Update()
     }
     if (GetTickCount() - m_KnightAniTime > 10)
     {
+        //컷신 중일 때 도전(도발) 애니메이션 재생
+        if (isCutscene)
+        {
+            if (GetTickCount() - m_StartAniTime > 200) { // 0.2초 간격
+                m_StartAniCount++;
+                if (m_StartAniCount > 1) m_StartAniCount = 0;
+                m_StartAniTime = GetTickCount();
+            }
+        }
         // 무적 시간 1.5초(1500ms) 해제 로직
         if (isInvincible && (GetTickCount() - invincibleTime > 1500)) {
             isInvincible = false;
@@ -506,8 +523,14 @@ void Knight::Draw()
 {
     if (Gmanager.m_GameStart == true)
     {
+        // 🌟 [추가] 컷신 중이면 무조건 도전(bossstart) 애니메이션만 그림!
+        if (isCutscene)
+        {
+            float drawingOffsetY = 20.0f; // 필요시 발바닥 높이 조절
+            bossStartImg[m_StartAniCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
+        }
         // 🌟 무적 시간일 때 0.1초 단위로 깜빡이기 (짝수 틱에만 렌더링 무시)
-        if (isInvincible && ((GetTickCount() / 100) % 2 == 0)) {
+        else if (isInvincible && ((GetTickCount() / 100) % 2 == 0)) {
             // 이 프레임은 기사를 그리지 않고 넘김 (깜빡깜빡)
         }
         else 

@@ -53,6 +53,9 @@ public:
 	D3DXVECTOR2 knockVelocity; // 기사 밀려나는 속도
 
 	bool isCutscene;          // 컷씬 중인지 여부 (컷씬에서는 모든 행동이 제한됨)
+	Sprite bossStartImg[2];
+	int m_StartAniCount;
+	DWORD m_StartAniTime;
 
 public:
 	void Init();

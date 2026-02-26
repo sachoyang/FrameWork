@@ -16,6 +16,10 @@ Key::~Key(void)
 
 void Key::Update()
 {
+	if (knight.isCutscene) // 컷신 중에는 키 입력 무시
+	{
+		return;
+	}
 	knight.isMove = false;
 	knight.isLookup = false;
 	knight.isLookdown = false;

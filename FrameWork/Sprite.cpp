@@ -141,7 +141,7 @@ void Sprite::Render( float x , float y , float radian, float sx, float sy, int p
     pSprite->SetTransform( &( scale * rot * trans ) ) ;
 
     dv_font.Sprite->Begin(D3DXSPRITE_ALPHABLEND) ;
-    pSprite->Draw( Texture , &Rect, &center, NULL , 0xFFFFFFFF ) ;
+    pSprite->Draw( Texture , &Rect, &center, NULL , color ) ;
     pSprite->Flush() ;
     dv_font.Sprite->End() ;
 
