@@ -183,7 +183,7 @@ void BossEnemy::Update()
         if (elapsed > 500) // 0.5초 대기 후 행동 결정
         {
             if (distToKnight <= 300.0f) {
-                // 🌟 [수정] 근접 시 확률: 60% 가로/세로베기, 20% 구르기 돌진, 20% 뒤로 구르기
+                // 근접 시 확률: 60% 가로/세로베기, 20% 구르기 돌진, 20% 뒤로 구르기
                 int randPattern = rand() % 100;
 
                 if (randPattern < 60) ChangeState(B_STATE_MELEE);
@@ -191,9 +191,19 @@ void BossEnemy::Update()
                 else ChangeState(B_STATE_ROLL_BACK);
             }
             else {
-                // 멀다! -> 걷기(접근) 또는 구르기 돌진
-                if (rand() % 100 < 40) ChangeState(B_STATE_ROLL_DASH);
-                else ChangeState(B_STATE_WALK);
+                // 🌟 멀다! -> 걷기(30%), 지상 구르기(40%), 탱탱볼 바운스(30%)
+                int randPattern = rand() % 100;
+
+                if (randPattern < 30) ChangeState(B_STATE_WALK);
+                else if (randPattern < 70) ChangeState(B_STATE_ROLL_DASH);
+                else {
+                    ChangeState(B_STATE_ROLL_BOUNCE);
+
+                    // 🌟 탱탱볼 시작! 위로 강하게 솟구치며 기사 쪽으로 포물선을 그립니다.
+                    bounceCount = 0;         // 바운스 횟수 0으로 초기화
+                    gravity = -22.0f;        // 위로 엄청 높게 점프! (-)
+                    velocity.x = (dir == 1) ? -12.0f : 12.0f; // 기사 쪽으로 이동
+                }
             }
         }
         break;
@@ -216,7 +226,7 @@ void BossEnemy::Update()
         break;
 
     case B_STATE_MELEE:
-        // 🌟 근접 2연타 (Swing01 ~ 11)
+        // 근접 2연타 (Swing01 ~ 11)
         // 0~5: 가로 베기 / 6~10: 세로 베기
         if (GetTickCount() - aniTime > 100) { // 0.1초마다 프레임 넘김
             aniCount++;
@@ -296,6 +306,49 @@ void BossEnemy::Update()
         }
         break;
 
+    case B_STATE_ROLL_BOUNCE:
+        // 1. 구르기 애니메이션 재생 (무한 루프)
+        if (GetTickCount() - aniTime > 80) {
+            aniCount++;
+            if (aniCount > 4 || aniCount < 1) aniCount = 1;
+            aniTime = GetTickCount();
+        }
+
+        // 2. 당구공처럼 벽에 튕기기!
+        if (dir == 1 && pos.x <= 150.0f) {
+            pos.x = 150.0f; // 벽에 파고들지 않게 꺼내줌
+            dir = -1;       // 반대쪽을 보게 함
+            velocity.x = 12.0f; // 반대쪽으로 튕겨 나감
+        }
+        else if (dir == -1 && pos.x >= SCREEN_WITH * 2 - 150.0f) {
+            pos.x = SCREEN_WITH * 2 - 150.0f;
+            dir = 1;
+            velocity.x = -12.0f;
+        }
+
+        // 3. 바닥에 닿았을 때의 처리 (핵심!)
+        // 물리 엔진이 바닥에 닿으면 gravity를 0으로 만든다는 점을 이용합니다.
+        if (gravity == 0)
+        {
+            bounceCount++; // 바닥에 닿았으니 바운스 횟수 1 증가
+
+            if (bounceCount >= 3) {
+                // 🌟 3번 통통 튀겼으면 멈추고 일어납니다.
+                ChangeState(B_STATE_IDLE);
+                velocity.x = 0; // 구르기 멈춤
+            }
+            else {
+                // 🌟 아직 덜 튀겼다면 다시 하늘로 솟구칩니다!
+                gravity = -22.0f;
+
+                // 튀어오를 때마다 기사가 있는 쪽으로 방향을 꺾어서 유도탄처럼 추적합니다.
+                int newLookDir = (knight.pos.x < pos.x) ? 1 : -1;
+                dir = newLookDir;
+                velocity.x = (dir == 1) ? -12.0f : 12.0f;
+            }
+        }
+        break;
+
     case B_STATE_ROLL_BACK: // 후퇴 (임시)
         ChangeState(B_STATE_IDLE);
         break;
@@ -334,6 +387,7 @@ void BossEnemy::Draw()
     else if (state == B_STATE_IDLE) currentImg = &walkImg[0]; // 대기할 땐 걷기 1번 프레임
     else if (state == B_STATE_MELEE) currentImg = &swingImg[aniCount];
     else if (state == B_STATE_ROLL_DASH) currentImg = &rollImg[aniCount];
+    else if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE) currentImg = &rollImg[aniCount];
     
     currentImg->color = color;
     //currentImg->SetColor((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, 255);
