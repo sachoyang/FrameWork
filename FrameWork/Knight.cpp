@@ -621,9 +621,24 @@ void Knight::Draw()
 void Knight::KnightMove()
 {
     m_rc.left = pos.x - 30;
-    m_rc.top = pos.y - 40;
+    //m_rc.top = pos.y - 40;
     m_rc.right = pos.x + imagesinfo.Width - 40;
     m_rc.bottom = pos.y + imagesinfo.Height - 70;
+
+    // =======================================================
+    // 🌟 [추가] 하단 키(Lookdown)를 눌러서 머리를 숙였을 때 히트박스 축소!
+    // =======================================================
+    if (isLookdown && grounded)
+    {
+        // 보스의 가로베기(노란색 박스) 밑단은 바닥에서 약 70픽셀 떠 있습니다.
+        // 기사의 머리(top)를 바닥(bottom)에서 50픽셀 위까지만 오도록 확 낮춰줍니다!
+        m_rc.top = m_rc.bottom - 65;
+    }
+    else
+    {
+        // 평상시 원래 기사의 콜라이더 높이
+        m_rc.top = pos.y - 40;
+    }
 }
 
 // 점프 시작 함수 (Key.cpp에서 호출)

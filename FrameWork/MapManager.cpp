@@ -2216,22 +2216,45 @@ void MapManager::Update(double frame)
 	// ==========================================================
 	if (m_pCurrentMapChunk->prefabID == 6) // 현재 방이 6번(보스 대기실)일 때만 작동!
 	{
+		// 🌟 키를 누르고 있는 시간을 측정할 타이머 변수 (static으로 선언해 프레임이 지나도 기억하게 함)
+		static DWORD teleportHoldTime = 0;
+
 		// 기사가 맵의 중앙(MW / 2) 부근 제단 위에 서 있는지 확인 (좌우 100픽셀 여유)
 		if (knight.pos.x >= MW / 2.0f - 100.0f && knight.pos.x <= MW / 2.0f + 100.0f)
 		{
 			// 기사가 땅에 서 있고(grounded), 윗방향키(isLookup)를 눌렀다면 텔레포트 발동!
 			if (knight.grounded && knight.isLookup)
 			{
-				ChangeMap(39); // 미리 준비해둔 39번 맵(진짜 보스방)으로 전환!
+				if (teleportHoldTime == 0) {
+					teleportHoldTime = GetTickCount();
+				}
+				// 3. 누른 상태로 1초(1000ms)가 지났다면? 텔레포트 발동!
+				else if (GetTickCount() - teleportHoldTime >= 1000)
+				{
+					teleportHoldTime = 0; // 타이머 초기화
 
-				int bossRoomID = 16;
+					ChangeMap(39); // 진짜 보스방(39번)으로 전환!
 
-				// 진짜 보스방(16번)의 정중앙 공중에 스폰시켜서 멋지게 떨어지도록 연출
-				knight.pos.x = 1000.0f;
-				knight.pos.y = m_Prefabs[bossRoomID].height - 250.0f;
+					int bossRoomID = 16;
+					knight.pos.x = 1000.0f;
+					knight.pos.y = m_Prefabs[bossRoomID].height - 250.0f;
 
-				return; // 맵이 바뀌었으니 이번 프레임 Update 즉시 종료
+					return; // 맵이 바뀌었으니 이번 프레임 Update 즉시 종료
+				}
+				//ChangeMap(39); // 미리 준비해둔 39번 맵(진짜 보스방)으로 전환!
+
+				//int bossRoomID = 16;
+
+				//// 진짜 보스방(16번)의 정중앙 공중에 스폰시켜서 멋지게 떨어지도록 연출
+				//knight.pos.x = 1000.0f;
+				//knight.pos.y = m_Prefabs[bossRoomID].height - 250.0f;
+
+				//return; // 맵이 바뀌었으니 이번 프레임 Update 즉시 종료
 			}
+		}
+		else
+		{
+			teleportHoldTime = 0; // 제단에서 벗어나면 타이머 초기화
 		}
 	}
 
