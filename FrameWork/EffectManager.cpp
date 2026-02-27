@@ -22,6 +22,49 @@ void EffectManager::Init() {
 
     // 🌟 2. 새로 추가할 이펙트들! (나중에 이미지가 생기면 여기에 위처럼 push_back 하시면 됩니다)
     // 예: 먼지 애니메이션 3장이라면 temp.Create() 3번 하고 m_SprJumpDust.push_back(temp) 3번 수행!
+    // [보스 포효 충격파] - 1장짜리라고 가정
+    // (경로는 실제 있는 곳으로 맞춰주세요!)
+    sprintf_s(FileName, "./resource/Img/effect/roar_wave.png");
+    temp.Create(FileName, false, 0); m_SprRoar.push_back(temp);
+
+
+    // =======================================================
+    // 💨 2. 애니메이션 이펙트 (먼지, 잔상 등 여러 장짜리)
+    // =======================================================
+
+    // [기사가 맞음]
+    for (int i = 1; i <= 7; i++) {
+        sprintf_s(FileName, "./resource/Img/effect/stun_impact_effect%02d.png", i);
+        temp.Create(FileName, false, 0);
+        m_SprKnightHitted.push_back(temp);
+    }
+    // [몬스터가 맞음]
+    for (int i = 1; i <= 6; i++) {
+        sprintf_s(FileName, "./resource/Img/effect/whitesplash_%02d.png", i);
+        temp.Create(FileName, false, 0);
+        m_SprMonsHitted.push_back(temp);
+    }
+
+    // [점프 먼지] - 예: jump_dust01.png ~ jump_dust04.png (4장)
+    for (int i = 1; i <= 4; i++) {
+        sprintf_s(FileName, "./resource/Img/effect/jump_dust%02d.png", i);
+        temp.Create(FileName, false, 0);
+        m_SprJumpDust.push_back(temp);
+    }
+
+    // [착지 먼지] - 예: land_dust01.png ~ land_dust05.png (5장)
+    for (int i = 1; i <= 5; i++) {
+        sprintf_s(FileName, "./resource/Img/effect/land_dust%02d.png", i);
+        temp.Create(FileName, false, 0);
+        m_SprLandDust.push_back(temp);
+    }
+
+    // [대시 먼지(잔상)] - 예: dash_dust01.png ~ dash_dust03.png (3장)
+    for (int i = 1; i <= 5; i++) {
+        sprintf_s(FileName, "./resource/Img/effect/dash_effect%02d.png", i-1);
+        temp.Create(FileName, false, 0);
+        m_SprDashDust.push_back(temp);
+    }
 }
 
 void EffectManager::Play(int type, float x, float y, int dir, float scaleY) {

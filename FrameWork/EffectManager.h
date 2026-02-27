@@ -41,6 +41,7 @@ private:
     // 이펙트별 이미지 배열 (애니메이션이면 여러 장, 단일이면 1장)
     std::vector<Sprite> m_SprHit, m_SprUnhit, m_SprHitUD, m_SprUnhitUD;
     std::vector<Sprite> m_SprJumpDust, m_SprLandDust, m_SprDashDust, m_SprRoar;
+    std::vector<Sprite> m_SprKnightHitted, m_SprMonsHitted;
 
 public:
     static EffectManager* GetInstance() {
