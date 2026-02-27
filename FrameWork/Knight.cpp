@@ -111,6 +111,8 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/bossstart02.png");
     bossStartImg[1].Create(FileName, false, 0);
     hp = 8;
+    isDead = false;
+    deadTime = 0;
 	isInvincible = false;
 	isKnockback = false;
     isAttackHit = false;
@@ -130,7 +132,23 @@ void Knight::Init()
 
 void Knight::Update()
 {
-    if (isCutscene) {
+    // 🌟 [추가] 기사가 죽었을 때의 강제 상태 고정!
+    if (isDead) 
+    {
+        isMove = false;
+        isDashing = false;
+        isAttacking = false;
+        isLookup = false;
+        isLookdown = false;
+
+        // 아직 기사 죽는 전용 애니메이션이 없으므로, 
+        // 5번(숙이기) 이미지를 써서 바닥에 쓰러진 것처럼 연출합니다.
+        m_KnightCount = 5;
+
+        // 이 상태에서도 중력과 바닥 충돌은 먹혀야 하므로 return 하지 않고 밑으로 흘려보냅니다.
+    }
+    else if (isCutscene) 
+    {
         isMove = false;
         isDashing = false;
         isAttacking = false;
@@ -140,19 +158,19 @@ void Knight::Update()
     {
 
     }
-    if (GetTickCount() - m_KnightAniTime > 10)
+    if (TIMEMGR->GetGameTime() - m_KnightAniTime > 10)
     {
         //컷신 중일 때 도전(도발) 애니메이션 재생
         if (isCutscene)
         {
-            if (GetTickCount() - m_StartAniTime > 200) { // 0.2초 간격
+            if (TIMEMGR->GetGameTime() - m_StartAniTime > 200) { // 0.2초 간격
                 m_StartAniCount++;
                 if (m_StartAniCount > 1) m_StartAniCount = 0;
-                m_StartAniTime = GetTickCount();
+                m_StartAniTime = TIMEMGR->GetGameTime();
             }
         }
         // 무적 시간 1.5초(1500ms) 해제 로직
-        if (isInvincible && (GetTickCount() - invincibleTime > 1500)) {
+        if (isInvincible && (TIMEMGR->GetGameTime() - invincibleTime > 1500)) {
             isInvincible = false;
         }
         // ========================================================
@@ -160,7 +178,7 @@ void Knight::Update()
         // ========================================================
         if (isAttacking)
         {
-            DWORD attackTime = GetTickCount() - attackStartTime;
+            DWORD attackTime = TIMEMGR->GetGameTime() - attackStartTime;
 
             // 공격 지속 시간 (예: 300ms = 0.3초 동안 공격)
             if (attackTime > 300)
@@ -214,7 +232,7 @@ void Knight::Update()
         // [대시 중]
         if (isDashing)
         {
-            if (GetTickCount() - dashStartTime > 200) // 대시 지속시간 끝
+            if (TIMEMGR->GetGameTime() - dashStartTime > 200) // 대시 지속시간 끝
             {
                 isDashing = false;
                 gravity = 0;
@@ -354,12 +372,12 @@ void Knight::Update()
         // ========================================================
         // 3단계: 애니메이션 처리
         // ========================================================
-        if (GetTickCount() - m_KnightAniTime > 50)
+        if (TIMEMGR->GetGameTime() - m_KnightAniTime > 50)
         {
             // 공격 애니메이션이 최우선!
             if (isAttacking)
             {
-                DWORD attackTime = GetTickCount() - attackStartTime;
+                DWORD attackTime = TIMEMGR->GetGameTime() - attackStartTime;
                 int frameOffset = 0;
                 if (attackTime < 100)      frameOffset = 0;
                 else if (attackTime < 200) frameOffset = 1;
@@ -372,7 +390,7 @@ void Knight::Update()
             }
             else if (isDashing)
             {
-                DWORD dashTime = GetTickCount() - dashStartTime;
+                DWORD dashTime = TIMEMGR->GetGameTime() - dashStartTime;
                 if (dashTime < 50)       m_KnightCount = 11;
                 else if (dashTime < 100) m_KnightCount = 12;
                 else if (dashTime < 150) m_KnightCount = 13;
@@ -392,7 +410,7 @@ void Knight::Update()
                 else if (gravity < 4.0f) m_KnightCount = 8;
                 else m_KnightCount = 9;
             }
-            m_KnightAniTime = GetTickCount();
+            m_KnightAniTime = TIMEMGR->GetGameTime();
         }
     }
 }
@@ -530,7 +548,7 @@ void Knight::Draw()
             bossStartImg[m_StartAniCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
         }
         // 🌟 무적 시간일 때 0.1초 단위로 깜빡이기 (짝수 틱에만 렌더링 무시)
-        else if (isInvincible && ((GetTickCount() / 100) % 2 == 0)) {
+        else if (isInvincible && ((TIMEMGR->GetGameTime() / 100) % 2 == 0)) {
             // 이 프레임은 기사를 그리지 않고 넘김 (깜빡깜빡)
         }
         else 
@@ -669,7 +687,7 @@ void Knight::JumpCut()
 // 대시 시작
 void Knight::DashStart()
 {
-    DWORD curTime = GetTickCount64();
+    DWORD curTime = TIMEMGR->GetGameTime();
 
     // 1. 쿨타임 체크 (0.5초 = 500ms)
     if (curTime - dashCooldownTime < 500) return;
@@ -691,43 +709,62 @@ void Knight::DashStart()
 void Knight::AttackStart()
 {
     if (isAttacking || isDashing) return;
-
-    // 1. 전체 공격 쿨타임 체크 (500ms)
-    if (GetTickCount() - lastAttackTime < 500) return;
+    if (TIMEMGR->GetGameTime() - lastAttackTime < 500) return;
 
     isAttacking = true;
-    float eX = knight.pos.x + (knight.dir == 1 ? -60 : 60);
-    if (knight.attackType == 0) EFFECT->Play(EF_UNHIT, eX, knight.pos.y - 30, knight.dir == 1 ? 1 : -1);
-    else if (knight.attackType == 1) EFFECT->Play(EF_UNHIT_UPDOWN, knight.pos.x, knight.pos.y - 80, knight.dir, -1.0f);
-    else if (knight.attackType == 2) EFFECT->Play(EF_UNHIT_UPDOWN, knight.pos.x, knight.pos.y + 50, knight.dir, 1.0f);
     isAttackHit = false;
-    attackStartTime = GetTickCount();
-    lastAttackTime = GetTickCount(); // 쿨타임 타이머 시작
+    attackStartTime = TIMEMGR->GetGameTime(); // (이 부분은 이따 3단계에서 바꿀 겁니다!)
+    lastAttackTime = TIMEMGR->GetGameTime();
 
-    // 🌟 2. 키 입력 조합으로 공격 타입 결정
-    if (!grounded && isLookdown) {
-        attackType = 2; // 공중 + 아래키 = 하단 찍기
-    }
-    else if (isLookup) {
-        attackType = 1; // 위키 = 상단 공격
-    }
-    else {
-        attackType = 0; // 일반 측면 공격
-    }
+    // 🌟 1. 키 입력 조합으로 공격 타입 결정 (여기서 타입이 완벽히 굳어집니다)
+    if (!grounded && isLookdown) attackType = 2; // 하단
+    else if (isLookup) attackType = 1;           // 상단
+    else attackType = 0;                         // 측면
+
+    // =======================================================
+    // 🌟 2. [버그 수정] 이펙트는 무조건 attackType을 기준으로 여기서 스폰!
+    // (이외의 위치에 허공 스윙(Unhit) 이펙트를 띄우는 코드가 있다면 모두 지워주세요!)
+    // =======================================================
+    float eX = pos.x + (dir == 1 ? -60 : 60);
+    if (attackType == 0)      EFFECT->Play(EF_UNHIT, eX, pos.y - 30, dir);
+    else if (attackType == 1) EFFECT->Play(EF_UNHIT_UPDOWN, pos.x, pos.y - 80, dir, -1.0f);
+    else if (attackType == 2) EFFECT->Play(EF_UNHIT_UPDOWN, pos.x, pos.y + 50, dir, 1.0f);
 }
 
 void Knight::TakeDamage(int damage, int hitDir)
 {
-    if (isInvincible || isDashing) return;
+    if (isInvincible || isDashing || isDead) return;
 
     hp -= damage;
     if (hp <= 0) hp = 0; // 나중에 게임오버 처리용
 
-    isInvincible = true;
-    invincibleTime = GetTickCount();
+    // =======================================================
+    // 🌟 [사망 처리] 체력이 0 이하가 되었을 때
+    // =======================================================
+    if (hp <= 0) {
+        hp = 0;
+        isDead = true;
+        deadTime = TIMEMGR->GetGameTime(); // 죽은 시간 기록
+
+        // 죽는 순간 휘두르던 칼 취소
+        isAttacking = false;
+        isAttackHit = false;
+        SetRect(&attackBox, 0, 0, 0, 0);
+
+        // 🌟 타임 슬로우를 여기서 딱 한 번만 발동! (2초간 20% 속도)
+        TIMEMGR->SetTimeSlow(0.2f, 2000);
+
+        return; // 죽었을 땐 일반 피격의 무적 타이머나 넉백을 생략하고 여기서 함수 종료!
+    }
 
     // =======================================================
-    // 🌟 [버그 수정] 맞으면 즉시 공격 상태 해제 및 타격 박스 소멸!
+    // 살아있을 때의 일반 피격 처리
+    // =======================================================
+    isInvincible = true;
+    invincibleTime = TIMEMGR->GetGameTime();
+
+    // =======================================================
+    // 맞으면 즉시 공격 상태 해제 및 타격 박스 소멸!
     // =======================================================
     isAttacking = false;
     isAttackHit = false;

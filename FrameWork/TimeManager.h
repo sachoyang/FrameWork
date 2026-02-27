@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include "Include.h"
 
 class TimeManager
 {
 private:
-    TimeManager();  // ½Ì±ÛÅæÀ» À§ÇØ private Ã³¸®
+    TimeManager();  // ì‹±ê¸€í†¤ì„ ìœ„í•´ private ì²˜ë¦¬
     ~TimeManager();
 
     DWORD m_HitStopTime;
@@ -16,23 +16,31 @@ private:
     DWORD m_TimeSlowStartTime;
     DWORD m_TimeSlowDuration;
 
+    // ì¸ê²Œì„ ì ˆëŒ€ ì‹œê°„ ë³€ìˆ˜
+    DWORD m_GameTime;
+    DWORD m_PrevRealTime;
+
 public:
-    // ½Ì±ÛÅæ ÀÎ½ºÅÏ½º ¹İÈ¯
+    // ì‹±ê¸€í†¤ ì¸ìŠ¤í„´ìŠ¤ ë°˜í™˜
     static TimeManager* GetInstance() {
         static TimeManager instance;
         return &instance;
     }
 
     void Init();
-    void ResetTime(); // ¸Ê ÀÌµ¿ ½Ã ½Ã°£ °­Á¦ Á¤»óÈ­¿ë
+    void ResetTime(); // ë§µ ì´ë™ ì‹œ ì‹œê°„ ê°•ì œ ì •ìƒí™”ìš©
 
-    // ¿ÜºÎ¿¡¼­ È£ÃâÇÒ 2°³ÀÇ ÇÙ½É ¹«±â!
-    void SetHitStop(DWORD duration);                      // ¿ª°æÁ÷
-    void SetTimeSlow(float scale, DWORD duration);        // Å¸ÀÓ ½½·Î¿ì
+    // ì‹œê°„ ê°±ì‹  ë° ê°€ì ¸ì˜¤ê¸° í•¨ìˆ˜
+    void UpdateTime();
+    DWORD GetGameTime() { return m_GameTime; }
 
-    // °ÔÀÓ ·çÇÁ°¡ ¸Å ÇÁ·¹ÀÓ ¹°¾îº¼ ÇÔ¼ö
+    // ì™¸ë¶€ì—ì„œ í˜¸ì¶œí•  2ê°œì˜ í•µì‹¬ ë¬´ê¸°!
+    void SetHitStop(DWORD duration);                      // ì—­ê²½ì§
+    void SetTimeSlow(float scale, DWORD duration);        // íƒ€ì„ ìŠ¬ë¡œìš°
+
+    // ê²Œì„ ë£¨í”„ê°€ ë§¤ í”„ë ˆì„ ë¬¼ì–´ë³¼ í•¨ìˆ˜
     bool IsTimeStopped();
 };
 
-// ¾îµğ¼­µç TIMEMGR-> ÇÔ¼ö() ÇüÅÂ·Î ¾µ ¼ö ÀÖ°Ô ¸ÅÅ©·Î Á¤ÀÇ
+// ì–´ë””ì„œë“  TIMEMGR-> í•¨ìˆ˜() í˜•íƒœë¡œ ì“¸ ìˆ˜ ìˆê²Œ ë§¤í¬ë¡œ ì •ì˜
 #define TIMEMGR TimeManager::GetInstance()

@@ -30,6 +30,10 @@ public:
 	bool isMove;
 	bool isLookup, isLookdown;
 
+	// 사망 상태 및 시간 기록용 변수
+	bool isDead;
+	DWORD deadTime;
+
 	bool isDashing;         // 현재 대시 중인가?
 	bool canAirDash;        // 공중 대시 가능한가? (점프 후 1회 제한)
 

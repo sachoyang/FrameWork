@@ -28,7 +28,7 @@ void EffectManager::Play(int type, float x, float y, int dir, float scaleY) {
     EffectObj obj;
     obj.type = type;   obj.x = x;           obj.y = y;
     obj.dir = dir;     obj.scaleY = scaleY;
-    obj.spawnTime = GetTickCount(); obj.lastFrameTime = GetTickCount();
+    obj.spawnTime = TIMEMGR->GetGameTime(); obj.lastFrameTime = TIMEMGR->GetGameTime();
     obj.currentFrame = 0; obj.isDead = false;
 
     // 🌟 이펙트 종류에 따른 애니메이션/유지시간 세팅
@@ -53,7 +53,7 @@ void EffectManager::Update() {
     if (TIMEMGR->IsTimeStopped()) return; // 🌟 시간 정지 시 이펙트도 같이 멈춤!
 
     for (auto it = m_Effects.begin(); it != m_Effects.end(); ) {
-        DWORD curTime = GetTickCount();
+        DWORD curTime = TIMEMGR->GetGameTime();
         if (it->isAnimation) {
             if (curTime - it->lastFrameTime > it->duration) {
                 it->currentFrame++;

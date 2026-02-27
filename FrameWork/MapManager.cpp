@@ -2381,9 +2381,12 @@ void MapManager::Update(double frame)
 		}
 	}
 
-	// 기사의 HP가 0이 되어 죽는 순간! (2초간 20% 속도로 슬로우 연출)
-	if (knight.hp <= 0) {
-		TIMEMGR->SetTimeSlow(0.2f, 2000);
+	// =======================================================
+	// 게임오버 씬(OVER) 전환 연출
+	// =======================================================
+	if (knight.isDead && (GetTickCount() - knight.deadTime > 2000)) {
+		// 2초의 슬로우 모션 연출이 끝나면 게임오버 씬으로 넘깁니다!
+		g_Mng.n_Chap = OVER; // (혹시 Define.h에 게임오버 씬 변수 이름이 OVER가 아니라면 맞게 수정해 주세요!)
 	}
 
 }
