@@ -2271,6 +2271,7 @@ void MapManager::Update(double frame)
 					knight.isAttackHit = true;
 					e->TakeDamage(1, knight.dir == 1 ? -1 : 1); // 때린 방향으로 넉백
 
+
 					if (knight.attackType == 2) { // 하단 찍기 포고 점프!
 						knight.gravity = -13.0f;
 						// 강제로 공중 판정을 주고, 바닥에서 5픽셀 강제로 뜯어냅니다! (끼임 방지)
@@ -2310,6 +2311,7 @@ void MapManager::Update(double frame)
 				if (isHitByBoss) {
 					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
 					knight.TakeDamage(1, pushDir);
+
 				}
 			}
 		}
@@ -2353,9 +2355,10 @@ void MapManager::Update(double frame)
 		bool isAnyBossDead = (b1 && b1->state == B_STATE_DIE) || (b2 && b2->state == B_STATE_DIE);
 
 		if (isAnyBossDead && b3 && b3->state == B_STATE_SLEEP) {
-			b3->ChangeState(1 /*B_STATE_AWAKE_ROAR*/);
+			b3->ChangeState(B_STATE_AWAKE_ROAR);
 		}
 	}
+
 }
 void MapManager::Draw()
 {

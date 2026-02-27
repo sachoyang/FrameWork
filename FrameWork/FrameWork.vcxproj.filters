@@ -55,6 +55,9 @@
     <Filter Include="소스 파일\Enemy">
       <UniqueIdentifier>{d1102c0b-61ae-4346-8471-e528b1640582}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Time">
+      <UniqueIdentifier>{6815745f-0202-4242-9866-76975f6fb3a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -132,6 +135,9 @@
     <ClInclude Include="Boss.h">
       <Filter>소스 파일\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="TimeManager.h">
+      <Filter>소스 파일\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="key.cpp">
@@ -202,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="Boss.cpp">
       <Filter>소스 파일\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeManager.cpp">
+      <Filter>소스 파일\Time</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
