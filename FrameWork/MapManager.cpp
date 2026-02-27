@@ -1940,6 +1940,9 @@ void MapManager::ChangeMap(int mapID)
 	// 맵을 36개까지 쓰기로 했으니, 제한을 40으로
 	if (mapID < 1 || mapID >= 40) return;
 
+	// 맵 바뀔 때 타임 엔진 초기화!
+	TIMEMGR->ResetTime();
+
 	m_pCurrentMapChunk = &m_MapList[mapID];
 
 	CAM->SetMapSize(m_pCurrentMapChunk->width, m_pCurrentMapChunk->height);
@@ -2271,6 +2274,8 @@ void MapManager::Update(double frame)
 					knight.isAttackHit = true;
 					e->TakeDamage(1, knight.dir == 1 ? -1 : 1); // 때린 방향으로 넉백
 
+					// 기사가 때리면 0.04초 정지 (손맛)
+					TIMEMGR->SetHitStop(40);
 
 					if (knight.attackType == 2) { // 하단 찍기 포고 점프!
 						knight.gravity = -13.0f;
@@ -2312,6 +2317,8 @@ void MapManager::Update(double frame)
 					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
 					knight.TakeDamage(1, pushDir);
 
+					// 기사가 맞으면 0.15초 뼈아픈 정지
+					TIMEMGR->SetHitStop(150);
 				}
 			}
 		}
@@ -2357,6 +2364,16 @@ void MapManager::Update(double frame)
 		if (isAnyBossDead && b3 && b3->state == B_STATE_SLEEP) {
 			b3->ChangeState(B_STATE_AWAKE_ROAR);
 		}
+
+		// 3번 보스가 죽는 순간! (3초간 30% 속도로 슬로우 연출)
+		if (b3 && b3->state == B_STATE_DIE) {
+			TIMEMGR->SetTimeSlow(0.3f, 3000);
+		}
+	}
+
+	// 기사의 HP가 0이 되어 죽는 순간! (2초간 20% 속도로 슬로우 연출)
+	if (knight.hp <= 0) {
+		TIMEMGR->SetTimeSlow(0.2f, 2000);
 	}
 
 }
