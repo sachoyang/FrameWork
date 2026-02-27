@@ -6,8 +6,8 @@ class Knight
 public:
 	Sprite Knightimg[25];
 
-	Sprite hitEffect[2];
-	Sprite unhitEffect[2];
+	/*Sprite hitEffect[2];
+	Sprite unhitEffect[2];*/
 
 	float gravity;
 	bool grounded;

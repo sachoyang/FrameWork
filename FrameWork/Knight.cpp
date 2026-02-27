@@ -93,17 +93,17 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/attackdown02.png"); Knightimg[22].Create(FileName, false, 0);
     sprintf_s(FileName, "./resource/Img/knight1/attackdown03.png"); Knightimg[23].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/effect/hit.png");
-    hitEffect[0].Create(FileName, false, 0);
+    //sprintf_s(FileName, "./resource/Img/effect/hit.png");
+    //hitEffect[0].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/effect/unhit.png");
-    unhitEffect[0].Create(FileName, false, 0);
+    //sprintf_s(FileName, "./resource/Img/effect/unhit.png");
+    //unhitEffect[0].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/effect/hitdown.png");
-    hitEffect[1].Create(FileName, false, 0);
+    //sprintf_s(FileName, "./resource/Img/effect/hitdown.png");
+    //hitEffect[1].Create(FileName, false, 0);
 
-    sprintf_s(FileName, "./resource/Img/effect/unhitdown.png");
-    unhitEffect[1].Create(FileName, false, 0);
+    //sprintf_s(FileName, "./resource/Img/effect/unhitdown.png");
+    //unhitEffect[1].Create(FileName, false, 0);
 
     sprintf_s(FileName, "./resource/Img/knight1/bossstart01.png");
     bossStartImg[0].Create(FileName, false, 0);
@@ -549,39 +549,39 @@ void Knight::Draw()
             // 2. hit / unhit 상태에 따른 공격 이펙트 그리기
             // =======================================================
 
-            if (isAttacking)
-            {
-                float renderX = pos.x - CAM->GetX();
-                float renderY = pos.y - CAM->GetY();
+            //if (isAttacking)
+            //{
+            //    float renderX = pos.x - CAM->GetX();
+            //    float renderY = pos.y - CAM->GetY();
 
-                if (attackType == 0) // [측면 공격]
-                {
-                    float effectOffsetX = 60.0f;
-                    float effectOffsetY = -30.0f;
+            //    if (attackType == 0) // [측면 공격]
+            //    {
+            //        float effectOffsetX = 60.0f;
+            //        float effectOffsetY = -30.0f;
 
-                    if (dir == -1) // 오른쪽 (반전 필요)
-                    {
-                        if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
-                        else             unhitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
-                    }
-                    else // 왼쪽 (dir == 1, 원본)
-                    {
-                        if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
-                        else             unhitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
-                    }
-                }
-                else // [상단 / 하단 공격] -> hitEffect[1] 사용
-                {
-                    float effectOffsetX = 0.0f; // 몸의 중심에서 나감
-                    float effectOffsetY = (attackType == 1) ? -80.0f : 50.0f; // 위 공격은 마이너스, 아래는 플러스 좌표
+            //        if (dir == -1) // 오른쪽 (반전 필요)
+            //        {
+            //            if (isAttackHit) hitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
+            //            else             unhitEffect[0].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, -1, 1, 1);
+            //        }
+            //        else // 왼쪽 (dir == 1, 원본)
+            //        {
+            //            if (isAttackHit) hitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
+            //            else             unhitEffect[0].Render(renderX - effectOffsetX, renderY + effectOffsetY, 0, 1, 1, 1);
+            //        }
+            //    }
+            //    else // [상단 / 하단 공격] -> hitEffect[1] 사용
+            //    {
+            //        float effectOffsetX = 0.0f; // 몸의 중심에서 나감
+            //        float effectOffsetY = (attackType == 1) ? -80.0f : 50.0f; // 위 공격은 마이너스, 아래는 플러스 좌표
 
-                    // 기본이 하단 이펙트이므로, 상단 공격(1)일 때는 Y축 크기를 -1로 주어 위아래 반전시킴!
-                    float scaleY = (attackType == 1) ? -1.0f : 1.0f;
+            //        // 기본이 하단 이펙트이므로, 상단 공격(1)일 때는 Y축 크기를 -1로 주어 위아래 반전시킴!
+            //        float scaleY = (attackType == 1) ? -1.0f : 1.0f;
 
-                    if (isAttackHit) hitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
-                    else             unhitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
-                }
-            }
+            //        if (isAttackHit) hitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
+            //        else             unhitEffect[1].Render(renderX + effectOffsetX, renderY + effectOffsetY, 0, dir, scaleY, 1);
+            //    }
+            //}
 
             //if (isAttacking)
             //{
@@ -649,7 +649,7 @@ void Knight::JumpStart()
         // 최대 점프력 설정 (값이 클수록 높이 뜀)
         gravity = -20.0f;
         grounded = false;
-
+        EFFECT->Play(EF_JUMP_DUST, pos.x, pos.y); // 점프 먼지 스폰!
         // 점프 소리 재생 (필요 시)
         // sound.Play("Jump");
     }
@@ -679,6 +679,7 @@ void Knight::DashStart()
 
     // 3. 대시
     isDashing = true;
+    EFFECT->Play(EF_DASH_DUST, pos.x + (dir == 1 ? 40 : -40), pos.y, dir); // 대시 먼지 스폰!
     dashStartTime = curTime;
     dashCooldownTime = curTime;
     gravity = 0; // 중력 제거 (일직선 이동)
@@ -695,6 +696,10 @@ void Knight::AttackStart()
     if (GetTickCount() - lastAttackTime < 500) return;
 
     isAttacking = true;
+    float eX = knight.pos.x + (knight.dir == 1 ? -60 : 60);
+    if (knight.attackType == 0) EFFECT->Play(EF_UNHIT, eX, knight.pos.y - 30, knight.dir == 1 ? 1 : -1);
+    else if (knight.attackType == 1) EFFECT->Play(EF_UNHIT_UPDOWN, knight.pos.x, knight.pos.y - 80, knight.dir, -1.0f);
+    else if (knight.attackType == 2) EFFECT->Play(EF_UNHIT_UPDOWN, knight.pos.x, knight.pos.y + 50, knight.dir, 1.0f);
     isAttackHit = false;
     attackStartTime = GetTickCount();
     lastAttackTime = GetTickCount(); // 쿨타임 타이머 시작
@@ -720,6 +725,13 @@ void Knight::TakeDamage(int damage, int hitDir)
 
     isInvincible = true;
     invincibleTime = GetTickCount();
+
+    // =======================================================
+    // 🌟 [버그 수정] 맞으면 즉시 공격 상태 해제 및 타격 박스 소멸!
+    // =======================================================
+    isAttacking = false;
+    isAttackHit = false;
+    SetRect(&attackBox, 0, 0, 0, 0);
 
     // 기사 넉백 (공중으로 띄우고 뒤로 밀어냄)
     isKnockback = true;

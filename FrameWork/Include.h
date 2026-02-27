@@ -99,7 +99,7 @@
 #include "MapManager.h" 
 #include "UIManager.h"  
 #include "TimeManager.h"
-
+#include "EffectManager.h"
 // =========================================
 // 4단계: 최상위 게임 루프
 // =========================================

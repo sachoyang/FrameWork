@@ -58,6 +58,9 @@
     <Filter Include="소스 파일\Time">
       <UniqueIdentifier>{6815745f-0202-4242-9866-76975f6fb3a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Effect">
+      <UniqueIdentifier>{28b4af17-06d3-4ded-a24a-5285c416a750}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -138,6 +141,9 @@
     <ClInclude Include="TimeManager.h">
       <Filter>소스 파일\Time</Filter>
     </ClInclude>
+    <ClInclude Include="EffectManager.h">
+      <Filter>소스 파일\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="key.cpp">
@@ -211,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="TimeManager.cpp">
       <Filter>소스 파일\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectManager.cpp">
+      <Filter>소스 파일\Effect</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 struct CameraPos
 {
@@ -10,33 +10,37 @@ struct CameraPos
 class Camera
 {
 private:
-	//	À¯ÀÏÇÑ °´Ã¼
-	// ¸ÕÀú µ¥ÀÌÅ¸ ¿µ¿ª¿¡ ¿Ã¶ó°¨
+	//	ìœ ì¼í•œ ê°ì²´
+	// ë¨¼ì € ë°ì´íƒ€ ì˜ì—­ì— ì˜¬ë¼ê°
 	static Camera* m_pInstance;
 	CameraPos camPos;
 
+	float m_ShakeIntensity;   // í”ë“¤ë¦¼ ê°•ë„
+	DWORD m_ShakeEndTime;     // í”ë“¤ë¦¼ ëë‚˜ëŠ” ì‹œê°„
 public:
 	Camera(void);
 	~Camera(void);
 
-	//	°´Ã¼ ¾ò±â
+	//	ê°ì²´ ì–»ê¸°
 	static Camera*	GetInstance();
 
-	// ¸Ê ÀüÃ¼ Å©±â (ÀÌ ¹ÛÀ¸·Î Ä«¸Ş¶ó°¡ ¸ø ³ª°¨)
+	// ë§µ ì „ì²´ í¬ê¸° (ì´ ë°–ìœ¼ë¡œ ì¹´ë©”ë¼ê°€ ëª» ë‚˜ê°)
 	int mapWidth, mapHeight;
 
-	// Ä«¸Ş¶ó°¡ µû¶ó´Ù´Ò ´ë»ó (ÇÃ·¹ÀÌ¾î ÁÂÇ¥ Æ÷ÀÎÅÍ)
+	// ì¹´ë©”ë¼ê°€ ë”°ë¼ë‹¤ë‹ ëŒ€ìƒ (í”Œë ˆì´ì–´ ì¢Œí‘œ í¬ì¸í„°)
 	D3DXVECTOR2* target;
+
+	void Shake(float intensity, DWORD duration); // í”ë“¤ê¸° í˜¸ì¶œ í•¨ìˆ˜!
 
 	void SetXCam(double);
 	void SetYCam(double);
 
-	// ÃÊ±âÈ­ ¹× ¼³Á¤ ÇÔ¼ö
+	// ì´ˆê¸°í™” ë° ì„¤ì • í•¨ìˆ˜
 	void Init();
 	void SetTarget(D3DXVECTOR2* _target);
 	void SetMapSize(int w, int h);
 
-	// ¿ÜºÎ¿¡¼­ Ä«¸Ş¶ó À§Ä¡¸¦ °¡Á®°¥ ¼ö ÀÖ°Ô ÇØÁÖ´Â ÇÔ¼ö
+	// ì™¸ë¶€ì—ì„œ ì¹´ë©”ë¼ ìœ„ì¹˜ë¥¼ ê°€ì ¸ê°ˆ ìˆ˜ ìˆê²Œ í•´ì£¼ëŠ” í•¨ìˆ˜
 	double GetX() { return camPos.posX; }
 	double GetY() { return camPos.posY; }
 

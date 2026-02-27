@@ -1,17 +1,17 @@
-#include "Include.h"
+ï»¿#include "Include.h"
 
 
 Camera cam;
 
-//	À¯ÀÏ °´Ã¼ (µ¥ÀÌÅ¸ ¿µ¿ª¿¡ ¿Ã¶ó°£ º¯¼ö¿¡ ÃÊ±â°ª À» nullptr ·Î ¼ÂÆÃ)
-//  ÀÌ ·ÎÁ÷Àº ÇÁ·Î±×·¥ ½ÃÀÛÀü¿¡(main È£Ãâ) ½ÇÇàµÈ´Ù.
+//	ìœ ì¼ ê°ì²´ (ë°ì´íƒ€ ì˜ì—­ì— ì˜¬ë¼ê°„ ë³€ìˆ˜ì— ì´ˆê¸°ê°’ ì„ nullptr ë¡œ ì…‹íŒ…)
+//  ì´ ë¡œì§ì€ í”„ë¡œê·¸ëž¨ ì‹œìž‘ì „ì—(main í˜¸ì¶œ) ì‹¤í–‰ëœë‹¤.
 Camera * Camera::m_pInstance = nullptr;
 
 Camera* Camera::GetInstance()
 {
 	if (m_pInstance == nullptr)
 	{
-		// Èü ¸Þ¸ð¸®¿¡ °´Ã¼ ÇÒ´ç and µ¥ÀÌÅ¸ ¿µ¿ªÀÇ ÂüÁ¶ º¯¼ö¿¡ ÁÖ¼Ò ÇÒ´ç
+		// íž™ ë©”ëª¨ë¦¬ì— ê°ì²´ í• ë‹¹ and ë°ì´íƒ€ ì˜ì—­ì˜ ì°¸ì¡° ë³€ìˆ˜ì— ì£¼ì†Œ í• ë‹¹
 		m_pInstance = new Camera();
 	}
 
@@ -37,7 +37,7 @@ void Camera::Init()
 {
 	camPos.posX = 0;
 	camPos.posY = 0;
-	// ±âº»°ªÀº È­¸é Å©±â¿Í °°°Ô ¼³Á¤ (µû·Î ¼³Á¤ ¾È ÇÏ¸é °íÁ¤µÊ)
+	// ê¸°ë³¸ê°’ì€ í™”ë©´ í¬ê¸°ì™€ ê°™ê²Œ ì„¤ì • (ë”°ë¡œ ì„¤ì • ì•ˆ í•˜ë©´ ê³ ì •ë¨)
 	mapWidth = SCREEN_WITH;
 	mapHeight = SCREEN_HEIGHT;
 	target = nullptr;
@@ -54,37 +54,50 @@ void Camera::SetMapSize(int w, int h)
 	mapHeight = h;
 }
 
-void Camera::Update() // ¿ø·¡´Â ¸ðµç Å¬·¡½º¸¦ ´ÙÇü¼ºÀ¸·Î ¹è¿­·Î ÂüÁ¶ÇÏ¿© °ªÀ» ÀüºÎ º¯°æ(¸®½ºÆ®?)
+void Camera::Update() // ì›ëž˜ëŠ” ëª¨ë“  í´ëž˜ìŠ¤ë¥¼ ë‹¤í˜•ì„±ìœ¼ë¡œ ë°°ì—´ë¡œ ì°¸ì¡°í•˜ì—¬ ê°’ì„ ì „ë¶€ ë³€ê²½(ë¦¬ìŠ¤íŠ¸?)
 {
-	// ÀÏ´Ü ¸Ê Ã³¸®...
+	// ì¼ë‹¨ ë§µ ì²˜ë¦¬...
 	/*mapMng.posX = camPos.posX;
 	mapMng.posY = camPos.posY;*/
 
-	// Å¸°Ù(ÇÃ·¹ÀÌ¾î)ÀÌ ¾øÀ¸¸é ¾Æ¹«°Íµµ ¾È ÇÔ
+	// íƒ€ê²Ÿ(í”Œë ˆì´ì–´)ì´ ì—†ìœ¼ë©´ ì•„ë¬´ê²ƒë„ ì•ˆ í•¨
 	if (target == nullptr) return;
 
 	// =============================================================
-	// 1. Áß¾Ó Á¤·Ä °è»ê
-	// ¸ñÇ¥: Ä³¸¯ÅÍ°¡ È­¸é Á¤Áß¾Ó¿¡ ¿À°Ô Ä«¸Þ¶ó ÁÂÇ¥¸¦ ÀâÀ½
-	// °ø½Ä: Ä³¸¯ÅÍÀ§Ä¡ - (È­¸éÅ©±â / 2)
+	// 1. ì¤‘ì•™ ì •ë ¬ ê³„ì‚°
+	// ëª©í‘œ: ìºë¦­í„°ê°€ í™”ë©´ ì •ì¤‘ì•™ì— ì˜¤ê²Œ ì¹´ë©”ë¼ ì¢Œí‘œë¥¼ ìž¡ìŒ
+	// ê³µì‹: ìºë¦­í„°ìœ„ì¹˜ - (í™”ë©´í¬ê¸° / 2)
 	// =============================================================
 	camPos.posX = target->x - (SCREEN_WITH / 2.0f);
 	camPos.posY = target->y - (SCREEN_HEIGHT / 2.0f);
 
 	// =============================================================
-	// 2. ¸Ê ¹ÛÀ¸·Î ¸ø ³ª°¡°Ô °¡µÎ±â (Clamping)
+	// 2. ë§µ ë°–ìœ¼ë¡œ ëª» ë‚˜ê°€ê²Œ ê°€ë‘ê¸° (Clamping)
 	// =============================================================
 
-	// ¿ÞÂÊ & À§ÂÊ Á¦ÇÑ (0º¸´Ù ÀÛ¾ÆÁú ¼ö ¾øÀ½)
+	// ì™¼ìª½ & ìœ„ìª½ ì œí•œ (0ë³´ë‹¤ ìž‘ì•„ì§ˆ ìˆ˜ ì—†ìŒ)
 	if (camPos.posX < 0) camPos.posX = 0;
 	if (camPos.posY < 0) camPos.posY = 0;
 
-	// ¿À¸¥ÂÊ & ¾Æ·¡ÂÊ Á¦ÇÑ (¸Ê ³¡ - È­¸é Å©±â º¸´Ù Ä¿Áú ¼ö ¾øÀ½)
+	// ì˜¤ë¥¸ìª½ & ì•„ëž˜ìª½ ì œí•œ (ë§µ ë - í™”ë©´ í¬ê¸° ë³´ë‹¤ ì»¤ì§ˆ ìˆ˜ ì—†ìŒ)
 	if (camPos.posX > mapWidth - SCREEN_WITH)
 		camPos.posX = (float)(mapWidth - SCREEN_WITH);
 
 	if (camPos.posY > mapHeight - SCREEN_HEIGHT)
 		camPos.posY = (float)(mapHeight - SCREEN_HEIGHT);
+
+	if (GetTickCount() < m_ShakeEndTime) {
+		float offsetX = ((rand() % 200) - 100) / 100.0f * m_ShakeIntensity;
+		float offsetY = ((rand() % 200) - 100) / 100.0f * m_ShakeIntensity;
+		camPos.posX += offsetX;
+		camPos.posY += offsetY;
+	}
+}
+
+void Camera::Shake(float intensity, DWORD duration)
+{
+	m_ShakeIntensity = intensity;
+	m_ShakeEndTime = GetTickCount() + duration;
 }
 
 void Camera::SetXCam(double x)
@@ -97,4 +110,4 @@ void Camera::SetYCam(double y)
 	camPos.posY += y;
 }
 
-// Singleton µðÀÚÀÎ ÆÐÅÏÀ¸·Î extern ¼±¾ð ¾ÈÇØµµ µÊ (°øºÎ¿ë)
+// Singleton ë””ìžì¸ íŒ¨í„´ìœ¼ë¡œ extern ì„ ì–¸ ì•ˆí•´ë„ ë¨ (ê³µë¶€ìš©)

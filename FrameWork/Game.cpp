@@ -19,6 +19,7 @@ void Game::Init()
 	//player.Init();
 	sound.Init();
 	Gmanager.Init();
+	EFFECT->Init();
 	uiMng.Init();
 	// 데이타 베이스///////////////////
 	//sql.Init();
@@ -29,6 +30,7 @@ void Game::Draw()
 	mapMng.Draw();
 	//bird.Draw();
 	knight.Draw();
+	EFFECT->Draw();
 	//player.Draw();
 	coll.Draw();
 	Gmanager.Draw();
@@ -68,6 +70,8 @@ void Game::Update(double frame)
 			coll.Update();
 			mapMng.Update(130);
 			Gmanager.Update();
+
+			EFFECT->Update();
 
 			CAM->Update(); // 카메라 업데이트
 		}

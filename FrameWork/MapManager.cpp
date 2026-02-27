@@ -2276,6 +2276,13 @@ void MapManager::Update(double frame)
 
 					// 기사가 때리면 0.04초 정지 (손맛)
 					TIMEMGR->SetHitStop(40);
+					CAM->Shake(8.0f, 100); //카메라 흔들림 효과 (강도 8, 지속시간 0.1초)
+
+					// 🌟 방향에 따른 이펙트 타입 및 좌표 계산 후 스폰
+					float eX = knight.pos.x + (knight.dir == 1 ? -60 : 60);
+					if (knight.attackType == 0) EFFECT->Play(EF_HIT, eX, knight.pos.y - 30, knight.dir == 1 ? 1 : -1);
+					else if (knight.attackType == 1) EFFECT->Play(EF_HIT_UPDOWN, knight.pos.x, knight.pos.y - 80, knight.dir, -1.0f);
+					else if (knight.attackType == 2) EFFECT->Play(EF_HIT_UPDOWN, knight.pos.x, knight.pos.y + 50, knight.dir, 1.0f);
 
 					if (knight.attackType == 2) { // 하단 찍기 포고 점프!
 						knight.gravity = -13.0f;
@@ -2290,7 +2297,7 @@ void MapManager::Update(double frame)
 			if (!knight.isInvincible) {
 				bool isHitByBoss = false;
 
-				// 🌟 A. 보스의 무기 공격(attackBox)에 맞았는가?
+				// A. 보스의 무기 공격(attackBox)에 맞았는가?
 				if (e->type == 3) {
 					BossEnemy* b = (BossEnemy*)e;
 					if (b->isAttacking && IntersectRect(&temp, &knight.m_rc, &b->attackBox)) {
@@ -2298,7 +2305,7 @@ void MapManager::Update(double frame)
 					}
 				}
 
-				// 🌟 B. 일반적인 몸통 박치기에 맞았는가?
+				// B. 일반적인 몸통 박치기에 맞았는가?
 				if (e->CanDealDamage() && IntersectRect(&temp, &knight.m_rc, &e->m_rc)) {
 					isHitByBoss = true;
 
@@ -2319,6 +2326,9 @@ void MapManager::Update(double frame)
 
 					// 기사가 맞으면 0.15초 뼈아픈 정지
 					TIMEMGR->SetHitStop(150);
+
+					CAM->Shake(15.0f, 200); // 세게 맞았으니 더 강하게(강도 15) 흔들림!
+					EFFECT->Play(EF_HIT, knight.pos.x, knight.pos.y, pushDir); // 기사 피격 이펙트
 				}
 			}
 		}
