@@ -5,7 +5,7 @@
 Logo::Logo()
 {
 	// 데이타 베이스 관련
-	sql.mysql_Success = false;
+	//sql.mysql_Success = false;
 	// 데이타 베이스 테스트 관련
 	count = 0; //g_Mng.n_Chap = GAME;
 }

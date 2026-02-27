@@ -164,7 +164,10 @@
     <ClInclude Include="Logo.h" />
     <ClInclude Include="MapManager.h" />
     <ClInclude Include="Menu.h" />
-    <ClInclude Include="Mysql.h" />
+    <ClInclude Include="Mysql.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Over.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Player2.h" />
@@ -192,7 +195,10 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MapManager.cpp" />
     <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="Mysql.cpp" />
+    <ClCompile Include="Mysql.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Over.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Player2.cpp" />
