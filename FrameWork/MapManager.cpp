@@ -2284,6 +2284,10 @@ void MapManager::Update(double frame)
 					else if (knight.attackType == 1) EFFECT->Play(EF_HIT_UPDOWN, knight.pos.x, knight.pos.y - 80, knight.dir, -1.0f);
 					else if (knight.attackType == 2) EFFECT->Play(EF_HIT_UPDOWN, knight.pos.x, knight.pos.y + 50, knight.dir, 1.0f);
 
+					//float eX = e->pos.x;
+					//float eY = e->pos.y - 20.0f; // 적 몸통 중간쯤
+					EFFECT->Play(EF_SPLASH, e->pos.x, e->pos.y - 20.0f, knight.dir);
+
 					if (knight.attackType == 2) { // 하단 찍기 포고 점프!
 						knight.gravity = -13.0f;
 						// 강제로 공중 판정을 주고, 바닥에서 5픽셀 강제로 뜯어냅니다! (끼임 방지)
@@ -2328,7 +2332,7 @@ void MapManager::Update(double frame)
 					TIMEMGR->SetHitStop(150);
 
 					CAM->Shake(15.0f, 200); // 세게 맞았으니 더 강하게(강도 15) 흔들림!
-					EFFECT->Play(EF_HIT, knight.pos.x, knight.pos.y, pushDir); // 기사 피격 이펙트
+					EFFECT->Play(EF_STUN, knight.pos.x, knight.pos.y, -pushDir); // 기사 피격 이펙트
 				}
 			}
 		}

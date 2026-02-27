@@ -8,8 +8,8 @@ enum EffectType {
     EF_UNHIT,           // 측면 빗맞음 (단일 이미지)
     EF_HIT_UPDOWN,      // 상하 타격
     EF_UNHIT_UPDOWN,    // 상하 빗맞음
-    EF_JUMP_DUST,       // 점프 먼지 (애니메이션)
-    EF_LAND_DUST,       // 착지 먼지 (애니메이션)
+    EF_STUN,       // 피격 스턴
+    EF_SPLASH,       // 타격 스플래시
     EF_DASH_DUST,       // 대시 잔상/먼지
     EF_ROAR             // 보스 포효 충격파 (단일 이미지 오래 유지)
 };
@@ -40,8 +40,9 @@ private:
 
     // 이펙트별 이미지 배열 (애니메이션이면 여러 장, 단일이면 1장)
     std::vector<Sprite> m_SprHit, m_SprUnhit, m_SprHitUD, m_SprUnhitUD;
-    std::vector<Sprite> m_SprJumpDust, m_SprLandDust, m_SprDashDust, m_SprRoar;
-    std::vector<Sprite> m_SprKnightHitted, m_SprMonsHitted;
+    std::vector<Sprite> m_SprDashDust, m_SprRoar;
+    std::vector<Sprite> m_SprStun;
+    std::vector<Sprite> m_SprSplash;
 
 public:
     static EffectManager* GetInstance() {

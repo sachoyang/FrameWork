@@ -667,7 +667,6 @@ void Knight::JumpStart()
         // 최대 점프력 설정 (값이 클수록 높이 뜀)
         gravity = -20.0f;
         grounded = false;
-        EFFECT->Play(EF_JUMP_DUST, pos.x, pos.y); // 점프 먼지 스폰!
         // 점프 소리 재생 (필요 시)
         // sound.Play("Jump");
     }

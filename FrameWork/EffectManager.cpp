@@ -36,27 +36,13 @@ void EffectManager::Init() {
     for (int i = 1; i <= 7; i++) {
         sprintf_s(FileName, "./resource/Img/effect/stun_impact_effect%02d.png", i);
         temp.Create(FileName, false, 0);
-        m_SprKnightHitted.push_back(temp);
+        m_SprStun.push_back(temp);
     }
     // [몬스터가 맞음]
     for (int i = 1; i <= 6; i++) {
         sprintf_s(FileName, "./resource/Img/effect/whitesplash_%02d.png", i);
         temp.Create(FileName, false, 0);
-        m_SprMonsHitted.push_back(temp);
-    }
-
-    // [점프 먼지] - 예: jump_dust01.png ~ jump_dust04.png (4장)
-    for (int i = 1; i <= 4; i++) {
-        sprintf_s(FileName, "./resource/Img/effect/jump_dust%02d.png", i);
-        temp.Create(FileName, false, 0);
-        m_SprJumpDust.push_back(temp);
-    }
-
-    // [착지 먼지] - 예: land_dust01.png ~ land_dust05.png (5장)
-    for (int i = 1; i <= 5; i++) {
-        sprintf_s(FileName, "./resource/Img/effect/land_dust%02d.png", i);
-        temp.Create(FileName, false, 0);
-        m_SprLandDust.push_back(temp);
+        m_SprSplash.push_back(temp);
     }
 
     // [대시 먼지(잔상)] - 예: dash_dust01.png ~ dash_dust03.png (3장)
@@ -76,18 +62,27 @@ void EffectManager::Play(int type, float x, float y, int dir, float scaleY) {
 
     // 🌟 이펙트 종류에 따른 애니메이션/유지시간 세팅
     if (type == EF_HIT || type == EF_UNHIT || type == EF_HIT_UPDOWN || type == EF_UNHIT_UPDOWN) {
-        obj.isAnimation = false; obj.duration = 100; // 0.1초 띄우고 삭제
+        obj.isAnimation = false; obj.duration = 200; // 0.1초 띄우고 삭제
         obj.maxFrame = 1;
     }
     else if (type == EF_ROAR) {
         obj.isAnimation = false; obj.duration = 1000; // 포효는 1초 유지
         obj.maxFrame = 1;
     }
-    else {
-        // 나머지 먼지류는 애니메이션으로 취급!
+    else if (type == EF_DASH_DUST) {
         obj.isAnimation = true;
-        obj.maxFrame = 1; // 💡나중에 이미지 여러 장 넣으시면 장수에 맞게 늘리세요!
-        obj.duration = 50; // 프레임당 0.05초 재생
+        obj.maxFrame = 5;
+        obj.duration = 40; // 대시는 속도감이 생명이니 아주 빠르게 (0.04초 간격)
+    }
+    else if (type == EF_STUN) {
+        obj.isAnimation = true;
+        obj.maxFrame = 7;
+        obj.duration = 50; // 0.05초 간격 재생
+    }
+    else if (type == EF_SPLASH) {
+        obj.isAnimation = true;
+        obj.maxFrame = 6;
+        obj.duration = 40; // 타격감 극대화를 위해 빠르게 재생
     }
     m_Effects.push_back(obj);
 }
@@ -97,6 +92,7 @@ void EffectManager::Update() {
 
     for (auto it = m_Effects.begin(); it != m_Effects.end(); ) {
         DWORD curTime = TIMEMGR->GetGameTime();
+
         if (it->isAnimation) {
             if (curTime - it->lastFrameTime > it->duration) {
                 it->currentFrame++;
@@ -124,8 +120,8 @@ void EffectManager::Draw() {
         case EF_UNHIT: sprList = &m_SprUnhit; break;
         case EF_HIT_UPDOWN: sprList = &m_SprHitUD; break;
         case EF_UNHIT_UPDOWN: sprList = &m_SprUnhitUD; break;
-        case EF_JUMP_DUST: sprList = &m_SprJumpDust; break;
-        case EF_LAND_DUST: sprList = &m_SprLandDust; break;
+        case EF_STUN: sprList = &m_SprStun; break;
+        case EF_SPLASH: sprList = &m_SprSplash; break;
         case EF_DASH_DUST: sprList = &m_SprDashDust; break;
         case EF_ROAR: sprList = &m_SprRoar; break;
         }
