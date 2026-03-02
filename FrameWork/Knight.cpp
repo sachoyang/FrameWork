@@ -789,10 +789,11 @@ bool Knight::TakeDamage(int damage, int hitDir)
     if (hp <= 0) {
         hp = 0;
         isDead = true;
-        deadTime = GetTickCount();
+        deadTime = TIMEMGR->GetGameTime();
 
         isAttacking = false;
         isAttackHit = false;
+        isDashing = false; // 🌟 [추가] 죽을 때도 대시 캔슬
         SetRect(&attackBox, 0, 0, 0, 0);
 
         TIMEMGR->SetTimeSlow(0.2f, 2000);
@@ -802,11 +803,14 @@ bool Knight::TakeDamage(int damage, int hitDir)
 
     // 일반 피격 처리
     isInvincible = true;
-    invincibleTime = GetTickCount();
+    invincibleTime = TIMEMGR->GetGameTime();
 
     // 맞았으니 공격 취소
     isAttacking = false;
     isAttackHit = false;
+
+    isDashing = false;
+
     SetRect(&attackBox, 0, 0, 0, 0);
 
     // 기사 넉백
