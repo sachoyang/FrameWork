@@ -18,7 +18,7 @@ public:
 
 	int hp;
 	const int maxHp = 8;
-	
+
 	D3DXIMAGE_INFO imagesinfo;
 	RECT m_rc;
 	D3DXVECTOR2 pos;
@@ -75,7 +75,7 @@ public:
 	// 공격 시작 함수 (X키 누를 때)
 	void AttackStart();
 	// 데미지 처리 함수
-	void TakeDamage(int damage, int hitDir); 
+	// void TakeDamage(int damage, int hitDir);
+	bool TakeDamage(int damage, int hitDir);
 };
-
 extern Knight knight;

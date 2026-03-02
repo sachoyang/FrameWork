@@ -2279,7 +2279,7 @@ void MapManager::Update(double frame)
 					CAM->Shake(8.0f, 100); //카메라 흔들림 효과 (강도 8, 지속시간 0.1초)
 
 					// =======================================================
-					// 🌟 [수정] 충돌 교집합(temp)의 중심점에서 이펙트 생성!
+					// 충돌 교집합(temp)의 중심점에서 이펙트 생성!
 					// =======================================================
 					float hitX = (float)(temp.left + temp.right) / 2.0f;
 					float hitY = (float)(temp.top + temp.bottom) / 2.0f;
@@ -2337,13 +2337,20 @@ void MapManager::Update(double frame)
 				// 맞았다면 데미지 적용!
 				if (isHitByBoss) {
 					int pushDir = (knight.pos.x < e->pos.x) ? -1 : 1;
-					knight.TakeDamage(1, pushDir);
+					//knight.TakeDamage(1, pushDir);
+					if (knight.TakeDamage(1, pushDir))
+					{
+						// 진짜로 맞았을 때만 시간이 멈추고 이펙트가 나옴 -> "드르르륵" 완전 해결!
+						TIMEMGR->SetHitStop(150);
+						CAM->Shake(15.0f, 200); //(카메라 쉐이크 있다면)
 
-					// 기사가 맞으면 0.15초 뼈아픈 정지
-					TIMEMGR->SetHitStop(150);
+						EFFECT->Play(EF_STUN, knight.pos.x, knight.pos.y, -pushDir);
+					}
+					//// 기사가 맞으면 0.15초 뼈아픈 정지
+					//TIMEMGR->SetHitStop(150);
 
-					CAM->Shake(15.0f, 200); // 세게 맞았으니 더 강하게(강도 15) 흔들림!
-					EFFECT->Play(EF_STUN, knight.pos.x, knight.pos.y, -pushDir); // 기사 피격 이펙트
+					//CAM->Shake(15.0f, 200); // 세게 맞았으니 더 강하게(강도 15) 흔들림!
+					//EFFECT->Play(EF_STUN, knight.pos.x, knight.pos.y, -pushDir); // 기사 피격 이펙트
 				}
 			}
 		}

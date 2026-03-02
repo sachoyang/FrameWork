@@ -730,48 +730,90 @@ void Knight::AttackStart()
     else if (attackType == 2) EFFECT->Play(EF_UNHIT_UPDOWN, pos.x, pos.y + 50, dir, 1.0f);
 }
 
-void Knight::TakeDamage(int damage, int hitDir)
+//void Knight::TakeDamage(int damage, int hitDir)
+//{
+//    if (isInvincible || isDashing || isDead) return;
+//
+//    hp -= damage;
+//    if (hp <= 0) hp = 0; // 나중에 게임오버 처리용
+//
+//    // =======================================================
+//    // 🌟 [사망 처리] 체력이 0 이하가 되었을 때
+//    // =======================================================
+//    if (hp <= 0) {
+//        hp = 0;
+//        isDead = true;
+//        deadTime = TIMEMGR->GetGameTime(); // 죽은 시간 기록
+//
+//        // 죽는 순간 휘두르던 칼 취소
+//        isAttacking = false;
+//        isAttackHit = false;
+//        SetRect(&attackBox, 0, 0, 0, 0);
+//
+//        // 🌟 타임 슬로우를 여기서 딱 한 번만 발동! (2초간 20% 속도)
+//        TIMEMGR->SetTimeSlow(0.2f, 2000);
+//
+//        return; // 죽었을 땐 일반 피격의 무적 타이머나 넉백을 생략하고 여기서 함수 종료!
+//    }
+//
+//    // =======================================================
+//    // 살아있을 때의 일반 피격 처리
+//    // =======================================================
+//    isInvincible = true;
+//    invincibleTime = TIMEMGR->GetGameTime();
+//
+//    // =======================================================
+//    // 맞으면 즉시 공격 상태 해제 및 타격 박스 소멸!
+//    // =======================================================
+//    isAttacking = false;
+//    isAttackHit = false;
+//    SetRect(&attackBox, 0, 0, 0, 0);
+//
+//    // 기사 넉백 (공중으로 띄우고 뒤로 밀어냄)
+//    isKnockback = true;
+//    knockVelocity.x = hitDir * 8.0f;
+//    gravity = -8.0f;
+//    grounded = false;
+//}
+
+// 반환 타입 bool로 변경
+bool Knight::TakeDamage(int damage, int hitDir)
 {
-    if (isInvincible || isDashing || isDead) return;
+    // 🌟 1. [수정] 'isDashing' 조건을 제거했습니다! (이제 대시 중에 맞으면 아픕니다)
+    // 무적 상태거나 이미 죽었다면 데미지 무시 -> false 반환
+    if (isInvincible || isDead) return false;
 
     hp -= damage;
-    if (hp <= 0) hp = 0; // 나중에 게임오버 처리용
 
-    // =======================================================
-    // 🌟 [사망 처리] 체력이 0 이하가 되었을 때
-    // =======================================================
+    // 사망 처리
     if (hp <= 0) {
         hp = 0;
         isDead = true;
-        deadTime = TIMEMGR->GetGameTime(); // 죽은 시간 기록
+        deadTime = GetTickCount();
 
-        // 죽는 순간 휘두르던 칼 취소
         isAttacking = false;
         isAttackHit = false;
         SetRect(&attackBox, 0, 0, 0, 0);
 
-        // 🌟 타임 슬로우를 여기서 딱 한 번만 발동! (2초간 20% 속도)
         TIMEMGR->SetTimeSlow(0.2f, 2000);
 
-        return; // 죽었을 땐 일반 피격의 무적 타이머나 넉백을 생략하고 여기서 함수 종료!
+        return true; // 🌟 죽었을 때도 '맞은 건 맞으니까' true 반환
     }
 
-    // =======================================================
-    // 살아있을 때의 일반 피격 처리
-    // =======================================================
+    // 일반 피격 처리
     isInvincible = true;
-    invincibleTime = TIMEMGR->GetGameTime();
+    invincibleTime = GetTickCount();
 
-    // =======================================================
-    // 맞으면 즉시 공격 상태 해제 및 타격 박스 소멸!
-    // =======================================================
+    // 맞았으니 공격 취소
     isAttacking = false;
     isAttackHit = false;
     SetRect(&attackBox, 0, 0, 0, 0);
 
-    // 기사 넉백 (공중으로 띄우고 뒤로 밀어냄)
+    // 기사 넉백
     isKnockback = true;
     knockVelocity.x = hitDir * 8.0f;
     gravity = -8.0f;
     grounded = false;
+
+    return true; // 🌟 데미지가 제대로 들어갔으니 true 반환!
 }
