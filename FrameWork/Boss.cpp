@@ -265,56 +265,65 @@ void BossEnemy::Update()
 
         // 걷다가 가까워지면 즉시 공격!
         if (distToKnight <= 250.0f) ChangeState(B_STATE_MELEE);
-        // 너무 오래 걸으면(2초) 다시 생각함
-        else if (elapsed > 2000) ChangeState(B_STATE_IDLE);
+        // 너무 오래 걸으면(3초) 다시 생각함
+        else if (elapsed > 3000) ChangeState(B_STATE_IDLE);
         break;
 
     case B_STATE_MELEE:
         // 근접 2연타 (Swing01 ~ 11)
         // 0~5: 가로 베기 / 6~10: 세로 베기
-        if (GetTickCount() - aniTime > 100) { // 0.1초마다 프레임 넘김
-            aniCount++;
-            aniTime = GetTickCount();
-
-            // 전진 이동 기믹 (특정 타격 프레임에서 앞으로 쿵! 이동)
-            if (aniCount == 3 || aniCount == 8) {
-                velocity.x = (dir == 1) ? -15.0f : 15.0f;
-            }
+        if (elapsed < 400) {
+            // 준비 동작 (살짝 뒤로 물러남)
+            aniCount = 0;
+            velocity.x = (dir == 1) ? 2.0f : -2.0f; // 반대 방향으로 스멀스멀
         }
+        else
+        {
+            if (GetTickCount() - aniTime > 100) { // 0.1초마다 프레임 넘김
+                aniCount++;
+                aniTime = GetTickCount();
 
-        //// 타격 히트박스(attackBox) 활성화 구간 (이미지 크기에 맞게 거대하게!)
-        //if ((aniCount >= 2 && aniCount <= 4) || (aniCount >= 7 && aniCount <= 9)) {
-        //    isAttacking = true;
-        //    if (dir == 1) { // 왼쪽 보고 칠 때
-        //        SetRect(&attackBox, pos.x - 250, pos.y - 150, pos.x + 50, pos.y + 120);
-        //    }
-        //    else { // 오른쪽 보고 칠 때
-        //        SetRect(&attackBox, pos.x - 50, pos.y - 150, pos.x + 250, pos.y + 120);
-        //    }
-        //}
+                // 전진 이동 기믹 (특정 타격 프레임에서 앞으로 쿵! 이동)
+                if (aniCount == 3 || aniCount == 8) {
+                    velocity.x = (dir == 1) ? -15.0f : 15.0f;
+                }
+            }
 
-        // 1. 가로 베기 구간 (옆으로 쫙 길게! 위아래는 얇게)
-        if (aniCount >= 2 && aniCount <= 4) {
-            isAttacking = true;
-            if (dir == 1) { // 왼쪽 보고 칠 때 (X를 왼쪽으로 길게 -300)
-                SetRect(&attackBox, pos.x - 300, pos.y - 50, pos.x + 50, pos.y + 50);
+            //// 타격 히트박스(attackBox) 활성화 구간 (이미지 크기에 맞게 거대하게!)
+            //if ((aniCount >= 2 && aniCount <= 4) || (aniCount >= 7 && aniCount <= 9)) {
+            //    isAttacking = true;
+            //    if (dir == 1) { // 왼쪽 보고 칠 때
+            //        SetRect(&attackBox, pos.x - 250, pos.y - 150, pos.x + 50, pos.y + 120);
+            //    }
+            //    else { // 오른쪽 보고 칠 때
+            //        SetRect(&attackBox, pos.x - 50, pos.y - 150, pos.x + 250, pos.y + 120);
+            //    }
+            //}
+
+            // 1. 가로 베기 구간 (옆으로 쫙 길게! 위아래는 얇게)
+            if (aniCount >= 2 && aniCount <= 4) {
+                isAttacking = true;
+                if (dir == 1) { // 왼쪽 보고 칠 때 (X를 왼쪽으로 길게 -300)
+                    SetRect(&attackBox, pos.x - 300, pos.y - 50, pos.x + 50, pos.y + 50);
+                }
+                else {        // 오른쪽 보고 칠 때 (X를 오른쪽으로 길게 +300)
+                    SetRect(&attackBox, pos.x - 50, pos.y - 50, pos.x + 300, pos.y + 50);
+                }
             }
-            else {        // 오른쪽 보고 칠 때 (X를 오른쪽으로 길게 +300)
-                SetRect(&attackBox, pos.x - 50, pos.y - 50, pos.x + 300, pos.y + 50);
+
+            // 2. 세로 베기 구간 (위로 아주 높게! X 폭은 적당히)
+            else if (aniCount >= 7 && aniCount <= 9) {
+                isAttacking = true;
+                if (dir == 1) { // 왼쪽 (Y를 위로 엄청 높게 -250)
+                    SetRect(&attackBox, pos.x - 200, pos.y - 200, pos.x + 50, pos.y + 120);
+                }
+                else {        // 오른쪽
+                    SetRect(&attackBox, pos.x - 50, pos.y - 200, pos.x + 200, pos.y + 120);
+                }
             }
+
+            if (aniCount > 10) ChangeState(B_STATE_IDLE); // 공격 끝나면 대기
         }
-        // 2. 세로 베기 구간 (위로 아주 높게! X 폭은 적당히)
-        else if (aniCount >= 7 && aniCount <= 9) {
-            isAttacking = true;
-            if (dir == 1) { // 왼쪽 (Y를 위로 엄청 높게 -250)
-                SetRect(&attackBox, pos.x - 200, pos.y - 230, pos.x + 50, pos.y + 120);
-            }
-            else {        // 오른쪽
-                SetRect(&attackBox, pos.x - 50, pos.y - 230, pos.x + 200, pos.y + 120);
-            }
-        }
-
-        if (aniCount > 10) ChangeState(B_STATE_IDLE); // 공격 끝나면 대기
         break;
 
     case B_STATE_ROLL_DASH:

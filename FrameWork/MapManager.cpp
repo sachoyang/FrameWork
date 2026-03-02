@@ -1829,7 +1829,7 @@ void MapManager::CreateRandomMap()
 				forceBoss = true;
 			}
 			else {
-				// [핵심 변경] 비트마스크 검사 삭제! 무조건 남는 공간이 있으면 프리팹(1~4번) 투입!
+				// 무조건 남는 공간이 있으면 프리팹(1~5번) 투입!
 				for (int newID = 1; newID <= 5; newID++) {
 					int gw_new = m_Prefabs[newID].gridW;
 					int gh_new = m_Prefabs[newID].gridH;
