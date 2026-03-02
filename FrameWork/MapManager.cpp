@@ -2278,6 +2278,17 @@ void MapManager::Update(double frame)
 					TIMEMGR->SetHitStop(40);
 					CAM->Shake(8.0f, 100); //카메라 흔들림 효과 (강도 8, 지속시간 0.1초)
 
+					// =======================================================
+					// 🌟 [수정] 충돌 교집합(temp)의 중심점에서 이펙트 생성!
+					// =======================================================
+					float hitX = (float)(temp.left + temp.right) / 2.0f;
+					float hitY = (float)(temp.top + temp.bottom) / 2.0f;
+					// 랜덤성 추가 (상처가 한 곳에만 나면 재미없으니 +- 10픽셀 정도 흩뿌리기)
+					hitX += (rand() % 20) - 10;
+					hitY += (rand() % 20) - 10;
+
+					EFFECT->Play(EF_SPLASH, hitX, hitY, knight.dir);
+
 					// 🌟 방향에 따른 이펙트 타입 및 좌표 계산 후 스폰
 					float eX = knight.pos.x + (knight.dir == 1 ? -60 : 60);
 					if (knight.attackType == 0) EFFECT->Play(EF_HIT, eX, knight.pos.y - 30, knight.dir == 1 ? 1 : -1);
@@ -2286,7 +2297,7 @@ void MapManager::Update(double frame)
 
 					//float eX = e->pos.x;
 					//float eY = e->pos.y - 20.0f; // 적 몸통 중간쯤
-					EFFECT->Play(EF_SPLASH, e->pos.x, e->pos.y - 20.0f, knight.dir);
+					//EFFECT->Play(EF_SPLASH, e->pos.x, e->pos.y - 20.0f, knight.dir);
 
 					if (knight.attackType == 2) { // 하단 찍기 포고 점프!
 						knight.gravity = -13.0f;
