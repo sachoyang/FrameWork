@@ -20,16 +20,16 @@ void EffectManager::Init() {
     sprintf_s(FileName, "./resource/Img/effect/unhitdown.png");
     temp.Create(FileName, false, 0); m_SprUnhitUD.push_back(temp);
 
-    // 🌟 2. 새로 추가할 이펙트들! (나중에 이미지가 생기면 여기에 위처럼 push_back 하시면 됩니다)
+    // 2. 새로 추가할 이펙트들! (나중에 이미지가 생기면 여기에 위처럼 push_back 하시면 됩니다)
     // 예: 먼지 애니메이션 3장이라면 temp.Create() 3번 하고 m_SprJumpDust.push_back(temp) 3번 수행!
     // [보스 포효 충격파] - 1장짜리라고 가정
     // (경로는 실제 있는 곳으로 맞춰주세요!)
-    sprintf_s(FileName, "./resource/Img/effect/roar_wave.png");
+    sprintf_s(FileName, "./resource/Img/effect/roar_effect.png");
     temp.Create(FileName, false, 0); m_SprRoar.push_back(temp);
 
 
     // =======================================================
-    // 💨 2. 애니메이션 이펙트 (먼지, 잔상 등 여러 장짜리)
+    // 2. 애니메이션 이펙트 (먼지, 잔상 등 여러 장짜리)
     // =======================================================
 
     // [기사가 맞음]

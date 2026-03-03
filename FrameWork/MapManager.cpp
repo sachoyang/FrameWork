@@ -1791,7 +1791,7 @@ void MapManager::CreateRandomMap()
 		int currentMapCount = 1;
 		int failCount = 0;
 
-		while (!q.empty() && failCount < 1000 && currentMapCount < 30)
+		while (!q.empty() && failCount < 1000 && currentMapCount < 32)
 		{
 			failCount++;
 			int qIdx = rand() % q.size();
