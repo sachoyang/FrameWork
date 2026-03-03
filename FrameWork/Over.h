@@ -7,6 +7,11 @@ public:
 	Over();
 	~Over();
 
+	Sprite m_Title;    // "GAMEOVER" 이미지
+	int m_Alpha;       // 투명도 (0 ~ 255)
+
+	D3DXIMAGE_INFO imagesinfo;
+
 	virtual void Init();
 	virtual void Update(double frame);
 	virtual void Draw();

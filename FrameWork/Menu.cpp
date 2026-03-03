@@ -53,8 +53,6 @@ void Menu::Update(double frame)
 	//	}
 	//	if (count > 1) count = 0;
 	//}
-
-
 }
 
 void Menu::Draw()
@@ -122,6 +120,16 @@ void Menu::OnMessage(MSG* msg)
 			{
 				if (g_Mng.n_Chap == MENU)
 				{
+					coll.Init();
+					CAM->Init();
+					CAM->SetTarget(&knight.pos);
+					mapMng.Init();
+					knight.Init();
+					sound.Init();
+					Gmanager.Init();
+					EFFECT->Init();
+					uiMng.Init();
+
 					g_Mng.n_Chap = GAME;
 					sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
 				}

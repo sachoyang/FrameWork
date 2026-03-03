@@ -29,6 +29,7 @@ void MapManager::Init()
 {
 	srand((unsigned int)time(NULL)); // 랜덤 시드 초기화
 
+	m_CorpseRegistry.clear();
 	// 프리펩 초기화 먼저 진행 후 맵 생성 (맵 생성 시 프리펩 정보가 필요)
 	InitPrefabs();
 
