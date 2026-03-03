@@ -22,7 +22,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	wc.cbClsExtra = NULL ;
 	wc.cbWndExtra = NULL ;
 	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH) ;
-	wc.hCursor = LoadCursor( wc.hInstance, IDC_ARROW ) ;
+	//wc.hCursor = LoadCursor( wc.hInstance, IDC_ARROW ) ;
+	wc.hCursor = (HCURSOR)LoadImage(
+		NULL,                           // 파일에서 로드할 때는 NULL
+		TEXT("./resource/Img/UI/Cursor.cur"), // 커서 파일 경로 (.cur)
+		IMAGE_CURSOR,                   // 이미지 타입
+		0, 0,                           // 기본 크기 사용 (0, 0)
+		LR_LOADFROMFILE | LR_DEFAULTSIZE // 파일 로드 옵션
+	);
 	wc.hIcon = LoadIcon( wc.hInstance, IDI_APPLICATION ) ;
 	wc.hIconSm = LoadIcon( wc.hInstance, IDI_APPLICATION ) ;
 	wc.lpfnWndProc = WndProc ;
@@ -64,7 +71,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	// WS_POPUP 빼면 테투리가 생긴다~
 	g_hWnd = CreateWindowEx( NULL, wc.lpszClassName, 
 		"Game", 
-		WS_EX_TOPMOST//|WS_POPUP, 
+		WS_OVERLAPPEDWINDOW
+		//WS_EX_TOPMOST|WS_POPUP, 
 		,X, Y, W, H,
 		NULL, NULL, wc.hInstance, NULL ) ;
 
