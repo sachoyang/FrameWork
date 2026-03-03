@@ -1,5 +1,4 @@
 ﻿#include "Include.h"
-#include <vector>
 
 MapManager mapMng;
 
@@ -1940,6 +1939,26 @@ void MapManager::ChangeMap(int mapID)
 	// 맵을 36개까지 쓰기로 했으니, 제한을 40으로
 	if (mapID < 1 || mapID >= 40) return;
 
+	// =======================================================
+	// 방을 나가기 전, 현재 "죽어있는 몬스터"들의 위치를 기록!
+	// =======================================================
+	if (m_pCurrentMapChunk != nullptr) // 첫 시작이 아닐 때만
+	{
+		for (auto e : m_Enemies)
+		{
+			// 이미 죽은 놈이라면?
+			if (e->isDead) {
+				CorpseInfo info;
+				info.x = e->pos.x; // 바닥에 떨어진 최종 좌표
+				info.y = e->pos.y;
+				info.dir = e->dir;
+
+				// 명부에 등록 (이미 있으면 위치 갱신)
+				m_CorpseRegistry[e->m_ID] = info;
+			}
+		}
+	}
+
 	// 맵 바뀔 때 타임 엔진 초기화!
 	TIMEMGR->ResetTime();
 
@@ -2087,6 +2106,8 @@ void MapManager::ChangeMap(int mapID)
 	//	Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
 	//	m_Enemies.push_back(f1);
 	//}
+	
+	
 	// =================================================================
 	// 진짜 보스방(39번) 진입 시: 감시자의 기사 3형제 스폰 & 컷신 시작!
 	// =================================================================
@@ -2122,19 +2143,73 @@ void MapManager::ChangeMap(int mapID)
 		int gw = m_Prefabs[pID].gridW;
 		int gh = m_Prefabs[pID].gridH;
 
+		// 고유 ID 생성을 위한 카운터 (방 번호 * 1000 + 순서)
+		int spawnCounter = 0;
+		int roomBaseID = currentRoomID * 1000;
+
 		// 1. 지상 몹 (가로 칸 수당 2마리씩)
-		for (int i = 0; i < gw * 2; i++) {
+		//for (int i = 0; i < gw * 2; i++) {
+		//	Enemy* g = new GroundEnemy();
+		//	// 가로로 띄엄띄엄 배치, 높이는 제일 아래쪽 바닥 근처
+		//	g->Init(400.0f + (i * 600.0f), (gh * SCREEN_HEIGHT) - 150.0f);
+		//	m_Enemies.push_back(g);
+		//}
+
+		// 1. 지상 몹 루프
+		for (int i = 0; i < gw * 2; i++) 
+		{
+			spawnCounter++;
+			int myID = roomBaseID + spawnCounter; // 예: 3번방의 1번째 몹 = 3001
+
 			Enemy* g = new GroundEnemy();
-			// 가로로 띄엄띄엄 배치, 높이는 제일 아래쪽 바닥 근처
-			g->Init(400.0f + (i * 600.0f), (gh * SCREEN_HEIGHT) - 150.0f);
+
+			// 이 ID가 사망자 명부에 있는가?
+			if (m_CorpseRegistry.find(myID) != m_CorpseRegistry.end())
+			{
+				// 명부에 있다 = 이미 죽은 놈이다 -> 시체 위치로 소환!
+				CorpseInfo info = m_CorpseRegistry[myID];
+				g->Init(info.x, info.y-100); // 죽었던 그 자리 그대로!
+				g->SetCorpse();          // 태어나자마자 죽은 상태로
+				g->dir = info.dir;
+			}
+			else
+			{
+				// 명부에 없다 = 살아있다 -> 원래 리젠 위치에 소환
+				g->Init(400.0f + (i * 600.0f), (gh * SCREEN_HEIGHT) - 150.0f);
+			}
+
+			g->m_ID = myID; // ID 부여
 			m_Enemies.push_back(g);
 		}
 
 		// 2. 비행 몹 (세로 칸 수당 1마리씩)
+		//for (int i = 0; i < gh; i++) {
+		//	Enemy* f = new FlyEnemy();
+		//	// 세로로 띄엄띄엄 공중에 배치
+		//	f->Init(600.0f, 200.0f + (i * 800.0f));
+		//	m_Enemies.push_back(f);
+		//}
+
+		// 2. 비행 몹 루프 (똑같이 적용)
 		for (int i = 0; i < gh; i++) {
+			spawnCounter++;
+			int myID = roomBaseID + spawnCounter; // 예: 3003
+
 			Enemy* f = new FlyEnemy();
-			// 세로로 띄엄띄엄 공중에 배치
-			f->Init(600.0f, 200.0f + (i * 800.0f));
+
+			if (m_CorpseRegistry.find(myID) != m_CorpseRegistry.end())
+			{
+				CorpseInfo info = m_CorpseRegistry[myID];
+				f->Init(info.x, info.y);
+				f->SetCorpse();
+				f->dir = info.dir;
+			}
+			else
+			{
+				f->Init(600.0f, 200.0f + (i * 800.0f));
+			}
+
+			f->m_ID = myID;
 			m_Enemies.push_back(f);
 		}
 	}
@@ -2289,7 +2364,7 @@ void MapManager::Update(double frame)
 
 					EFFECT->Play(EF_SPLASH, hitX, hitY, knight.dir);
 
-					// 🌟 방향에 따른 이펙트 타입 및 좌표 계산 후 스폰
+					// 방향에 따른 이펙트 타입 및 좌표 계산 후 스폰
 					float eX = knight.pos.x + (knight.dir == 1 ? -60 : 60);
 					if (knight.attackType == 0) EFFECT->Play(EF_HIT, eX, knight.pos.y - 30, knight.dir == 1 ? 1 : -1);
 					else if (knight.attackType == 1) EFFECT->Play(EF_HIT_UPDOWN, knight.pos.x, knight.pos.y - 80, knight.dir, -1.0f);

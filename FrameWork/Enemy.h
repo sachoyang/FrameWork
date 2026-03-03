@@ -5,6 +5,8 @@
 class Enemy
 {
 public:
+	int m_ID;          // 몬스터 고유 ID (필요하면 사용)
+
     int type;           // 1: 지상, 2: 비행
     D3DXVECTOR2 pos;    // 현재 위치
     RECT m_rc;          // 피격 박스 (몸체)
@@ -35,6 +37,14 @@ public:
 
     virtual bool CanDealDamage() { return true; }
     virtual bool IsTargetable() { return true; }
+
+    // 시체 상태로 강제 전환하는 함수 (맵 로드 시 사용)
+    virtual void SetCorpse() {
+        isDead = true;
+        hp = 0;
+        // 필요하다면 여기서 사망 스프라이트의 마지막 프레임으로 고정하는 코드를 넣습니다.
+        // 예: currentFrame = maxFrame - 1;
+    }
 };
 
 // 지상 몹 (1번)

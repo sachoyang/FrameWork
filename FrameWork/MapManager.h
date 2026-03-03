@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Include.h"
 #include <vector>
+#include <map>
 
 // =======================================================
 // 프리팹 방 방향 비트 플래그
@@ -53,6 +54,12 @@ struct MapChunk
 	int prefabID;
 };
 
+//시체 정보를 담을 구조체
+struct CorpseInfo {
+	float x, y; // 시체가 널브러진 최종 좌표
+	int dir;    // 시체가 바라보는 방향
+};
+
 class Enemy;
 
 class MapManager
@@ -68,6 +75,8 @@ public :
 	MapChunk m_MapList[40];
 
 	std::list<Enemy*> m_Enemies; //현재 맵의 적 리스트
+	// 사망자 명부 (Key: 몬스터ID, Value: 위치 정보)
+	std::map<int, CorpseInfo> m_CorpseRegistry;
 
 	// UI에서 미니맵을 그릴 때 읽어갈 6x6 배열
 	int m_Grid[6][6];

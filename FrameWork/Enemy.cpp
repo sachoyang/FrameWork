@@ -20,7 +20,7 @@ void Enemy::TakeDamage(int damage, int hitDir)
     }
     else 
     {
-        // 🌟 타격감 2번: 통통 튀어오르는 넉백!
+        // 타격감 2번: 통통 튀어오르는 넉백!
         velocity.x = hitDir * 5.0f; // 맞은 방향으로 밀려남
         gravity = -7.0f;            // 위로 튀어오름
     }
@@ -39,7 +39,7 @@ void Enemy::Draw()
 
     if (isDead) 
     {
-        // 🌟 [핵심 수정] 살아있을 때와 죽었을 때의 이미지 높이 차이를 계산해서,
+        // [핵심 수정] 살아있을 때와 죽었을 때의 이미지 높이 차이를 계산해서,
         // 시체의 발바닥(바닥)이 살아있을 때의 발바닥 위치와 정확히 일치하도록 아래로 내려줍니다!
         float liveHeight = img[0].imagesinfo.Height;
         float deadHeight = deadImg[aniCount].imagesinfo.Height;
@@ -157,7 +157,7 @@ void FlyEnemy::Update()
             pos.x += velocity.x; velocity.x *= 0.9f;
 
             if (!isDead) {
-                // 🌟 [핵심 수정] 넉백 당하는 동안 계속 흘러가는 시간에 맞춰 중심점(startPos)을 역산합니다!
+                // 넉백 당하는 동안 계속 흘러가는 시간에 맞춰 중심점(startPos)을 역산합니다!
                 // 이렇게 하면 무적(isHit)이 끝났을 때 텔레포트하지 않고 현재 위치에서 궤도를 자연스럽게 이어갑니다.
                 DWORD t = GetTickCount() - spawnTime;
                 float speed = 0.0015f;

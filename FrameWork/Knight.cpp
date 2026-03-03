@@ -93,18 +93,6 @@ void Knight::Init()
     sprintf_s(FileName, "./resource/Img/knight1/attackdown02.png"); Knightimg[22].Create(FileName, false, 0);
     sprintf_s(FileName, "./resource/Img/knight1/attackdown03.png"); Knightimg[23].Create(FileName, false, 0);
 
-    //sprintf_s(FileName, "./resource/Img/effect/hit.png");
-    //hitEffect[0].Create(FileName, false, 0);
-
-    //sprintf_s(FileName, "./resource/Img/effect/unhit.png");
-    //unhitEffect[0].Create(FileName, false, 0);
-
-    //sprintf_s(FileName, "./resource/Img/effect/hitdown.png");
-    //hitEffect[1].Create(FileName, false, 0);
-
-    //sprintf_s(FileName, "./resource/Img/effect/unhitdown.png");
-    //unhitEffect[1].Create(FileName, false, 0);
-
     sprintf_s(FileName, "./resource/Img/knight1/bossstart01.png");
     bossStartImg[0].Create(FileName, false, 0);
 
@@ -793,12 +781,12 @@ bool Knight::TakeDamage(int damage, int hitDir)
 
         isAttacking = false;
         isAttackHit = false;
-        isDashing = false; // 🌟 [추가] 죽을 때도 대시 캔슬
+        isDashing = false; // 죽을 때도 대시 캔슬
         SetRect(&attackBox, 0, 0, 0, 0);
 
         TIMEMGR->SetTimeSlow(0.2f, 2000);
 
-        return true; // 🌟 죽었을 때도 '맞은 건 맞으니까' true 반환
+        return true; // 죽었을 때도 '맞은 건 맞으니까' true 반환
     }
 
     // 일반 피격 처리
