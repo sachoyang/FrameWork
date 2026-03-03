@@ -24,7 +24,7 @@ void EffectManager::Init() {
     // 예: 먼지 애니메이션 3장이라면 temp.Create() 3번 하고 m_SprJumpDust.push_back(temp) 3번 수행!
     // [보스 포효 충격파] - 1장짜리라고 가정
     // (경로는 실제 있는 곳으로 맞춰주세요!)
-    sprintf_s(FileName, "./resource/Img/effect/roar_effect.png");
+    sprintf_s(FileName, "./resource/Img/effect/roar_effect01.png");
     temp.Create(FileName, false, 0); m_SprRoar.push_back(temp);
 
 
