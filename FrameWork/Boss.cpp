@@ -196,8 +196,8 @@ void BossEnemy::Update()
         }
 
         if (elapsed == 500) { // 애니메이션이 포효를 시작하는 특정 프레임(시간)
-            EFFECT->Play(EF_ROAR, pos.x, pos.y - 100);
-            CAM->Shake(20.0f, 1000); // 🌟 보스가 포효하면 화면이 1초간 미친듯이 흔들림!
+            EFFECT->Play(EF_ROAR, pos.x, pos.y);
+            CAM->Shake(20.0f, 1000); //보스가 포효하면 화면이 1초간 미친듯이 흔들림!
         }
         break;
 
