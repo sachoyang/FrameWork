@@ -6,6 +6,7 @@ class Enemy
 {
 public:
 	int m_ID;          // 몬스터 고유 ID (필요하면 사용)
+    bool isCorpseFixed;
 
     int type;           // 1: 지상, 2: 비행
     D3DXVECTOR2 pos;    // 현재 위치
@@ -42,8 +43,15 @@ public:
     virtual void SetCorpse() {
         isDead = true;
         hp = 0;
-        // 필요하다면 여기서 사망 스프라이트의 마지막 프레임으로 고정하는 코드를 넣습니다.
-        // 예: currentFrame = maxFrame - 1;
+
+        // 1. [ChangeState 대체] 애니메이션 직접 지정
+        // deadImg는 2장(0, 1)이므로 마지막인 1번으로 고정
+        aniCount = 1;
+
+        // 2. [증발 버그 해결] 물리 변수 강제 초기화!
+        // 이 값이 쓰레기 값이면 isRestingCorpse가 false가 되어 저 멀리 날아갑니다.
+        velocity = D3DXVECTOR2(0.0f, 0.0f);
+        gravity = 0.0f;
     }
 };
 

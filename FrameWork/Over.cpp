@@ -1,4 +1,4 @@
-#include "Include.h"
+ï»¿#include "Include.h"
 
 
 Over::Over()
@@ -11,13 +11,14 @@ Over::~Over()
 
 void Over::Init()
 {
-
+	
 }
 
-// Chap, ÀçÁ¤ÀÇ ÇÔ¼ö È£Ãâ
+// Chap, ì¬ì •ì˜ í•¨ìˆ˜ í˜¸ì¶œ
 void Over::Update(double frame)
 {
-	//if(Ã³¸® ÈÄ) g_Mng.n_Chap = MENU; 
+	//if(ì²˜ë¦¬ í›„) g_Mng.n_Chap = MENU; 
+
 }
 
 void Over::Draw()

@@ -33,6 +33,7 @@ public:
 	// 사망 상태 및 시간 기록용 변수
 	bool isDead;
 	DWORD deadTime;
+	DWORD realDeadTime;  // 🌟 [추가] 씬 전환용 현실 사망 시간 (RealTime)
 
 	bool isDashing;         // 현재 대시 중인가?
 	bool canAirDash;        // 공중 대시 가능한가? (점프 후 1회 제한)

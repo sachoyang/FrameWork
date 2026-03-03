@@ -2168,7 +2168,7 @@ void MapManager::ChangeMap(int mapID)
 			{
 				// 명부에 있다 = 이미 죽은 놈이다 -> 시체 위치로 소환!
 				CorpseInfo info = m_CorpseRegistry[myID];
-				g->Init(info.x, info.y-100); // 죽었던 그 자리 그대로!
+				g->Init(info.x, info.y); // 죽었던 그 자리 그대로!
 				g->SetCorpse();          // 태어나자마자 죽은 상태로
 				g->dir = info.dir;
 			}
@@ -2481,7 +2481,7 @@ void MapManager::Update(double frame)
 	// =======================================================
 	// 게임오버 씬(OVER) 전환 연출
 	// =======================================================
-	if (knight.isDead && (GetTickCount() - knight.deadTime > 2000)) {
+	if (knight.isDead && (GetTickCount() - knight.realDeadTime > 2000)) {
 		// 2초의 슬로우 모션 연출이 끝나면 게임오버 씬으로 넘깁니다!
 		g_Mng.n_Chap = OVER; // (혹시 Define.h에 게임오버 씬 변수 이름이 OVER가 아니라면 맞게 수정해 주세요!)
 	}

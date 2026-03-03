@@ -778,6 +778,7 @@ bool Knight::TakeDamage(int damage, int hitDir)
         hp = 0;
         isDead = true;
         deadTime = TIMEMGR->GetGameTime();
+        realDeadTime = GetTickCount();
 
         isAttacking = false;
         isAttackHit = false;
