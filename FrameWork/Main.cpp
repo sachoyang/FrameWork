@@ -64,8 +64,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	// WS_POPUP 빼면 테투리가 생긴다~
 	g_hWnd = CreateWindowEx( NULL, wc.lpszClassName, 
 		"Game", 
-		WS_EX_TOPMOST|WS_POPUP, 
-		X, Y, W, H,
+		WS_EX_TOPMOST//|WS_POPUP, 
+		,X, Y, W, H,
 		NULL, NULL, wc.hInstance, NULL ) ;
 
 

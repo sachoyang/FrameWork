@@ -41,6 +41,7 @@
 #include "Sprite.h"
 #include "Chap.h"
 
+#include "FmodSound.h"
 
 /* ---------------------------------------------------
 ///////////////// 사용자 추가 파일 ///////////////////
@@ -50,31 +51,6 @@
 
 //////////////////////////////////////////////////////
 -----------------------------------------------------*/
-//#include "Game.h"
-//#include "Logo.h"
-//#include "Menu.h"
-//#include "Over.h"
-//#include "CMng.h"
-//
-//#include "Camera.h"
-//
-//#include "MapManager.h"
-//
-//#include "Key.h"
-//#include "Sound.h"
-//
-//#include "Player.h"
-//#include "Player2.h"
-//#include "Collider.h"
-//
-//#include "GameManager.h"
-//
-//#include "Bird.h"
-//#include "Enemy.h"
-//#include "Knight.h"
-//#include "UIManager.h"
-
-
 // =========================================
 // 1단계: 코어 (가장 기본 도구들)
 // =========================================
