@@ -28,7 +28,9 @@ MapManager::~MapManager()
 void MapManager::Init()
 {
 	srand((unsigned int)time(NULL)); // 랜덤 시드 초기화
-
+	m_GameOverTitle.Create("./resource/Img/UI/gameover_text.png", false, 0);
+	m_BlackScreen.Create("./resource/Img/UI/black_bg.png", false, 0);
+	D3DXGetImageInfoFromFile("./resource/Img/UI/gameover_text.png", &goimagesinfo);
 	m_CorpseRegistry.clear();
 	// 프리펩 초기화 먼저 진행 후 맵 생성 (맵 생성 시 프리펩 정보가 필요)
 	InitPrefabs();
@@ -1824,9 +1826,12 @@ void MapManager::CreateRandomMap()
 			else if (d.dir == DIR_LEFT) testTargetX = rx - 1;
 
 			// X좌표가 5 이상 다다르면, 보스 대기실 확정!
-			if (!bossPlaced && testTargetX >= 5 && d.dir == DIR_RIGHT) {
-				validPrefabs.push_back(6); // 보스 대기실 용도로 6번 방(1x1) 사용
-				forceBoss = true;
+			if (!bossPlaced && testTargetX == 5 && d.dir == DIR_RIGHT) {
+				// 안전장치: 혹시라도 그 자리에 이미 방이 있다면 덮어쓰지 않음
+				if (m_Grid[ry][5] == 0) {
+					validPrefabs.push_back(6);
+					forceBoss = true;
+				}
 			}
 			else {
 				// 무조건 남는 공간이 있으면 프리팹(1~5번) 투입!
@@ -2488,6 +2493,7 @@ void MapManager::Update(double frame)
 	}
 
 }
+
 void MapManager::Draw()
 {
 	/*if(m_Stage==1)
@@ -2538,6 +2544,39 @@ void MapManager::Draw()
 			e->Draw(); // 일반 살아있는 몹
 		}
 	}
+
+	// =======================================================
+	// 🌟 [추가] 기사가 죽었다면, 서서히 어두워지며 게임오버 로고 출력!
+	// =======================================================
+	if (knight.isDead)
+	{
+		// 1. 죽은 지 얼마나 지났는지 계산 (0 ~ 2000ms)
+		// (주의: knight.realDeadTime은 GetTickCount() 기준이어야 합니다!)
+		DWORD elapsed = GetTickCount() - knight.realDeadTime;
+
+		// 2. 투명도(Alpha) 계산 (0초일 때 0 -> 2초일 때 255)
+		int galpha = (int)((elapsed / 2000.0f) * 255);
+		int alpha = galpha;
+		if (galpha > 128) alpha = 128;
+
+		// 3. 화면 전체를 덮는 반투명 검은 박스 그리기
+		// (이미지를 화면 크기만큼 확대해서 그립니다)
+		m_BlackScreen.SetColor(255, 255, 255, alpha);
+		m_BlackScreen.Render(0, 0, 0, SCREEN_WITH, SCREEN_HEIGHT); // 스케일을 키워서 꽉 채움
+
+		// 4. 투명도가 절반(128)을 넘으면 게임오버 글씨 등장!
+		if (galpha > 120)
+		{
+			// 글씨도 서서히 나타나게 하려면: (alpha - 120) * 2 등을 활용
+			int textAlpha = (galpha - 120) * 2;
+			if (textAlpha > 255) textAlpha = 255;
+
+			m_GameOverTitle.SetColor(255, 255, 255, textAlpha);
+			// 화면 중앙에 배치
+			m_GameOverTitle.Render((SCREEN_WITH - goimagesinfo.Width) / 2, 0, 0, 1, 1);
+		}
+	}
+
 	// =======================================================
 	// 디버그용 텍스트 출력 모음
 	// =======================================================

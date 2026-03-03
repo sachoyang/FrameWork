@@ -363,7 +363,11 @@ void Knight::Update()
         if (TIMEMGR->GetGameTime() - m_KnightAniTime > 50)
         {
             // 공격 애니메이션이 최우선!
-            if (isAttacking)
+            if (isDead)
+            {
+                m_KnightCount = 5;
+            }
+            else if (isAttacking)
             {
                 DWORD attackTime = TIMEMGR->GetGameTime() - attackStartTime;
                 int frameOffset = 0;

@@ -31,21 +31,34 @@ void Over::Update(double frame)
 //m_Title.Render((SCREEN_WITH - imagesinfo.Width) / 2, 0, 0, 1, 1);
 void Over::Draw()
 {
-	if (g_Mng.chap[GAME]) {
-		g_Mng.chap[GAME]->Draw();
-	}
-	if (m_Alpha > 0) {
-		// 텍스트(GAMEOVER) 그리기
-		m_Title.SetColor(255, 255, 255, m_Alpha); // Alpha 적용 (서서히 나타남)
-		m_Title.Render((SCREEN_WITH - imagesinfo.Width) / 2, 0, 0, 1, 1);
-		// 안내 문구
-		if (m_Alpha >= 255) {
-			if ((GetTickCount() / 500) % 2 == 0) {
-				dv_font.DrawString("PRESS ANY BUTTON TO TITLE",
-					SCREEN_WITH / 2 - 150, 600,
-					D3DCOLOR_ARGB(255, 255, 255, 255));
-			}
-		}
+	//if (g_Mng.chap[GAME]) {
+	//	g_Mng.chap[GAME]->Draw();
+	//}
+	//if (m_Alpha > 0) {
+	//	// 텍스트(GAMEOVER) 그리기
+	//	m_Title.SetColor(255, 255, 255, m_Alpha); // Alpha 적용 (서서히 나타남)
+	//	m_Title.Render((SCREEN_WITH - imagesinfo.Width) / 2, 0, 0, 1, 1);
+	//	// 안내 문구
+	//	if (m_Alpha >= 255) {
+	//		if ((GetTickCount() / 500) % 2 == 0) {
+	//			dv_font.DrawString("PRESS ANY BUTTON TO TITLE",
+	//				SCREEN_WITH / 2 - 150, 600,
+	//				D3DCOLOR_ARGB(255, 255, 255, 255));
+	//		}
+	//	}
+	//}
+
+	// 1. 게임 화면(배경) 그리기
+	if (g_Mng.chap[GAME]) g_Mng.chap[GAME]->Draw();
+
+	// 🌟 [핵심] MapManager가 마지막에 그렸던 것과 똑같은 상태(완전 어둠 + 글씨)를 덧그림
+	// (이미 MapManager::Draw() 안에서 isDead 체크 후 검은 화면을 그리고 있으므로,
+	//  g_Mng.chap[GAME]->Draw() 만 호출해도 화면은 어둡게 나옵니다!)
+
+	// 다만, 확실하게 하기 위해 여기서도 안내 문구(PRESS ANY BUTTON)를 추가로 그립니다.
+	if ((GetTickCount() / 500) % 2 == 0)
+	{
+		dv_font.DrawString("PRESS ANY BUTTON TO TITLE", SCREEN_WITH / 2 - 150, 600, D3DCOLOR_ARGB(255, 255, 255, 255));
 	}
 }
 

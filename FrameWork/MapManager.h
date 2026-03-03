@@ -71,6 +71,9 @@ public :
 
 	MapChunk* m_pCurrentMapChunk;
 
+	Sprite m_GameOverTitle; // GAME OVER 글씨
+	Sprite m_BlackScreen;   // 검은 배경 (1x1 픽셀 이미지 추천)
+	D3DXIMAGE_INFO goimagesinfo;
 	// std::map<int, MapChunk*> m_MapList;
 	MapChunk m_MapList[40];
 
