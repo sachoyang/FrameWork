@@ -26,22 +26,25 @@ void Over::Update(double frame)
 		if (m_Alpha > 255) m_Alpha = 255;
 	}
 }
+//m_Title.SetColor(255, 255, 255, m_Alpha);
 
+//m_Title.Render((SCREEN_WITH - imagesinfo.Width) / 2, 0, 0, 1, 1);
 void Over::Draw()
 {
-	// 1. 게임오버 이미지 그리기 (Alpha값 적용)
-	m_Title.SetColor(255, 255, 255, m_Alpha);
-
-	m_Title.Render((SCREEN_WITH - imagesinfo.Width) / 2, 0, 0, 1, 1); // 화면 중앙 배치 (좌표 조절 필요)
-
-	// 2. 안내 문구 출력 (연출이 끝났을 때만 표시)
-	if (m_Alpha >= 255)
-	{
-		// 깜빡이는 효과를 위해 시간 활용 (선택사항)
-		if ((GetTickCount() / 500) % 2 == 0)
-		{
-			// 화면 하단 중앙에 안내 메시지 출력
-			dv_font.DrawString("PRESS ANY BUTTON TO TITLE", SCREEN_WITH / 2 - 150, 600, D3DCOLOR_ARGB(255, 255, 255, 255));
+	if (g_Mng.chap[GAME]) {
+		g_Mng.chap[GAME]->Draw();
+	}
+	if (m_Alpha > 0) {
+		// 텍스트(GAMEOVER) 그리기
+		m_Title.SetColor(255, 255, 255, m_Alpha); // Alpha 적용 (서서히 나타남)
+		m_Title.Render((SCREEN_WITH - imagesinfo.Width) / 2, 0, 0, 1, 1);
+		// 안내 문구
+		if (m_Alpha >= 255) {
+			if ((GetTickCount() / 500) % 2 == 0) {
+				dv_font.DrawString("PRESS ANY BUTTON TO TITLE",
+					SCREEN_WITH / 2 - 150, 600,
+					D3DCOLOR_ARGB(255, 255, 255, 255));
+			}
 		}
 	}
 }

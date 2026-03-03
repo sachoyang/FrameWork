@@ -264,53 +264,60 @@ void Key::Update()
 		
 	}
 
-	if (knight.isDashing == false)
+	if (!knight.isDead)
 	{
-		if (KeyDown(VK_LEFT))
+		if (knight.isDashing == false)
 		{
-			if (GetTickCount64() - KeyTime1 > 10)
+			if (KeyDown(VK_LEFT))
 			{
-				knight.isMove = TRUE;
-				knight.pos.x -= 3.0f;
-				knight.dir = 1;
+				if (GetTickCount64() - KeyTime1 > 10)
+				{
+					knight.isMove = TRUE;
+					knight.pos.x -= 3.0f;
+					knight.dir = 1;
 
-				KeyTime1 = GetTickCount64();
+					KeyTime1 = GetTickCount64();
+				}
+			}
+
+			if (KeyDown(VK_RIGHT))
+			{
+				if (GetTickCount64() - KeyTime1 > 10)
+				{
+					knight.isMove = TRUE;
+					knight.pos.x += 3.0f;
+					knight.dir = -1;
+
+					KeyTime1 = GetTickCount64();
+				}
 			}
 		}
 
-		if (KeyDown(VK_RIGHT))
+
+
+		if (KeyDown(VK_UP))
 		{
-			if (GetTickCount64() - KeyTime1 > 10)
+			if (GetTickCount64() - KeyTime3 > 10)
 			{
-				knight.isMove = TRUE;
-				knight.pos.x += 3.0f;
-				knight.dir = -1;
-
-				KeyTime1 = GetTickCount64();
+				knight.isLookup = TRUE;
+				KeyTime3 = GetTickCount64();
 			}
+
 		}
-	}
 
-	if(KeyDown(VK_UP))
-	{
-		if(GetTickCount64() - KeyTime3 > 10)
-		{	
-			knight.isLookup = TRUE;
-			KeyTime3 = GetTickCount64();
-		}
-		
-	}
-
-	if(KeyDown(VK_DOWN))
-	{
-
-		if(GetTickCount64() - KeyTime3 > 10)
+		if (KeyDown(VK_DOWN))
 		{
-			knight.isLookdown = TRUE;
-			KeyTime3 = GetTickCount64();
+
+			if (GetTickCount64() - KeyTime3 > 10)
+			{
+				knight.isLookdown = TRUE;
+				KeyTime3 = GetTickCount64();
+			}
+
 		}
-		
 	}
+
+	
 
 	// 1. 점프 시작 (누르고 있을 때)
 	if (KeyDown('Z'))

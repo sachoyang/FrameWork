@@ -403,128 +403,6 @@ void Knight::Update()
     }
 }
 
-//void Knight::Update()
-//{
-//    if (GetTickCount() - m_KnightAniTime > 10)
-//    {
-//
-//
-//        // Gravity
-//        if (!grounded) pos.y += gravity;
-//
-//        // Collision Check
-//        bool isCollided = false; // 이번 프레임에 땅에 닿았는지 체크
-//        RECT tempRect;
-//
-//        // coll.m_Walls 리스트를 순회
-//        for (auto& wall : coll.m_Walls)
-//        {
-//            if (IntersectRect(&tempRect, &m_rc, &wall))
-//            {
-//                // [착지 판정] 떨어지는 중이고(gravity >= 0), 발이 벽 윗부분에 걸쳤을 때
-//                // (m_rc.bottom - 20)은 발바닥 조금 위, (wall.top + 20)은 벽 윗면 조금 아래
-//                // 즉, "발이 벽 윗모서리를 타고 넘었을 때"만 착지로 인정
-//                if (gravity >= 0 && (m_rc.bottom - 30) < wall.top)
-//                {
-//                    // 1. 땅에 닿음 처리
-//                    grounded = true;
-//                    isCollided = true;
-//                    gravity = 0; // 중력 초기화 (안 그러면 계속 빨라짐)
-//
-//                    // 2. 위치 보정 (스냅)
-//                    // 캐릭터를 벽 바로 위로 끌어올림 (1px 정도 겹치게 해서 다음 프레임에도 충돌 유지)
-//                    pos.y = (float)wall.top - (imagesinfo.Height - 70) + 1.0f;
-//
-//                    // 3. 보정된 위치로 m_rc 다시 갱신 (중요!)
-//                    m_rc.left = pos.x - 40;
-//                    m_rc.top = pos.y - 40;
-//                    m_rc.right = pos.x + imagesinfo.Width - 50;
-//                    m_rc.bottom = pos.y + imagesinfo.Height - 70;
-//
-//                    break; // 땅 하나만 밟으면 되니까 루프 종료
-//                }
-//            }
-//        }
-//
-//        // 충돌한 벽이 하나도 없으면 공중에 뜬 것
-//        if (isCollided == false)
-//        {
-//            grounded = false;
-//        }
-//
-//        // 공중에 있을 때만 중력 가속
-//        if (!grounded)
-//        {
-//            gravity += 0.5f; // 0.8f는 너무 빠를 수 있어 조절함
-//            if (gravity > 15.0f) gravity = 15.0f; // 최대 낙하 속도 제한 (안전장치)
-//        }
-//
-//
-//        m_rc.left = pos.x-40;
-//        m_rc.top = pos.y-40;
-//        m_rc.right = pos.x + imagesinfo.Width-50;
-//        m_rc.bottom = pos.y + imagesinfo.Height-70;
-//
-//        //if (GetTickCount() - m_KnightAniTime > 100)
-//        //{
-//        //    if (isMove)
-//        //    {
-//        //        m_KnightCount++;
-//        //        if (m_KnightCount > 2) m_KnightCount = 0;
-//        //    }
-//        //    else if (isLookup)
-//        //    {
-//        //        m_KnightCount = 4;
-//        //    }
-//        //    else if (isLookdown)
-//        //    {
-//        //        m_KnightCount = 5;
-//        //    }
-//        //    else
-//        //    {
-//        //        m_KnightCount = 3;
-//        //    }
-//        //    m_KnightAniTime = GetTickCount();
-//        //}
-//        ////m_KnightAniTime = GetTickCount();
-//
-//        // =========================================================
-//        // [애니메이션 상태 머신] (속도에 따라 이미지 교체)
-//        // =========================================================
-//        if (GetTickCount() - m_KnightAniTime > 50) // 애니메이션 속도
-//        {
-//            if (grounded)
-//            {
-//                // [땅]
-//                if (isMove)
-//                {
-//                    m_KnightCount++;
-//                    if (m_KnightCount > 2) m_KnightCount = 0;
-//                }
-//                else if (isLookup) m_KnightCount = 4;
-//                else if (isLookdown) m_KnightCount = 5;
-//                else m_KnightCount = 3; // 기본 대기
-//            }
-//            else
-//            {
-//                // [공중] 수직 속도(gravity)에 따라 이미지 변경
-//                // gravity는 위로 갈수록 음수(-), 아래로 갈수록 양수(+)
-//
-//                if (gravity < -12.0f)      m_KnightCount = 6; // 점프 준비 (빠른 상승)
-//                else if (gravity < -4.0f)  m_KnightCount = 7; // 상승 중
-//                else if (gravity < 4.0f)   m_KnightCount = 8; // 꼭대기 (체공)
-//                else if (gravity < 12.0f)  m_KnightCount = 9; // 하강 시작
-//                else                       m_KnightCount = 9; // 착지 준비(fall02는 착지 순간 연출용이라 일단 fall01 유지)
-//
-//                // 참고: fall02(착지)는 grounded가 true가 된 직후 잠깐 보여줘야 해서 로직이 복잡하므로 
-//                // 일단 하강 이미지를 계속 쓰도록 했습니다.
-//            }
-//            m_KnightAniTime = GetTickCount();
-//        }
-//    }
-//    
-//}
-
 void Knight::Draw()
 {
     if (Gmanager.m_GameStart == true)
@@ -718,52 +596,6 @@ void Knight::AttackStart()
     else if (attackType == 2) EFFECT->Play(EF_UNHIT_UPDOWN, pos.x, pos.y + 50, dir, 1.0f);
 }
 
-//void Knight::TakeDamage(int damage, int hitDir)
-//{
-//    if (isInvincible || isDashing || isDead) return;
-//
-//    hp -= damage;
-//    if (hp <= 0) hp = 0; // 나중에 게임오버 처리용
-//
-//    // =======================================================
-//    // 🌟 [사망 처리] 체력이 0 이하가 되었을 때
-//    // =======================================================
-//    if (hp <= 0) {
-//        hp = 0;
-//        isDead = true;
-//        deadTime = TIMEMGR->GetGameTime(); // 죽은 시간 기록
-//
-//        // 죽는 순간 휘두르던 칼 취소
-//        isAttacking = false;
-//        isAttackHit = false;
-//        SetRect(&attackBox, 0, 0, 0, 0);
-//
-//        // 🌟 타임 슬로우를 여기서 딱 한 번만 발동! (2초간 20% 속도)
-//        TIMEMGR->SetTimeSlow(0.2f, 2000);
-//
-//        return; // 죽었을 땐 일반 피격의 무적 타이머나 넉백을 생략하고 여기서 함수 종료!
-//    }
-//
-//    // =======================================================
-//    // 살아있을 때의 일반 피격 처리
-//    // =======================================================
-//    isInvincible = true;
-//    invincibleTime = TIMEMGR->GetGameTime();
-//
-//    // =======================================================
-//    // 맞으면 즉시 공격 상태 해제 및 타격 박스 소멸!
-//    // =======================================================
-//    isAttacking = false;
-//    isAttackHit = false;
-//    SetRect(&attackBox, 0, 0, 0, 0);
-//
-//    // 기사 넉백 (공중으로 띄우고 뒤로 밀어냄)
-//    isKnockback = true;
-//    knockVelocity.x = hitDir * 8.0f;
-//    gravity = -8.0f;
-//    grounded = false;
-//}
-
 // 반환 타입 bool로 변경
 bool Knight::TakeDamage(int damage, int hitDir)
 {
@@ -777,6 +609,9 @@ bool Knight::TakeDamage(int damage, int hitDir)
     if (hp <= 0) {
         hp = 0;
         isDead = true;
+
+        m_KnightCount = 5;
+
         deadTime = TIMEMGR->GetGameTime();
         realDeadTime = GetTickCount();
 
