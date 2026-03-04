@@ -89,13 +89,18 @@ public :
 	MapChunk* m_pCurrentMapChunk;
 
 	// 4. 타일 이미지 저장소
-	Sprite m_TileImages[10];
+	//Sprite m_TileImages[10];
+	Sprite m_FloorImages[3];    // 바닥 3종
+	Sprite m_PlatformImage;     // 플랫폼
+	Sprite m_WallImage;         // 벽 (왼쪽 기준, 오른쪽 벽은 반전해서 사용)
+	Sprite m_CeilingImage;      // 천장
 
 	Sprite m_GameOverTitle; // GAME OVER 글씨
 	Sprite m_BlackScreen;   // 검은 배경 (1x1 픽셀 이미지 추천)
 	D3DXIMAGE_INFO goimagesinfo;
 	// std::map<int, MapChunk*> m_MapList;
 	MapChunk m_MapList[40];
+
 
 	std::list<Enemy*> m_Enemies; //현재 맵의 적 리스트
 	// 사망자 명부 (Key: 몬스터ID, Value: 위치 정보)

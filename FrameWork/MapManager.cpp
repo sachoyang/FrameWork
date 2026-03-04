@@ -34,14 +34,23 @@ void MapManager::Init()
 
 	// 타일 이미지 로드
 	// 1. 바닥
-	m_TileImages[TILE_FLOOR].Create("./resource/Img/map/floor.png", false, 0);
+	m_FloorImages[0].Create("./resource/Img/map/floor01.png", false, 0);
+	D3DXGetImageInfoFromFile("./resource/Img/map/floor01.png", &m_FloorImages[0].imagesinfo);
+	m_FloorImages[1].Create("./resource/Img/map/floor02.png", false, 0);
+	D3DXGetImageInfoFromFile("./resource/Img/map/floor02.png", &m_FloorImages[1].imagesinfo);
+	m_FloorImages[2].Create("./resource/Img/map/floor03.png", false, 0);	
+	D3DXGetImageInfoFromFile("./resource/Img/map/floor03.png", &m_FloorImages[2].imagesinfo);
 	// 2. 플랫폼
-	m_TileImages[TILE_PLATFORM].Create("./resource/Img/map/platform.png", false, 0);
+	m_PlatformImage.Create("./resource/Img/map/platform.png", false, 0);	
+	D3DXGetImageInfoFromFile("./resource/Img/map/platform.png", &m_PlatformImage.imagesinfo);
+
 	// 3. 왼쪽 벽 (왼쪽:검은색 / 오른쪽:벽)
-	m_TileImages[TILE_WALL_L].Create("./resource/Img/map/wall_left.png", false, 0);
+	m_WallImage.Create("./resource/Img/map/wall.png", false, 0);
+	D3DXGetImageInfoFromFile("./resource/Img/map/wall.png", &m_WallImage.imagesinfo);
 	// 4. 오른쪽 벽 (왼쪽 벽 이미지를 뒤집어 쓸 예정이면 따로 로드 안 해도 됨)
 	// 5. 천장
-	m_TileImages[TILE_CEILING].Create("./resource/Img/map/ceiling.png", false, 0);
+	m_CeilingImage.Create("./resource/Img/map/ceiling.png", false, 0);
+	D3DXGetImageInfoFromFile("./resource/Img/map/ceiling.png", &m_CeilingImage.imagesinfo);
 
 	m_CorpseRegistry.clear();
 
@@ -2043,7 +2052,7 @@ void MapManager::ChangeMap(int mapID)
 	//	coll.AddWall(prefabWall);
 	//}
 
-	// 🌟 [수정] WallInfo에서 rc(RECT)만 쏙 빼서 물리 엔진에 전달
+	// WallInfo에서 rc(RECT)만 쏙 빼서 물리 엔진에 전달
 	if (pID != 0 && !m_Prefabs[pID].walls.empty())
 	{
 		for (auto& w : m_Prefabs[pID].walls)
@@ -2523,101 +2532,110 @@ void MapManager::Draw()
 		m_pCurrentMapChunk->bgLayer[i].Render(0 - CAM->GetX(), 0 - CAM->GetY(), 0, 1, 1);
 	}
 
-	// 🌟 2. [추가] 타일 렌더링 시스템
+	// 🌟 [타일 렌더링 시스템]
 	int pID = m_pCurrentMapChunk->prefabID;
 	if (pID > 0)
 	{
 		for (auto& w : m_Prefabs[pID].walls)
 		{
-			if (w.type == TILE_NONE) continue; // 투명벽은 패스
+			if (w.type == TILE_NONE) continue;
 
 			RECT rc = w.rc;
+			float colliderW = (float)(rc.right - rc.left);
+			float colliderH = (float)(rc.bottom - rc.top);
 
-			// ---------------------------------------------------
-			// 🧱 바닥 (Floor)
-			// ---------------------------------------------------
-			if (w.type == TILE_FLOOR)
+			// =========================================================
+			// ☁️ 2. 플랫폼 (Platform) - 스케일링 + 중앙 정렬 + 중앙 피벗 보정
+			// =========================================================
+			if (w.type == TILE_PLATFORM)
 			{
-				Sprite* img = &m_TileImages[TILE_FLOOR];
-				int width = img->imagesinfo.Width; // 270
+				Sprite* img = &m_PlatformImage;
+				float imgW = (float)img->imagesinfo.Width;
+				float imgH = (float)img->imagesinfo.Height;
 
-				// 왼쪽부터 오른쪽 끝까지 반복해서 찍기
-				for (int x = rc.left; x < rc.right; x += width) {
-					// Top(윗면)에 맞춰 그리기
-					img->Render(x - CAM->GetX(), rc.top - CAM->GetY(), 0, 1, 1, 1);
-				}
-			}
-			// ---------------------------------------------------
-			// ☁️ 플랫폼 (Platform) - 스케일링 적용!
-			// ---------------------------------------------------
-			else if (w.type == TILE_PLATFORM)
-			{
-				Sprite* img = &m_TileImages[TILE_PLATFORM];
-				float imgW = (float)img->imagesinfo.Width; // 283
-				float colliderW = (float)(rc.right - rc.left);
-
-				// 콜라이더 너비에 맞춰 억지로 늘리기 (Scale)
+				// 스케일 계산 (콜라이더 너비에 맞춤)
 				float scaleX = colliderW / imgW;
 
-				// 왼쪽 위(Left, Top)에 딱 맞춰 그리면 늘어난 만큼 꽉 참
-				img->Render(rc.left - CAM->GetX(), rc.top - CAM->GetY(), 0, 1, scaleX, 1.0f);
+				// 🌟 좌표 보정 (Render가 Center 기준이므로, 우리가 원하는 위치의 '중앙'을 줘야 함)
+				// X: 콜라이더의 정중앙
+				float centerX = (rc.left + rc.right) / 2.0f;
+				// Y: 콜라이더 윗면(Top) + 이미지 높이의 절반
+				float centerY = rc.top + (imgH / 2.0f);
+
+				img->Render(centerX - CAM->GetX(), centerY - CAM->GetY(), 0, scaleX, 1, 1.0f);
 			}
-			// ---------------------------------------------------
-			// 🧗 왼쪽 벽 (Wall L) - [왼쪽:검은색 | 오른쪽:벽]
-			// ---------------------------------------------------
+			// =========================================================
+			// 🧱 1. 바닥 (Floor) - 상단 정렬 + 반복
+			// =========================================================
+			else if (w.type == TILE_FLOOR)
+			{
+				int imgW = m_FloorImages[0].imagesinfo.Width;
+				int imgH = m_FloorImages[0].imagesinfo.Height;
+				int idx = 0;
+
+				for (int x = rc.left; x < rc.right; x += imgW)
+				{
+					// X: 현재 x + 이미지 절반 (중앙 맞춤)
+					// Y: 콜라이더 Top + 이미지 절반
+					float drawX = x + (imgW / 2.0f);
+					float drawY = rc.top + (imgH / 2.0f);
+
+					m_FloorImages[idx].Render(drawX - CAM->GetX(), drawY - CAM->GetY(), 0, 1, 1, 1);
+					idx = (idx + 1) % 3;
+				}
+			}
+			// =========================================================
+			// 🧗 3. 왼쪽 벽 (Wall L) - 우측 정렬
+			// =========================================================
 			else if (w.type == TILE_WALL_L)
 			{
-				Sprite* img = &m_TileImages[TILE_WALL_L];
-				int imgW = img->imagesinfo.Width;  // 240
-				int imgH = img->imagesinfo.Height; // 339
+				int imgW = m_WallImage.imagesinfo.Width;
+				int imgH = m_WallImage.imagesinfo.Height;
 
-				// 🌟 [핵심] 오른쪽 정렬! (이미지의 오른쪽 끝을 콜라이더 오른쪽 끝에 맞춤)
-				// DrawX = Collider.Right - ImageWidth
-				// 이렇게 하면 검은색 부분은 왼쪽 허공으로 나감
-				int drawX = rc.right - imgW;
+				// X: 콜라이더 Right - 이미지 절반 (그래야 오른쪽 끝이 맞음)
+				float drawX = rc.right - (imgW / 2.0f);
 
 				for (int y = rc.top; y < rc.bottom; y += imgH) {
-					img->Render(drawX - CAM->GetX(), y - CAM->GetY(), 0, 1, 1, 1);
+					float drawY = y + (imgH / 2.0f);
+					m_WallImage.Render(drawX - CAM->GetX(), drawY - CAM->GetY(), 0, 1, 1, 1);
 				}
 			}
-			// ---------------------------------------------------
-			// 🧗 오른쪽 벽 (Wall R) - [왼쪽:벽 | 오른쪽:검은색] (좌우반전)
-			// ---------------------------------------------------
+			// =========================================================
+			// 🧗 4. 오른쪽 벽 (Wall R) - 좌측 정렬 & 반전
+			// =========================================================
 			else if (w.type == TILE_WALL_R)
 			{
-				// 왼쪽 벽 이미지를 뒤집어 사용 (ScaleX = -1)
-				Sprite* img = &m_TileImages[TILE_WALL_L];
-				int imgH = img->imagesinfo.Height;
+				int imgW = m_WallImage.imagesinfo.Width;
+				int imgH = m_WallImage.imagesinfo.Height;
 
-				// 🌟 [핵심] 왼쪽 정렬!
-				// 이미지를 뒤집으면(ScaleX=-1), 보통 그리는 점(Pivot)에서 왼쪽으로 그려지거나
-				// 오른쪽으로 그려지는데 프레임워크마다 다릅니다.
-				// 일단 [왼쪽 끝]에 맞춰 그립니다.
-				// 만약 위치가 안 맞으면 drawX = rc.left + imgW; 로 수정 필요
-				int drawX = rc.left;
+				// X: 콜라이더 Left + 이미지 절반 (그래야 왼쪽 끝이 맞음)
+				// (이미지를 뒤집어도 Pivot이 중앙이면 좌표는 동일하게 중앙을 가리켜야 함)
+				float drawX = rc.left + (imgW / 2.0f);
 
 				for (int y = rc.top; y < rc.bottom; y += imgH) {
-					// dir 대신 ScaleX 자리에 -1 넣기!
-					img->Render(drawX - CAM->GetX(), y - CAM->GetY(), 0, 1, -1.0f, 1.0f);
+					float drawY = y + (imgH / 2.0f);
+					// Scale X = -1.0f (좌우 반전)
+					m_WallImage.Render(drawX - CAM->GetX(), drawY - CAM->GetY(), 0, 1, -1.0f, 1.0f);
 				}
 			}
-			// ---------------------------------------------------
-			// 🦇 천장 (Ceiling)
-			// ---------------------------------------------------
+			// =========================================================
+			// 🦇 5. 천장 (Ceiling) - 하단 정렬
+			// =========================================================
 			else if (w.type == TILE_CEILING)
 			{
-				Sprite* img = &m_TileImages[TILE_CEILING];
-				int imgW = img->imagesinfo.Width;
-				int imgH = img->imagesinfo.Height;
+				int imgW = m_CeilingImage.imagesinfo.Width;
+				int imgH = m_CeilingImage.imagesinfo.Height;
 
 				for (int x = rc.left; x < rc.right; x += imgW) {
-					// 바닥(bottom)에서 이미지 높이만큼 위로 올려 그림
-					img->Render(x - CAM->GetX(), (rc.bottom - imgH) - CAM->GetY(), 0, 1, 1, 1);
+					float drawX = x + (imgW / 2.0f);
+					// Y: 콜라이더 Bottom - 이미지 절반 (그래야 아랫면이 맞음)
+					float drawY = rc.bottom - (imgH / 2.0f);
+
+					m_CeilingImage.Render(drawX - CAM->GetX(), drawY - CAM->GetY(), 0, 1, 1, 1);
 				}
 			}
 		}
 	}
-
 
 	// =======================================================
 	// 1. 배경 쪽에 깔려야 할 '시체' 및 '수면 상태' 먼저 렌더링
@@ -2714,19 +2732,6 @@ void MapManager::Draw()
 			}
 		}
 	}
-	// =======================================================
-	// 디버그용: 현재 프리팹 번호 화면 출력
-	// =======================================================
-	//if (coll.isDebugDraw)
-	//{
-	//	char debugText[256];
-	//	sprintf_s(debugText, "Current Prefab ID : %d", m_pCurrentMapChunk->prefabID);
-	//	// 2. 좌측 하단: 현재 기사의 절대 좌표(X, Y) 출력 (새로 추가!)
-	//	char debugPos[256];
-	//	sprintf_s(debugPos, "Knight Pos: X(%.1f), Y(%.1f)", knight.pos.x, knight.pos.y);
-	//	dv_font.DrawString(debugText, 0, 0);   //글자출력
-	//	dv_font.DrawString(debugPos, 0, 100);
-	//}
 }
 
 void MapManager::LoadDebugPrefab(int pID)
