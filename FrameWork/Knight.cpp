@@ -5,23 +5,23 @@ Knight knight;
 
 Knight::Knight()
 {
-    m_KnightAniTime = 0;
-    m_KnightCount = 0;
-    isMove = 0;
-    isLookup = 0;
-    isLookdown = 0;
-    pos.x = 200;
-    pos.y = 100;
-    gravity = 5.75f;
-    grounded = false;
-    dir = -1;
+ //   m_KnightAniTime = 0;
+ //   m_KnightCount = 0;
+ //   isMove = 0;
+ //   isLookup = 0;
+ //   isLookdown = 0;
+ //   pos.x = 200;
+ //   pos.y = 100;
+ //   gravity = 5.75f;
+ //   grounded = false;
+ //   dir = -1;
 
-	//대시 관련 초기화
-    isDashing = false;
-    canAirDash = true;
-    dashStartTime = 0;
-    dashCooldownTime = 0;
-    dashSpeed = 25.0f; // 대시 속도 (걷기보다 훨씬 빠르게)
+	////대시 관련 초기화
+ //   isDashing = false;
+ //   canAirDash = true;
+ //   dashStartTime = 0;
+ //   dashCooldownTime = 0;
+ //   dashSpeed = 25.0f; // 대시 속도 (걷기보다 훨씬 빠르게)
 }
 
 Knight::~Knight()
@@ -98,21 +98,40 @@ void Knight::Init()
 
     sprintf_s(FileName, "./resource/Img/knight1/bossstart02.png");
     bossStartImg[1].Create(FileName, false, 0);
+   
+    KnightMove();
+
+    m_KnightAniTime = 0;
+    m_KnightCount = 0;
+    isMove = 0;
+    isLookup = 0;
+    isLookdown = 0;
+    pos.x = 200;
+    pos.y = 100;
+    gravity = 5.75f;
+    grounded = false;
+    dir = -1;
+
+    //대시 관련 초기화
+    isDashing = false;
+    canAirDash = true;
+    dashStartTime = 0;
+    dashCooldownTime = 0;
+    dashSpeed = 25.0f; // 대시 속도 (걷기보다 훨씬 빠르게)
+
     hp = 8;
     isDead = false;
     deadTime = 0;
-	isInvincible = false;
-	isKnockback = false;
+    isInvincible = false;
+    isKnockback = false;
     isAttackHit = false;
     isAttacking = false;
-	isCutscene = false;
+    isCutscene = false;
     m_StartAniCount = 0;
     m_StartAniTime = 0;
     attackStartTime = 0;
     lastAttackTime = 0; // 쿨타임 초기화
     SetRect(&attackBox, 0, 0, 0, 0);
-
-    KnightMove();
 }
 
 

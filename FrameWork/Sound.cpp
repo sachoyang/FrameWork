@@ -68,3 +68,27 @@ void Sound::VolDown()
 {
 	VolumDown();
 }
+
+// 사용법
+//배경음 재생(MapManager::ChangeMap 등)
+//
+//C++
+//// 1스테이지 BGM 틀기 (기존 BGM은 알아서 꺼짐)
+//SOUND->PlayBGM(SND_BGM_STAGE1);
+//점프할 때(Player::Update)
+//
+//C++
+//if (key.KeyDown(VK_SPACE))
+//{
+//	// 점프 로직...
+//	SOUND->PlayEffect(SND_EFF_JUMP); // 점프 소리!
+//}
+//공격할 때
+//
+//C++
+//SOUND->PlayEffect(SND_EFF_ATTACK);
+//보스방 입장 시
+//
+//C++
+//SOUND->PlayBGM(SND_BGM_BOSS); // 보스 음악으로 전환
+//SOUND->PlayEffect(SND_EFF_BOSS_ROAR); // 보스 포효 효과음
