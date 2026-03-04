@@ -198,6 +198,19 @@ LRESULT CALLBACK WndProc( HWND g_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	switch( uMsg )
 	{
+	case WM_COMMAND:
+		if (g_Mng.chap[g_Mng.n_Chap] != NULL)
+		{
+			// 메시지 포장해서 OnMessage로 토스
+			MSG msg;
+			msg.hwnd = g_hWnd;
+			msg.message = uMsg;
+			msg.wParam = wParam;
+			msg.lParam = lParam;
+
+			g_Mng.chap[g_Mng.n_Chap]->OnMessage(&msg);
+		}
+		break;
 	case WM_DESTROY:
          PostQuitMessage( 0 );
          return 0;
