@@ -25,7 +25,6 @@ public:
 
 	bool m_Collision;
 
-	std::list<Player2*>	myList;
 	bool Respawn;
 
 

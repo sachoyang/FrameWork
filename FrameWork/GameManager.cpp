@@ -55,16 +55,16 @@ void GameManager::Update()
 {
 	//if(게임 종료시) g_Mng.n_Chap = OVER; 
 
-	if (Respawn)
-	{
-		Respawn = !Respawn;
-		myList.push_front(new Player2());
-	}
+	//if (Respawn)
+	//{
+	//	Respawn = !Respawn;
+	//	myList.push_front(new Player2());
+	//}
 
-	for (auto Iter = myList.begin(); Iter != myList.end(); Iter++)
-	{
-		(*Iter)->Update();
-	}
+	//for (auto Iter = myList.begin(); Iter != myList.end(); Iter++)
+	//{
+	//	(*Iter)->Update();
+	//}
 }
 void GameManager::Save()
 {
@@ -108,8 +108,8 @@ void GameManager::Draw()
 	itoa(m_SysTem.m_Save2, show, 10);
 	//dv_font.DrawString(show, 200, 310);   //글자출력
 
-	for (auto Iter = myList.begin(); Iter != myList.end(); Iter++)
-	{
-		(*Iter)->Draw();
-	}
+	//for (auto Iter = myList.begin(); Iter != myList.end(); Iter++)
+	//{
+	//	(*Iter)->Draw();
+	//}
 } 

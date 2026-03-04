@@ -14,10 +14,8 @@ void Game::Init()
 	CAM->Init();
 	CAM->SetTarget(&knight.pos);
 	mapMng.Init();
-	//bird.Init();
 	knight.Init();
-	//player.Init();
-	sound.Init();
+	SOUND->Init();
 	Gmanager.Init();
 	EFFECT->Init();
 	uiMng.Init();
@@ -28,10 +26,8 @@ void Game::Init()
 void Game::Draw()
 {
 	mapMng.Draw();
-	//bird.Draw();
 	knight.Draw();
 	EFFECT->Draw();
-	//player.Draw();
 	coll.Draw();
 	Gmanager.Draw();
 	uiMng.Draw();
@@ -77,15 +73,10 @@ void Game::Update(double frame)
 
 			CAM->Update(); // 카메라 업데이트
 		}
-		////bird.Update();
-		//knight.Update();
-		////player.Update();
-		//coll.Update();
 		//// 입 맛에 맞게
 		//mapMng.Update(130);
 		//Gmanager.Update();
 
-		//CAM->Update(); // 모든 오브젝트 움직이고 나서 업데이트되야 함
 		// 데이타 베이스///////////////////
 		// 입 맛에 맞게 (여기선 안쓰임..프레임 값이 필요 할때만.. 그냥 방법만...)
 		//sql.Update(frame+3000);

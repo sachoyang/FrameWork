@@ -78,9 +78,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 
 
 	dv_font.Create(g_hWnd) ;
-	sound.g_pSoundManager = new CSoundManager();
-	sound.g_pSoundManager->Initialize(g_hWnd, DSSCL_PRIORITY);
-	sound.g_pSoundManager->SetPrimaryBufferFormat(2,22050,16);
+	//sound.g_pSoundManager = new CSoundManager();
+	//sound.g_pSoundManager->Initialize(g_hWnd, DSSCL_PRIORITY);
+	//sound.g_pSoundManager->SetPrimaryBufferFormat(2,22050,16);
 	
 	//g_SoundManager.Initialize(g_hWnd, DSSCL_PRIORITY);
 	//g_SoundManager.SetPrimaryBufferFormat(2,22050,16);

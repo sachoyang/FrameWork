@@ -101,7 +101,7 @@ void Menu::OnMessage(MSG* msg)
 				if (g_Mng.n_Chap == MENU) {
 
 					g_Mng.n_Chap = GAME;
-					sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
+					//sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
 
 				}
 				break;
@@ -125,13 +125,13 @@ void Menu::OnMessage(MSG* msg)
 					CAM->SetTarget(&knight.pos);
 					mapMng.Init();
 					knight.Init();
-					sound.Init();
+					SOUND->Init();
 					Gmanager.Init();
 					EFFECT->Init();
 					uiMng.Init();
 
 					g_Mng.n_Chap = GAME;
-					sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
+					//sound.m_Bk1->Play(0, DSBPLAY_LOOPING);
 				}
 			}
 			// 종료 버튼 클릭 여부 확인

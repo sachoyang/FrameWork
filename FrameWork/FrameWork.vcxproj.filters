@@ -34,17 +34,8 @@
     <Filter Include="소스 파일\콜라이더">
       <UniqueIdentifier>{12a0cf25-2be5-4e1d-ad05-c2a84868a263}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\플레이어1">
-      <UniqueIdentifier>{f8c8a3c6-05dd-4a47-a445-8abeecaf107f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\플레이어2">
-      <UniqueIdentifier>{d3a3e326-2847-465b-9737-da3607ab746a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\Map">
       <UniqueIdentifier>{cec1e42a-12c0-4cf8-9cca-8fc295a432ae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\bird">
-      <UniqueIdentifier>{71c4f222-2348-482f-a094-ebda250bc6ff}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\Knight">
       <UniqueIdentifier>{c6051ed8-bf8f-4da2-a7b5-db98dfb77656}</UniqueIdentifier>
@@ -108,26 +99,14 @@
     <ClInclude Include="Mysql.h">
       <Filter>소스 파일\Mysql</Filter>
     </ClInclude>
-    <ClInclude Include="Include.h">
-      <Filter>D3D Core\코어 헤더파일</Filter>
-    </ClInclude>
     <ClInclude Include="Collider.h">
       <Filter>소스 파일\콜라이더</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>소스 파일\플레이어1</Filter>
-    </ClInclude>
-    <ClInclude Include="Player2.h">
-      <Filter>소스 파일\플레이어2</Filter>
     </ClInclude>
     <ClInclude Include="MapManager.h">
       <Filter>소스 파일\Map</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>D3D Core\코어 헤더파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Bird.h">
-      <Filter>소스 파일\bird</Filter>
     </ClInclude>
     <ClInclude Include="Knight.h">
       <Filter>소스 파일\Knight</Filter>
@@ -194,20 +173,11 @@
     <ClCompile Include="Collider.cpp">
       <Filter>소스 파일\콜라이더</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>소스 파일\플레이어1</Filter>
-    </ClCompile>
-    <ClCompile Include="Player2.cpp">
-      <Filter>소스 파일\플레이어2</Filter>
-    </ClCompile>
     <ClCompile Include="MapManager.cpp">
       <Filter>소스 파일\Map</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>D3D Core\코어 소스</Filter>
-    </ClCompile>
-    <ClCompile Include="Bird.cpp">
-      <Filter>소스 파일\bird</Filter>
     </ClCompile>
     <ClCompile Include="Knight.cpp">
       <Filter>소스 파일\Knight</Filter>

@@ -21,7 +21,7 @@ void TimeManager::ResetTime() {
 }
 
 void TimeManager::SetHitStop(DWORD duration) {
-    // 🌟 [버그 수정] 이미 더 긴 역경직이 진행 중이라면 짧은 역경직으로 덮어씌우지 않음!
+    // 이미 더 긴 역경직이 진행 중이라면 짧은 역경직으로 덮어씌우지 않음!
     if (m_HitStopDuration > 0) {
         DWORD elapsed = GetTickCount() - m_HitStopTime;
         if (elapsed < m_HitStopDuration) {
@@ -35,7 +35,7 @@ void TimeManager::SetHitStop(DWORD duration) {
 }
 
 void TimeManager::SetTimeSlow(float scale, DWORD duration) {
-    // 🌟 [버그 수정] 이미 동일하거나 더 강한 슬로우가 걸려있다면 타이머 리셋 무시!
+    // 이미 동일하거나 더 강한 슬로우가 걸려있다면 타이머 리셋 무시!
     // (이 조건문 덕분에 매 프레임 호출되어도 타이머가 정상적으로 흘러갑니다)
     if (m_GlobalTimeScale <= scale && m_GlobalTimeScale != 1.0f) {
         return;
@@ -71,6 +71,6 @@ void TimeManager::UpdateTime() {
         if (curTime - m_TimeSlowStartTime > m_TimeSlowDuration) m_GlobalTimeScale = 1.0f;
     }
 
-    // 🌟 슬로우 배율(0.3배 등)이 곱해진 만큼만 게임 시간이 조심스럽게 흘러감!
+    // 슬로우 배율(0.3배 등)이 곱해진 만큼만 게임 시간이 조심스럽게 흘러감!
     m_GameTime += (DWORD)(delta * m_GlobalTimeScale);
 }

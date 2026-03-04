@@ -144,7 +144,7 @@ void Logo::Draw()
 {
 	loadimg.SetColor(255,255,255, alpha);  // 색상 변경
 	loadimg.Draw( 0 , 0 ) ;  //이미지출력
-	dv_font.DrawString( "로고" , 200 , 210 ) ;   //글자출력
+	//dv_font.DrawString( "로고" , 200 , 210 ) ;   //글자출력
 
 
 	// 데이타 베이스 결과 및 처리 상태 표시/////////////////////////////////////
