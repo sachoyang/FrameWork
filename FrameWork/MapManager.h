@@ -144,6 +144,7 @@ public :
 	void ChangeMap(int mapID);
 
 	//디버그용
+	char* GetStateName(int state);
 	int m_DebugPrefabID; // 현재 보고 있는 프리팹 번호
 	void LoadDebugPrefab(int pID); // 특정 프리팹을 강제로 로드하는 함수
 };

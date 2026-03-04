@@ -1259,7 +1259,7 @@ void MapManager::Draw()
 				char bossInfo[256];
 
 				// ID, 현재 체력, 현재 상태(Sleep, Roar 등)를 출력
-				sprintf_s(bossInfo, "[Boss %d] HP : %d / State : %d", b->bossID, b->hp, b->state);
+				sprintf_s(bossInfo, "[Boss %d] HP : %d / State : %s", b->bossID, b->hp, GetStateName(b->state));
 
 				// 1번(가운데)은 빨간색, 2번/3번(배경)은 회색빛으로 글씨 색깔도 센스있게!
 				D3DCOLOR textColor = (b->bossID == 1) ? D3DCOLOR_ARGB(255, 255, 100, 100) : D3DCOLOR_ARGB(255, 150, 150, 150);
@@ -1268,6 +1268,23 @@ void MapManager::Draw()
 				textY += 30; // 다음 줄로 내림
 			}
 		}
+	}
+}
+
+char* MapManager::GetStateName(int state)
+{
+	switch (state)
+	{
+	case B_STATE_SLEEP:       return "SLEEP";
+	case B_STATE_AWAKE_ROAR:  return "AWAKE_ROAR";
+	case B_STATE_IDLE:        return "IDLE";
+	case B_STATE_WALK:        return "WALK";
+	case B_STATE_MELEE:       return "MELEE";
+	case B_STATE_ROLL_DASH:   return "ROLL_DASH";
+	case B_STATE_ROLL_BOUNCE: return "ROLL_BOUNCE";
+	case B_STATE_ROLL_BACK:   return "ROLL_BACK";
+	case B_STATE_DIE:         return "DIE";
+	default:                  return "UNKNOWN";
 	}
 }
 
