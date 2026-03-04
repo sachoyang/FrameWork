@@ -155,10 +155,12 @@
     <ClInclude Include="DXUTsound.h" />
     <ClInclude Include="DeviceFont.h" />
     <ClInclude Include="EffectManager.h" />
+    <ClInclude Include="Ending.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="FmodSound.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="Include.h" />
     <ClInclude Include="key.h" />
     <ClInclude Include="Knight.h" />
     <ClInclude Include="Logo.h" />
@@ -182,6 +184,7 @@
     <ClCompile Include="DXUTsound.cpp" />
     <ClCompile Include="DeviceFont.cpp" />
     <ClCompile Include="EffectManager.cpp" />
+    <ClCompile Include="Ending.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="FmodSound.cpp" />
     <ClCompile Include="Game.cpp" />

@@ -55,6 +55,9 @@
     <Filter Include="리소스 파일\fmodsound">
       <UniqueIdentifier>{52d23d25-3b88-4327-b26c-d35de9fd05b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Ending">
+      <UniqueIdentifier>{60c419e7-6792-4240-be6a-11bca4f7ceed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -129,6 +132,12 @@
     <ClInclude Include="FmodSound.h">
       <Filter>리소스 파일\fmodsound</Filter>
     </ClInclude>
+    <ClInclude Include="Ending.h">
+      <Filter>소스 파일\Ending</Filter>
+    </ClInclude>
+    <ClInclude Include="Include.h">
+      <Filter>D3D Core\코어 헤더파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="key.cpp">
@@ -199,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="FmodSound.cpp">
       <Filter>리소스 파일\fmodsound</Filter>
+    </ClCompile>
+    <ClCompile Include="Ending.cpp">
+      <Filter>소스 파일\Ending</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

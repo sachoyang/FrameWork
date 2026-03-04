@@ -109,6 +109,9 @@ public :
 	// 사망자 명부 (Key: 몬스터ID, Value: 위치 정보)
 	std::map<int, CorpseInfo> m_CorpseRegistry;
 
+	// 게임 클리어(보스 사망) 시간 기록용
+	DWORD m_GameClearTime;
+
 	// UI에서 미니맵을 그릴 때 읽어갈 6x6 배열
 	int m_Grid[6][6];
 

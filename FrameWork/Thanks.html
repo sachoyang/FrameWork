@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Thanks - The Journey's End</title>
+    <style>
+        /* 다크 판타지 테마 설정 */
+        body {
+            background-color: #0a0a0a;
+            color: #d1c7a7; /* 바랜 금색 느낌 */
+            font-family: 'Cinzel', serif; /* 우아한 서체 권장 */
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                              url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&q=80&w=1920'); /* 어두운 성/안개 느낌의 배경 이미지 */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .container {
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid #4a3f28;
+            padding: 3rem;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(74, 63, 40, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            color: #f1e4bc;
+            text-shadow: 0 0 10px rgba(241, 228, 188, 0.3);
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #4a3f28, transparent);
+            margin: 2rem 0;
+        }
+
+        p {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: #b0a990;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            display: block;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            color: #d1c7a7;
+            border: 1px solid #4a3f28;
+            background: rgba(30, 30, 30, 0.5);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: rgba(74, 63, 40, 0.3);
+            color: #f1e4bc;
+            border-color: #f1e4bc;
+            box-shadow: 0 0 15px rgba(241, 228, 188, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translate(-50%, -50%) rotate(45deg);
+            transition: 0.5s;
+            opacity: 0;
+        }
+
+        .btn:hover::after {
+            opacity: 1;
+        }
+
+        footer {
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Special Thanks</h1>
+        <div class="divider"></div>
+        
+        <p>
+            끝없는 어둠 속에서도 빛을 잃지 않도록 도와준 모든 분께 감사드립니다.<br>
+            함께하신 여러분이 바로 이 여정의 진정한 주인공입니다.
+        </p>
+
+        <div class="button-group">
+            <a href="https://drive.google.com/drive/folders/1vkjoNVKytWTdLGx5aLG5bWZTgDoi4v4X?usp=sharing" class="btn" target="_blank">
+                📜 개발 일지 & 리소스 공유
+            </a>
+
+            <a href="https://github.com/sachoyang/FrameWork" class="btn" target="_blank">
+                ⚔️ 개발 깃허브 방문하기
+            </a>
+        </div>
+
+        <footer>
+            © 2026 Project Journey. All Rights Reserved.
+        </footer>
+    </div>
+
+</body>
+</html>

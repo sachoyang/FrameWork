@@ -89,6 +89,7 @@
 #include "Menu.h"
 #include "Over.h"
 #include "Game.h"
+#include "Ending.h"
 
 // 데이타 베이스///////////////////
 //#include "Mysql.h"
