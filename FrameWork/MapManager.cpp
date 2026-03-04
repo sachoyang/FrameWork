@@ -31,7 +31,21 @@ void MapManager::Init()
 	m_GameOverTitle.Create("./resource/Img/UI/gameover_text.png", false, 0);
 	m_BlackScreen.Create("./resource/Img/UI/black_bg.png", false, 0);
 	D3DXGetImageInfoFromFile("./resource/Img/UI/gameover_text.png", &goimagesinfo);
+
+	// 타일 이미지 로드
+	// 1. 바닥
+	m_TileImages[TILE_FLOOR].Create("./resource/Img/map/floor.png", false, 0);
+	// 2. 플랫폼
+	m_TileImages[TILE_PLATFORM].Create("./resource/Img/map/platform.png", false, 0);
+	// 3. 왼쪽 벽 (왼쪽:검은색 / 오른쪽:벽)
+	m_TileImages[TILE_WALL_L].Create("./resource/Img/map/wall_left.png", false, 0);
+	// 4. 오른쪽 벽 (왼쪽 벽 이미지를 뒤집어 쓸 예정이면 따로 로드 안 해도 됨)
+	// 5. 천장
+	m_TileImages[TILE_CEILING].Create("./resource/Img/map/ceiling.png", false, 0);
+
 	m_CorpseRegistry.clear();
+
+
 	// 프리펩 초기화 먼저 진행 후 맵 생성 (맵 생성 시 프리펩 정보가 필요)
 	InitPrefabs();
 
@@ -1165,7 +1179,7 @@ void MapManager::InitPrefabs()
 		m_Prefabs[i].typeID = 0;
 		m_Prefabs[i].walls.clear();
 	}
-
+	WallInfo w;
 	// ====================================================================
 	// 🌟 [도어 소켓 룰] 🌟
 	// 1. 좌/우 문: 항상 y = 700 위치에서 진입. (그래서 바닥 양옆에 300px짜리 발판이 무조건 있음)
@@ -1185,11 +1199,17 @@ void MapManager::InitPrefabs()
 		// 🌟 도어 소켓 (안전 지대)
 		//SetRect(&rc, 0, 770, 300, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 좌측 문 앞
 		//SetRect(&rc, 980, 770, 1280, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 우측 문 앞
-		SetRect(&rc, 490, 250, 790, 250 + pH); m_Prefabs[id].walls.push_back(rc); // 상단 문 낙하 방지
+		SetRect(&w.rc, 490, 250, 790, 250 + pH);
+		w.type = TILE_PLATFORM; 
+		m_Prefabs[id].walls.push_back(w); //m_Prefabs[id].walls.push_back(rc); // 상단 문 낙하 방지
 
 		// 내부 지형 (자유롭게 디자인)
-		SetRect(&rc, 350, 500, 550, 500 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 730, 500, 930, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 350, 500, 550, 500 + pH); 
+		w.type = TILE_PLATFORM; 
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 730, 500, 930, 500 + pH);
+		w.type = TILE_PLATFORM; 
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 2번] 1x2 수직 방 (엘리베이터)
@@ -1207,8 +1227,12 @@ void MapManager::InitPrefabs()
 			switch (gy)
 			{
 			case 0:
-				SetRect(&rc, 0, cy + 750, 300, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
-				SetRect(&rc, 980, cy + 750, 1280, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
+				SetRect(&w.rc, 0, cy + 750, 300, cy + 750 + pH); 
+				w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+				m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+				SetRect(&w.rc, 980, cy + 750, 1280, cy + 750 + pH);
+				w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+				m_Prefabs[id].walls.push_back(w);// m_Prefabs[id].walls.push_back(rc);
 				break;
 			case 1:
 				break;
@@ -1217,14 +1241,20 @@ void MapManager::InitPrefabs()
 			}
 			//SetRect(&rc, 0, cy + 770, 300, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
 			//SetRect(&rc, 980, cy + 770, 1280, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
-			SetRect(&rc, 530, cy + 250, 750, cy + 250 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&w.rc, 530, cy + 250, 750, cy + 250 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+			m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 		}
 
 		// 수직 연결 지형
-		SetRect(&rc, 300, 1300, 500, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 780, 1100, 980, 1100 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 300, 850, 500, 850 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 490, 550, 790, 550 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 300, 1300, 500, 1300 + pH); 
+		w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 780, 1100, 980, 1100 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 300, 850, 500, 850 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 490, 550, 790, 550 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 3번] 2x1 수평 방 (긴 복도/웅덩이)
@@ -1240,13 +1270,17 @@ void MapManager::InitPrefabs()
 			float cx = gx * SCREEN_WITH;
 			/*SetRect(&rc, cx, 700, cx + 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
 			SetRect(&rc, cx + 980, 700, cx + 1280, 700 + pH); m_Prefabs[id].walls.push_back(rc);*/
-			SetRect(&rc, cx + 490, 250, cx + 790, 250 + pH); m_Prefabs[id].walls.push_back(rc);
+			SetRect(&w.rc, cx + 490, 250, cx + 790, 250 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+			m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 		}
 
 		// 웅덩이 위 흔들다리 지형
-		SetRect(&rc, 800, 600, 1000, 600 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1180, 500, 1380, 500 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1560, 600, 1760, 600 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 800, 600, 1000, 600 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 1180, 500, 1380, 500 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 1560, 600, 1760, 600 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 4번] 2x2 거대 방 (중앙 허브)
@@ -1264,8 +1298,10 @@ void MapManager::InitPrefabs()
 				switch (gy)
 				{
 				case 0:
-					SetRect(&rc, cx, cy + 750, cx + 300, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
-					SetRect(&rc, cx + 980, cy + 750, cx + 1280, cy + 750 + pH); m_Prefabs[id].walls.push_back(rc);
+					SetRect(&w.rc, cx, cy + 750, cx + 300, cy + 750 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+					m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+					SetRect(&w.rc, cx + 980, cy + 750, cx + 1280, cy + 750 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+					m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 					break;
 				case 1:
 					break;
@@ -1274,16 +1310,22 @@ void MapManager::InitPrefabs()
 				}
 				//SetRect(&rc, cx, cy + 770, cx + 300, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
 				//SetRect(&rc, cx + 980, cy + 770, cx + 1280, cy + 770 + pH); m_Prefabs[id].walls.push_back(rc);
-				SetRect(&rc, cx + 490, cy + 250, cx + 790, cy + 250 + pH); m_Prefabs[id].walls.push_back(rc);
+				SetRect(&w.rc, cx + 490, cy + 250, cx + 790, cy + 250 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+				m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 			}
 		}
 
 		// 플랫폼
-		SetRect(&rc, 1000, 1100, 1560, 1100 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 600, 1300, 800, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1760, 1300, 1960, 1300 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 250, 500, 550, 500 + pH); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 1550, 500, 1850, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 1000, 1100, 1560, 1100 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 600, 1300, 800, 1300 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 1760, 1300, 1960, 1300 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 250, 500, 550, 500 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 1550, 500, 1850, 500 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 	}
 	// [프리팹 5번] 1x1 기본 방 변형
 	{
@@ -1297,10 +1339,12 @@ void MapManager::InitPrefabs()
 		// 🌟 도어 소켓 (안전 지대)
 		//SetRect(&rc, 0, 770, 300, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 좌측 문 앞
 		//SetRect(&rc, 980, 770, 1280, 770 + pH); m_Prefabs[id].walls.push_back(rc); // 우측 문 앞
-		SetRect(&rc, 490, 250, 790, 250 + pH); m_Prefabs[id].walls.push_back(rc); // 상단 문 낙하 방지
+		SetRect(&w.rc, 490, 250, 790, 250 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc); // 상단 문 낙하 방지
 
 		// 내부 지형 (자유롭게 디자인)
-		SetRect(&rc, 440, 500, 840, 500 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 440, 500, 840, 500 + pH); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 		//SetRect(&rc, 200, 400, 400, 400 + pH); m_Prefabs[id].walls.push_back(rc);
 		//SetRect(&rc, 880, 400, 1080, 400 + pH); m_Prefabs[id].walls.push_back(rc);
 	}
@@ -1317,8 +1361,10 @@ void MapManager::InitPrefabs()
 		// SetRect(&rc, 0, 700, 300, 700 + pH); m_Prefabs[id].walls.push_back(rc);
 
 		// 보스방 텔레포트 제단 (중앙)
-		SetRect(&rc, 490, 550, 790, 580); m_Prefabs[id].walls.push_back(rc);
-		SetRect(&rc, 540, 520, 740, 550); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 490, 550, 790, 580); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 540, 520, 740, 550); w.type = TILE_PLATFORM; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 	}
 
 	// [프리팹 16번] 보스방 (고정 2x1) 
@@ -1331,7 +1377,8 @@ void MapManager::InitPrefabs()
 		m_Prefabs[id].bgLayer[0].Create("./resource/Img/map1/Ch1_maps/map_bossroom01.png", false, 0);
 
 		//보스방은 텔레포트 전용이므로 소켓이 필요 없고 통짜 바닥만 깝니다.
-		SetRect(&rc, 0, 700, 2560, 700 + pH); m_Prefabs[id].walls.push_back(rc);
+		SetRect(&w.rc, 0, 700, 2560, 700 + pH); w.type = TILE_FLOOR; // 🌟 타입 지정 (알아서 늘어남)
+		m_Prefabs[id].walls.push_back(w);//m_Prefabs[id].walls.push_back(rc);
 	}
 }
 
@@ -1990,35 +2037,20 @@ void MapManager::ChangeMap(int mapID)
 		return;
 	}
 
-	// 1. 도면에 있는 수많은 벽과 발판들을 그냥 리스트에서 꺼내서 맵에 쫙! 뿌립니다.
-	for (auto& prefabWall : m_Prefabs[pID].walls)
-	{
-		coll.AddWall(prefabWall);
-	}
+	//// 1. 도면에 있는 수많은 벽과 발판들을 그냥 리스트에서 꺼내서 맵에 쫙! 뿌립니다.
+	//for (auto& prefabWall : m_Prefabs[pID].walls)
+	//{
+	//	coll.AddWall(prefabWall);
+	//}
 
-	//// =================================================================
-	//// 2. 막힌 문 자동 캡핑 (진행 불가 버그 완벽 차단)
-	//// =================================================================
-	//int MW = m_pCurrentMapChunk->width;
-	//int MH = m_pCurrentMapChunk->height;
-	//int thick = 100;
-	//// 프리팹 도면상으로는 문이 뚫려있는데, 실제 연결된 맵(nextMapID)이 0(없음)이라면?
-	//// 묻지도 따지지도 않고 그곳에 보이지 않는 거대한 철벽을 세워버립니다!
-	//if ((m_Prefabs[pID].typeID & DOOR_UP) && m_pCurrentMapChunk->nextMapID[DIR_UP] == 0) {
-	//	SetRect(&rc, 0, -50, MW, thick); coll.AddWall(rc);
-	//}
-	//if ((m_Prefabs[pID].typeID & DOOR_DOWN) && m_pCurrentMapChunk->nextMapID[DIR_DOWN] == 0) {
-	//	SetRect(&rc, 0, MH - thick, MW, MH + 50); coll.AddWall(rc);
-	//}
-	//if ((m_Prefabs[pID].typeID & DOOR_LEFT) && m_pCurrentMapChunk->nextMapID[DIR_LEFT] == 0) {
-	//	SetRect(&rc, -50, 0, thick, MH); coll.AddWall(rc);
-	//}
-	//if ((m_Prefabs[pID].typeID & DOOR_RIGHT) && m_pCurrentMapChunk->nextMapID[DIR_RIGHT] == 0) {
-	//	SetRect(&rc, MW - thick, 0, MW + 50, MH); coll.AddWall(rc);
-	//}
-	// =================================================================
-	// 2. 도어 소켓(Door Socket) 기반 자동 캡핑 엔진!
-	// =================================================================
+	// 🌟 [수정] WallInfo에서 rc(RECT)만 쏙 빼서 물리 엔진에 전달
+	if (pID != 0 && !m_Prefabs[pID].walls.empty())
+	{
+		for (auto& w : m_Prefabs[pID].walls)
+		{
+			coll.AddWall(w.rc);
+		}
+	}
 
 	// =================================================================
 	// 고급 도어 소켓 캡핑 엔진 (화면에 보이게 두께 30px 할당 & 구멍 뚫기)
@@ -2099,20 +2131,6 @@ void MapManager::ChangeMap(int mapID)
 	// 이전 맵 적들 메모리 정리
 	for (auto e : m_Enemies) delete e;
 	m_Enemies.clear();
-
-	//// 8번 프리팹(시작방)일 때 테스트용 몹 스폰!
-	//if (pID == 8) {
-	//	// 지상 몹 2마리
-	//	Enemy* g1 = new GroundEnemy(); g1->Init(400, m_pCurrentMapChunk->height - 200);
-	//	Enemy* g2 = new GroundEnemy(); g2->Init(800, m_pCurrentMapChunk->height - 200);
-	//	m_Enemies.push_back(g1);
-	//	m_Enemies.push_back(g2);
-
-	//	// 비행 몹 1마리 공중에
-	//	Enemy* f1 = new FlyEnemy(); f1->Init(600, m_pCurrentMapChunk->height - 500);
-	//	m_Enemies.push_back(f1);
-	//}
-	
 	
 	// =================================================================
 	// 진짜 보스방(39번) 진입 시: 감시자의 기사 3형제 스폰 & 컷신 시작!
@@ -2496,18 +2514,6 @@ void MapManager::Update(double frame)
 
 void MapManager::Draw()
 {
-	/*if(m_Stage==1)
-	{
-		m_MapImg1_1[0].Render(posX, posY, 0, 1, 1);
-		m_MapImg1_1[1].Render(posX, posY, 0, 1, 1);
-		m_MapImg1_1[3].Render(posX+270, posY+70, 0, 1, 1);
-		m_MapImg1_2[m_MapImg1_1_ani1Count].Render(posX, posY, 0, 1.5, 1.5);
-		m_MapImg1_1[2].Render(posX+190, posY, 0, 1, 1);
-		m_MapImg1_1[4].Render(posX+900, posY, 0, 1, 1);
-		m_MapImg1_1[5].Render(posX, posY, 0, 1, 1);
-
-	}*/
-
 	if (m_pCurrentMapChunk == nullptr) return;
 
 	// 현재 맵의 모든 레이어 그리기
@@ -2516,6 +2522,102 @@ void MapManager::Draw()
 		// 카메라 좌표만큼 빼주기
 		m_pCurrentMapChunk->bgLayer[i].Render(0 - CAM->GetX(), 0 - CAM->GetY(), 0, 1, 1);
 	}
+
+	// 🌟 2. [추가] 타일 렌더링 시스템
+	int pID = m_pCurrentMapChunk->prefabID;
+	if (pID > 0)
+	{
+		for (auto& w : m_Prefabs[pID].walls)
+		{
+			if (w.type == TILE_NONE) continue; // 투명벽은 패스
+
+			RECT rc = w.rc;
+
+			// ---------------------------------------------------
+			// 🧱 바닥 (Floor)
+			// ---------------------------------------------------
+			if (w.type == TILE_FLOOR)
+			{
+				Sprite* img = &m_TileImages[TILE_FLOOR];
+				int width = img->imagesinfo.Width; // 270
+
+				// 왼쪽부터 오른쪽 끝까지 반복해서 찍기
+				for (int x = rc.left; x < rc.right; x += width) {
+					// Top(윗면)에 맞춰 그리기
+					img->Render(x - CAM->GetX(), rc.top - CAM->GetY(), 0, 1, 1, 1);
+				}
+			}
+			// ---------------------------------------------------
+			// ☁️ 플랫폼 (Platform) - 스케일링 적용!
+			// ---------------------------------------------------
+			else if (w.type == TILE_PLATFORM)
+			{
+				Sprite* img = &m_TileImages[TILE_PLATFORM];
+				float imgW = (float)img->imagesinfo.Width; // 283
+				float colliderW = (float)(rc.right - rc.left);
+
+				// 콜라이더 너비에 맞춰 억지로 늘리기 (Scale)
+				float scaleX = colliderW / imgW;
+
+				// 왼쪽 위(Left, Top)에 딱 맞춰 그리면 늘어난 만큼 꽉 참
+				img->Render(rc.left - CAM->GetX(), rc.top - CAM->GetY(), 0, 1, scaleX, 1.0f);
+			}
+			// ---------------------------------------------------
+			// 🧗 왼쪽 벽 (Wall L) - [왼쪽:검은색 | 오른쪽:벽]
+			// ---------------------------------------------------
+			else if (w.type == TILE_WALL_L)
+			{
+				Sprite* img = &m_TileImages[TILE_WALL_L];
+				int imgW = img->imagesinfo.Width;  // 240
+				int imgH = img->imagesinfo.Height; // 339
+
+				// 🌟 [핵심] 오른쪽 정렬! (이미지의 오른쪽 끝을 콜라이더 오른쪽 끝에 맞춤)
+				// DrawX = Collider.Right - ImageWidth
+				// 이렇게 하면 검은색 부분은 왼쪽 허공으로 나감
+				int drawX = rc.right - imgW;
+
+				for (int y = rc.top; y < rc.bottom; y += imgH) {
+					img->Render(drawX - CAM->GetX(), y - CAM->GetY(), 0, 1, 1, 1);
+				}
+			}
+			// ---------------------------------------------------
+			// 🧗 오른쪽 벽 (Wall R) - [왼쪽:벽 | 오른쪽:검은색] (좌우반전)
+			// ---------------------------------------------------
+			else if (w.type == TILE_WALL_R)
+			{
+				// 왼쪽 벽 이미지를 뒤집어 사용 (ScaleX = -1)
+				Sprite* img = &m_TileImages[TILE_WALL_L];
+				int imgH = img->imagesinfo.Height;
+
+				// 🌟 [핵심] 왼쪽 정렬!
+				// 이미지를 뒤집으면(ScaleX=-1), 보통 그리는 점(Pivot)에서 왼쪽으로 그려지거나
+				// 오른쪽으로 그려지는데 프레임워크마다 다릅니다.
+				// 일단 [왼쪽 끝]에 맞춰 그립니다.
+				// 만약 위치가 안 맞으면 drawX = rc.left + imgW; 로 수정 필요
+				int drawX = rc.left;
+
+				for (int y = rc.top; y < rc.bottom; y += imgH) {
+					// dir 대신 ScaleX 자리에 -1 넣기!
+					img->Render(drawX - CAM->GetX(), y - CAM->GetY(), 0, 1, -1.0f, 1.0f);
+				}
+			}
+			// ---------------------------------------------------
+			// 🦇 천장 (Ceiling)
+			// ---------------------------------------------------
+			else if (w.type == TILE_CEILING)
+			{
+				Sprite* img = &m_TileImages[TILE_CEILING];
+				int imgW = img->imagesinfo.Width;
+				int imgH = img->imagesinfo.Height;
+
+				for (int x = rc.left; x < rc.right; x += imgW) {
+					// 바닥(bottom)에서 이미지 높이만큼 위로 올려 그림
+					img->Render(x - CAM->GetX(), (rc.bottom - imgH) - CAM->GetY(), 0, 1, 1, 1);
+				}
+			}
+		}
+	}
+
 
 	// =======================================================
 	// 1. 배경 쪽에 깔려야 할 '시체' 및 '수면 상태' 먼저 렌더링

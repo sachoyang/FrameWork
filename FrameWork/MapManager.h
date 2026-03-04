@@ -13,6 +13,22 @@
 // 보스방 고유 ID
 #define ROOM_BOSS  16
 
+// 1. 타일 타입 정의 (기획하신 리소스 목록)
+enum TileType {
+	TILE_NONE = 0,
+	TILE_FLOOR,     // 바닥 (270*80)
+	TILE_PLATFORM,  // 플랫폼 (283*71, 스케일링)
+	TILE_WALL_L,    // 왼쪽 벽 (240*339, 우측 정렬)
+	TILE_WALL_R,    // 오른쪽 벽 (좌측 정렬)
+	TILE_CEILING    // 천장 (316*47)
+};
+
+// 2. 벽 정보 구조체 (충돌박스 + 이미지타입)
+struct WallInfo {
+	RECT rc;
+	int type; // TileType
+};
+
 // =======================================================
 // 프리팹(도면) 구조체
 // =======================================================
@@ -28,8 +44,8 @@ struct RoomPrefab
 	Sprite bgLayer[2];    // 배경 이미지 (일단 2개 쓴다고 가정)
 	int layerCount;
 	// 이 방에 무조건 고정으로 들어갈 벽과 발판들
-	std::list<RECT> walls;
-
+	//std::list<RECT> walls;
+	std::vector<WallInfo> walls;
 	// 특정방향으로 들어왔을 때 플레이어가 스폰될 위치 (문 위치에서 약간 안쪽으로)
 	// 인덱스: 1(UP), 2(DOWN), 3(LEFT), 4(RIGHT)
 	float spawnX[5];
@@ -62,6 +78,7 @@ struct CorpseInfo {
 
 class Enemy;
 
+
 class MapManager
 {
 
@@ -70,6 +87,9 @@ public :
 	~MapManager();
 
 	MapChunk* m_pCurrentMapChunk;
+
+	// 4. 타일 이미지 저장소
+	Sprite m_TileImages[10];
 
 	Sprite m_GameOverTitle; // GAME OVER 글씨
 	Sprite m_BlackScreen;   // 검은 배경 (1x1 픽셀 이미지 추천)
