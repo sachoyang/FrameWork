@@ -53,7 +53,8 @@ void MapManager::Init()
 	D3DXGetImageInfoFromFile("./resource/Img/map/ceiling.png", &m_CeilingImage.imagesinfo);
 
 	m_CorpseRegistry.clear();
-
+	
+	m_GameClearTime = 0;
 
 	// 프리펩 초기화 먼저 진행 후 맵 생성 (맵 생성 시 프리펩 정보가 필요)
 	InitPrefabs();
@@ -985,10 +986,21 @@ void MapManager::Update(double frame)
 			b3->ChangeState(B_STATE_AWAKE_ROAR);
 		}
 
-		// 3번 보스가 죽는 순간! (3초간 30% 속도로 슬로우 연출)
-		if (b3 && b3->state == B_STATE_DIE) {
-			TIMEMGR->SetTimeSlow(0.3f, 3000);
+		// 모든 보스가 죽는 순간! (3초간 30% 속도로 슬로우 연출)
+		if( (b3 && b3->state == B_STATE_DIE)&& (b1 && b1->state == B_STATE_DIE)&& (b2 && b2->state == B_STATE_DIE)){
+			// 처음 죽은 순간에만 타이머 기록!
+			if (m_GameClearTime == 0) {
+				m_GameClearTime = GetTickCount();
+				TIMEMGR->SetTimeSlow(0.3f, 3000); // 3초간 슬로우
+			}
 		}
+	}
+
+	// 보스 죽고 4초 뒤 엔딩 화면으로 이동!
+	if (m_GameClearTime != 0 && (GetTickCount() - m_GameClearTime > 4000))
+	{
+		g_Mng.n_Chap = ENDING; // 엔딩 씬으로 전환
+		m_GameClearTime = 0;   // 중복 실행 방지
 	}
 
 	// =======================================================
