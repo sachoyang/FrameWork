@@ -95,6 +95,9 @@ public :
 	Sprite m_WallImage;         // 벽 (왼쪽 기준, 오른쪽 벽은 반전해서 사용)
 	Sprite m_CeilingImage;      // 천장
 
+	// ChangeMap에서 생성된 '동적 벽(캡핑)'들을 저장할 리스트
+	std::vector<WallInfo> m_DynamicWalls;
+
 	Sprite m_GameOverTitle; // GAME OVER 글씨
 	Sprite m_BlackScreen;   // 검은 배경 (1x1 픽셀 이미지 추천)
 	D3DXIMAGE_INFO goimagesinfo;
