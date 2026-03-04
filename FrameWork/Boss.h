@@ -1,6 +1,8 @@
 #pragma once
 #include "Include.h"
 
+#define BOSS_HP 10
+
 // 보스가 가질 수 있는 행동 상태(State) 목록
 enum BOSS_STATE {
     B_STATE_SLEEP,          // 배경에서 잠들어 있음

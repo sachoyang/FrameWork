@@ -4,7 +4,7 @@ BossEnemy::BossEnemy(int id)
 {
     type = 3; // 보스 전용 타입
     bossID = id;
-    hp = 20;
+    hp = BOSS_HP;
     state = B_STATE_SLEEP; // 처음엔 무조건 잠들어 있음
 }
 
@@ -15,7 +15,7 @@ void BossEnemy::Init(float x, float y)
     // 1. 기본 위치 및 스펙
     pos.x = x;
     pos.y = y;
-    hp = 20;
+    hp = BOSS_HP;
     dir = 1; // 왼쪽을 바라봄
 
     // =======================================================

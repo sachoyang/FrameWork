@@ -974,7 +974,7 @@ void MapManager::Update(double frame)
 		}
 
 		// 페이즈 2: 1번 보스의 체력이 반피(10) 이하이고, 2번 보스가 자고 있다면 기상!
-		if (b1 && b1->hp <= 10 && b2 && b2->state == B_STATE_SLEEP) {
+		if (b1 && b1->hp <= BOSS_HP/2 && b2 && b2->state == B_STATE_SLEEP) {
 			b2->ChangeState(B_STATE_AWAKE_ROAR);
 		}
 
