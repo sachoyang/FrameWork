@@ -50,7 +50,7 @@ void MapManager::Init()
 	// 4. 오른쪽 벽 (왼쪽 벽 이미지를 뒤집어 쓸 예정이면 따로 로드 안 해도 됨)
 	// 5. 천장
 	m_CeilingImage.Create("./resource/Img/map/ceiling01.png", false, 0);
-	D3DXGetImageInfoFromFile("./resource/Img/map/ceiling01.png", &m_CeilingImage.imagesinfo);
+	D3DXGetImageInfoFromFile("./resource/Img/map/ceiling.png", &m_CeilingImage.imagesinfo);
 
 	m_CorpseRegistry.clear();
 
@@ -1076,6 +1076,7 @@ void MapManager::Draw()
 		RECT rc = w.rc;
 		float colliderW = (float)(rc.right - rc.left);
 		float colliderH = (float)(rc.bottom - rc.top);
+
 		// =========================================================
 			// 🧱 1. 바닥 (Floor) - 상단 정렬 + 반복
 			// =========================================================
@@ -1107,8 +1108,9 @@ void MapManager::Draw()
 			// X: 콜라이더 Right - 이미지 절반 (그래야 오른쪽 끝이 맞음)
 			float drawX = rc.right - (imgW / 2.0f);
 
-			// 🌟 [스마트 Y 정렬]
-				// 윗 벽(Ceiling 붙음)은 밑에서 위로 그려야 문을 안 가림!
+			// [스마트 Y 정렬]
+			// 윗 벽(Ceiling 붙음)은 밑에서 위로 그려야 문을 안 가림!
+
 			if (rc.top <= 0) // 천장에 붙은 벽
 			{
 				// Bottom Align: rc.bottom에서 위로 올라감
@@ -1139,7 +1141,7 @@ void MapManager::Draw()
 			float drawX = rc.left + (imgW / 2.0f);
 			
 			// [스마트 Y 정렬]
-				// 윗 벽(Ceiling 붙음)은 밑에서 위로 그려야 문을 안 가림!
+			// 윗 벽(Ceiling 붙음)은 밑에서 위로 그려야 문을 안 가림!
 			if (rc.top <= 0) // 천장에 붙은 벽
 			{
 				// Bottom Align: rc.bottom에서 위로 올라감
@@ -1166,11 +1168,17 @@ void MapManager::Draw()
 			int imgH = m_CeilingImage.imagesinfo.Height;
 
 			for (int x = rc.left; x < rc.right; x += imgW) {
-				float drawX = x + (imgW / 2.0f);
-				// Y: 콜라이더 Bottom - 이미지 절반 (그래야 아랫면이 맞음)
-				float drawY = rc.bottom - (imgH / 2.0f);
 
-				m_CeilingImage.Render(drawX - CAM->GetX(), drawY - CAM->GetY(), 0, 1, 1, 1);
+				// 스케일 계산 (콜라이더 너비에 맞춤)
+				float scaleX = colliderW / imgW;
+
+				// 좌표 보정 (Render가 Center 기준이므로, 우리가 원하는 위치의 '중앙'을 줘야 함)
+				// X: 콜라이더의 정중앙
+				float drawX = (rc.left + rc.right) / 2.0f;
+				// Y: 콜라이더 윗면(Top) + 이미지 높이의 절반
+				float drawY = rc.top + (imgH / 2.0f);
+
+				m_CeilingImage.Render(drawX - CAM->GetX(), drawY - CAM->GetY(), 0, scaleX, 1, 1);
 			}
 		}
 	}
@@ -1203,7 +1211,7 @@ void MapManager::Draw()
 	}
 
 	// =======================================================
-	// 🌟 [추가] 기사가 죽었다면, 서서히 어두워지며 게임오버 로고 출력!
+	// 기사가 죽었다면, 서서히 어두워지며 게임오버 로고 출력!
 	// =======================================================
 	if (knight.isDead)
 	{
