@@ -20,7 +20,7 @@ void Game::Init()
 	EFFECT->Init();
 	uiMng.Init();
 	// 데이타 베이스///////////////////
-	//sql.Init();
+	// sql.Init();
 }
 
 void Game::Draw()
@@ -32,7 +32,7 @@ void Game::Draw()
 	Gmanager.Draw();
 	uiMng.Draw();
 	// 데이타 베이스///////////////////
-	//sql.Draw();
+	// sql.Draw();
 }
 
 // Chap, 재정의 함수 호출

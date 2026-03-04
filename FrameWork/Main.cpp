@@ -101,9 +101,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	g_Mng.chap[ENDING] = new Ending; // 🌟 [추가]
 	/////////////////////////////////////////
 
-	for(int i=0; i<TOTALCHAP; i++)
-		g_Mng.chap[i]->Init();
-
+	/*for(int i=0; i<TOTALCHAP; i++)
+		g_Mng.chap[i]->Init();*/
+	for (int i = 0; i < TOTALCHAP; i++)
+	{
+		if (g_Mng.chap[i] != NULL)
+		{
+			g_Mng.chap[i]->Init();
+		}
+	}
 	// Replace the main message loop with this
 	while (msg.message != WM_QUIT)
 	{

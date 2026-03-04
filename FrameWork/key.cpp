@@ -123,10 +123,6 @@ void Key::Update()
 	}
 
 
-
-
-
-
 	if(KeyDown(VK_F1))
 	{
 		if(GetTickCount64() - KeyTime1 > 10)
@@ -153,6 +149,8 @@ void Key::Update()
 	{
 		if(GetTickCount64() - KeyTime > 200)
 		{	
+			g_Mng.n_Chap = ENDING;
+
 			KeyTime = GetTickCount64();
 		}
 	
