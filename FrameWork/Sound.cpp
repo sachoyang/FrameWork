@@ -80,7 +80,7 @@ void Sound::StopEffect(SoundType type)
 
 	// FmodSound의 전역 함수 호출 (구현되어 있다고 가정)
 	// 만약 EffectStop이라는 함수가 없다면, FMOD 내부의 Stop 기능을 연결해야 합니다.
-	EffectStop(m_SoundIDs[type]);
+	//EffectStop(m_SoundIDs[type]);
 }
 
 // 사용법
