@@ -23,7 +23,7 @@ public:
 	{
 		System_Create(&m_pSystem);
 		// init(채널 최대설정값, 초기화 시점 , 추가로 넣을 보조 드라이버 );
-		m_pSystem->init(10, FMOD_INIT_NORMAL, 0);
+		m_pSystem->init(32, FMOD_INIT_NORMAL, 0);
 
 		m_Index = 0;
 		m_vloum = 1.0f;
@@ -71,17 +71,32 @@ public:
 	}
 
 	// 이펙트 플레이
-	void EffectPlay(int _SoundNum)
+	//void EffectPlay(int _SoundNum)
+	//{
+	//	auto Find = m_SoundList.find(_SoundNum);
+
+	//	// 만약 이펙트도 볼륨 조절 원하면 클래스 멤버로 빼야함
+	//	Channel* pChannel = nullptr;
+
+	//	// playSound(채널그룹, sound, 일시정지니?,채널);
+	//	m_pSystem->playSound(FMOD_CHANNEL_FREE, Find->second, 0, &pChannel);
+	//}
+	int EffectPlay(int _SoundNum)
 	{
 		auto Find = m_SoundList.find(_SoundNum);
+		if (Find == m_SoundList.end()) return -1;
 
-		// 만약 이펙트도 볼륨 조절 원하면 클래스 멤버로 빼야함
 		Channel* pChannel = nullptr;
-
-		// playSound(채널그룹, sound, 일시정지니?,채널);
 		m_pSystem->playSound(FMOD_CHANNEL_FREE, Find->second, 0, &pChannel);
-	}
 
+		// 채널 ID(Index)를 뽑아서 리턴
+		int channelIndex = -1;
+		if (pChannel)
+		{
+			pChannel->getIndex(&channelIndex);
+		}
+		return channelIndex;
+	}
 	// 배경음 플레이
 	void BGPlay(int _SoundNum)
 	{
@@ -114,6 +129,19 @@ public:
 		if (m_vloum >= 1.0) m_vloum = 1.0;
 		m_pBGChannel->setVolume(m_vloum);
 	}
+
+	void StopSound(int _ChannelIndex)
+	{
+		if (_ChannelIndex < 0) return;
+
+		Channel* pChannel = nullptr;
+		m_pSystem->getChannel(_ChannelIndex, &pChannel);
+
+		if (pChannel)
+		{
+			pChannel->stop();
+		}
+	}
 };
 
 static FmodSound g_SoundMgr;
@@ -125,11 +153,14 @@ int	AddSoundFile(std::string _FullPath, bool _IsLoop)
 }
 
 // 전역 이펙트 플레이 함수
-void EffectPlay(int _SoundNum)
+//void EffectPlay(int _SoundNum)
+//{
+//	g_SoundMgr.EffectPlay(_SoundNum);
+//}
+int EffectPlay(int _SoundNum)
 {
-	g_SoundMgr.EffectPlay(_SoundNum);
+	return g_SoundMgr.EffectPlay(_SoundNum);
 }
-
 // 전역 배경음 출력 함수
 void BGPlay(int _SoundNum)
 {
@@ -152,4 +183,9 @@ void VolumDown()
 void BGStop()
 {
 	g_SoundMgr.BGStop();
+}
+
+void StopSound(int _ChannelIndex)
+{
+	g_SoundMgr.StopSound(_ChannelIndex);
 }

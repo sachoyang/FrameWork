@@ -47,7 +47,7 @@ void EffectManager::Init() {
 
     // [대시 먼지(잔상)] - 예: dash_dust01.png ~ dash_dust03.png (3장)
     for (int i = 1; i <= 5; i++) {
-        sprintf_s(FileName, "./resource/Img/effect/dash_effect%02d.png", i-1);
+        sprintf_s(FileName, "./resource/Img/effect/dash_effect_%02d.png", i-1);
         temp.Create(FileName, false, 0);
         m_SprDashDust.push_back(temp);
     }

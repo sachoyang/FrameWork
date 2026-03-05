@@ -68,7 +68,7 @@ void BossEnemy::Init(float x, float y)
         sprintf_s(FileName, "./resource/Img/boss/die%02d.png", i + 1); // 파일명 확인 (die01.png)
         dieImg[i].Create(FileName, false, 0);
     }
-
+    m_dwSoundTime = 0;
     // 히트박스 갱신
     BossSetRect();
 }
@@ -98,6 +98,18 @@ void BossEnemy::ChangeState(int newState)
     stateStartTime = GetTickCount();
     aniCount = 0;
     aniTime = GetTickCount(); // 애니메이션 타이머 초기화
+    if (newState == B_STATE_AWAKE_ROAR)
+    {
+        SOUND->PlayEffect(SND_EFF_BOSS_ROAR);
+    }
+    else if ((newState == B_STATE_ROLL_DASH)||(newState == B_STATE_ROLL_BOUNCE))
+    {
+		SOUND->PlayEffect(SND_EFF_BOSS_ROLL);
+    }
+	else if (newState == B_STATE_DIE)
+    {
+
+    }
 }
 
 bool BossEnemy::CanDealDamage()
@@ -159,21 +171,22 @@ void BossEnemy::Update()
     isAttacking = false;
     SetRect(&attackBox, 0, 0, 0, 0);
 
-    if (state == B_STATE_AWAKE_ROAR) {
-        // 🌟 2초(2000ms) 동안 4프레임 분배 (0.5초마다 변경)
-        if (elapsed < 500) aniCount = 0;       // 준비 동작 1
-        else if (elapsed < 1000) aniCount = 1; // 준비 동작 2
-        else if (elapsed < 1500) aniCount = 2; // 포효 1
-        else aniCount = 3;                     // 포효 2
-    }
-    else if (state == B_STATE_WALK) {
-        // 🌟 걷기 애니메이션 재생 (0.15초마다 프레임 넘김)
-        if (GetTickCount() - aniTime > 150) {
-            aniCount++;
-            if (aniCount > 5) aniCount = 0; // 6프레임 반복
-            aniTime = GetTickCount();
-        }
-    }
+  //  if (state == B_STATE_AWAKE_ROAR) {
+  //      // 🌟 2초(2000ms) 동안 4프레임 분배 (0.5초마다 변경)
+		//SOUND->PlayEffect(SND_EFF_BOSS_ROAR); // 포효 시작할 때 효과음 재생
+  //      if (elapsed < 500) aniCount = 0;       // 준비 동작 1
+  //      else if (elapsed < 1000) aniCount = 1; // 준비 동작 2
+  //      else if (elapsed < 1500) aniCount = 2; // 포효 1
+  //      else aniCount = 3;                     // 포효 2
+  //  }
+  //  else if (state == B_STATE_WALK) {
+  //      // 🌟 걷기 애니메이션 재생 (0.15초마다 프레임 넘김)
+  //      if (GetTickCount() - aniTime > 150) {
+  //          aniCount++;
+  //          if (aniCount > 5) aniCount = 0; // 6프레임 반복
+  //          aniTime = GetTickCount();
+  //      }
+  //  }
 
     // 히트박스 갱신
     BossSetRect();
@@ -279,6 +292,7 @@ void BossEnemy::Update()
         }
         else
         {
+            
             if (GetTickCount() - aniTime > 100) { // 0.1초마다 프레임 넘김
                 aniCount++;
                 aniTime = GetTickCount();
@@ -302,6 +316,7 @@ void BossEnemy::Update()
 
             // 1. 가로 베기 구간 (옆으로 쫙 길게! 위아래는 얇게)
             if (aniCount >= 2 && aniCount <= 4) {
+                SOUND->PlayEffect(SND_EFF_BOSS_ATTACK1);
                 isAttacking = true;
                 if (dir == 1) { // 왼쪽 보고 칠 때 (X를 왼쪽으로 길게 -300)
                     SetRect(&attackBox, pos.x - 300, pos.y - 50, pos.x + 50, pos.y + 50);
@@ -313,6 +328,7 @@ void BossEnemy::Update()
 
             // 2. 세로 베기 구간 (위로 아주 높게! X 폭은 적당히)
             else if (aniCount >= 7 && aniCount <= 9) {
+                SOUND->PlayEffect(SND_EFF_BOSS_ATTACK2);
                 isAttacking = true;
                 if (dir == 1) { // 왼쪽 (Y를 위로 엄청 높게 -250)
                     SetRect(&attackBox, pos.x - 200, pos.y - 200, pos.x + 50, pos.y + 120);
@@ -327,13 +343,16 @@ void BossEnemy::Update()
         break;
 
     case B_STATE_ROLL_DASH:
-        // 🌟 지상 구르기 돌진 (Roll01 ~ Roll07)
+        //SOUND->PlayEffect(SND_EFF_BOSS_ROLL);
+
+        // 지상 구르기 돌진 (Roll01 ~ Roll07)
         if (elapsed < 400) {
             // 준비 동작 (살짝 뒤로 물러남)
             aniCount = 0;
             velocity.x = (dir == 1) ? 2.0f : -2.0f; // 반대 방향으로 스멀스멀
         }
         else {
+
             // 본격적인 돌진 (무한 궤도 1~4 프레임 반복)
             velocity.x = (dir == 1) ? -15.0f : 15.0f; // 엄청난 속도로 돌진!
 
@@ -372,9 +391,11 @@ void BossEnemy::Update()
             if (aniCount > 4 || aniCount < 1) aniCount = 1;
             aniTime = GetTickCount();
         }
+        //SOUND->PlayEffect(SND_EFF_BOSS_ROLL_SKY);
 
         // 2. 당구공처럼 벽에 튕기기!
         if (dir == 1 && pos.x <= 150.0f) {
+
             pos.x = 150.0f; // 벽에 파고들지 않게 꺼내줌
             velocity.x = -velocity.x; // 왼쪽 벽에 박으면 우측으로 튕김
             dir = -1;       // 방향을 꺾어주면 위의 velocity.x 강제 유지 코드 덕에 반대로 튕겨 날아감!
@@ -396,6 +417,8 @@ void BossEnemy::Update()
                 velocity.x = 0;
             }
             else {
+                //SOUND->PlayEffect(SND_EFF_BOSS_ROLL_SKY);
+
                 // 🌟 바닥에 닿자마자 기사 위치를 스캔하여 궤도를 수정하며 다시 솟구침!
                 gravity = -25.0f;
 
@@ -462,7 +485,15 @@ void BossEnemy::Draw()
     else if (state == B_STATE_WALK) currentImg = &walkImg[aniCount];
 	else if (state == B_STATE_IDLE) currentImg = &stopImg[aniCount];
     else if (state == B_STATE_MELEE) currentImg = &swingImg[aniCount];
-    else if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE) currentImg = &rollImg[aniCount];
+    else if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE) 
+    { 
+        currentImg = &rollImg[aniCount]; 
+        if (GetTickCount() - m_dwSoundTime > 1500)
+        {
+            SOUND->PlayEffect(SND_EFF_BOSS_ROLL); // Loop 아님, 1회 재생
+            m_dwSoundTime = GetTickCount();
+        }
+    }
     else if (state == B_STATE_DIE) currentImg = &dieImg[aniCount];
 
     currentImg->color = color;

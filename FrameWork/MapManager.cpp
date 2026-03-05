@@ -64,6 +64,7 @@ void MapManager::Init()
 
 	// [초기 시작] 1번 맵으로 시작!
 	ChangeMap(1);
+	SOUND->PlayBGM(SND_BGM_STAGE1);
 }
 
 void MapManager::InitPrefabs()
@@ -459,7 +460,10 @@ void MapManager::CreateRandomMap()
 
 void MapManager::ChangeMap(int mapID)
 {
-
+	if (mapID!=1)
+	{
+		SOUND->PlayBGM(SND_BGM_FIGHT);
+	}
 	// 맵을 36개까지 쓰기로 했으니, 제한을 40으로
 	if (mapID < 1 || mapID >= 40) return;
 
@@ -627,6 +631,7 @@ void MapManager::ChangeMap(int mapID)
 	// =================================================================
 	if (currentRoomID == 39||(currentRoomID == 38)&&pID==ROOM_BOSS)
 	{
+		SOUND->PlayBGM(SND_BGM_BOSS);
 		// 렌더링 순서(Z-Order)를 위해 배경 쪽에 있는 애들부터 먼저 스폰(Draw)합니다.
 		knight.pos.x = 1000.0f;
 		// 1. 왼쪽 보스 (2번, 잠듦)
@@ -993,6 +998,7 @@ void MapManager::Update(double frame)
 				m_GameClearTime = GetTickCount();
 				TIMEMGR->SetTimeSlow(0.3f, 3000); // 3초간 슬로우
 			}
+			SOUND->PlayBGM(SND_EFF_BOSS_DIE);
 		}
 	}
 
@@ -1006,6 +1012,10 @@ void MapManager::Update(double frame)
 	// =======================================================
 	// 게임오버 씬(OVER) 전환 연출
 	// =======================================================
+	if (knight.isDead)
+	{
+		SOUND->PlayBGM(SND_EFF_HERO_DIE);
+	}
 	if (knight.isDead && (GetTickCount() - knight.realDeadTime > 2000)) {
 		// 2초의 슬로우 모션 연출이 끝나면 게임오버 씬으로 넘깁니다!
 		g_Mng.n_Chap = OVER; // (혹시 Define.h에 게임오버 씬 변수 이름이 OVER가 아니라면 맞게 수정해 주세요!)

@@ -402,6 +402,7 @@ void Knight::Update()
             else if (isDashing)
             {
                 DWORD dashTime = TIMEMGR->GetGameTime() - dashStartTime;
+
                 if (dashTime < 50)       m_KnightCount = 11;
                 else if (dashTime < 100) m_KnightCount = 12;
                 else if (dashTime < 150) m_KnightCount = 13;
@@ -556,6 +557,8 @@ void Knight::JumpStart()
         // 최대 점프력 설정 (값이 클수록 높이 뜀)
         gravity = -20.0f;
         grounded = false;
+        SOUND->PlayEffect(SND_EFF_JUMP);
+
     }
 }
 
@@ -583,10 +586,68 @@ void Knight::DashStart()
 
     // 3. 대시
     isDashing = true;
-    EFFECT->Play(EF_DASH_DUST, pos.x + (dir == 1 ? 40 : -40), pos.y, dir); // 대시 먼지 스폰!
     dashStartTime = curTime;
     dashCooldownTime = curTime;
     gravity = 0; // 중력 제거 (일직선 이동)
+    SOUND->PlayEffect(SND_EFF_DASH);
+
+    // =================================================================
+    // 🌟 [핵심 로직] 벽을 뚫지 않는 "최종 도착 지점" 계산
+    // =================================================================
+
+    float maxDashDist = 200.0f; // 최대 대시 거리
+    float finalX = pos.x;       // 최종 이펙트가 생길 위치 (일단 내 위치로 시작)
+
+    // 방향에 따른 목표 지점 설정 (dir: 1=왼쪽, -1=오른쪽)
+    // 주의: Knight::Update의 moveX 로직(moveX = -(dir * dashSpeed))에 따르면
+    // dir이 1이면 왼쪽(-), -1이면 오른쪽(+)으로 이동합니다.
+
+    if (dir == 1) // [왼쪽]으로 대시
+    {
+        float targetX = pos.x - maxDashDist; // 원래 가고 싶은 곳
+        finalX = targetX; // 일단 장애물 없다고 가정
+
+        // 모든 벽을 검사해서 "내 왼쪽"에 있고 "가장 가까운" 벽을 찾음
+        for (auto& wall : coll.m_Walls)
+        {
+            // Y축(높이)이 겹치는지 확인 (내 몸통 높이에 있는 벽인가?)
+            if (m_rc.bottom > wall.top && m_rc.top < wall.bottom)
+            {
+                // 벽이 내 왼쪽에 있고(wall.right < m_rc.left)
+                // 원래 목표보다 더 가깝다면(wall.right > targetX)
+                if (wall.right <= m_rc.left && wall.right > targetX)
+                {
+                    finalX = (float)wall.right + 60.0f; // 벽 바로 오른쪽(앞)으로 위치 수정
+                    // (targetX를 갱신해서 더 멀리 있는 벽은 무시하게 만듦)
+                    targetX = finalX;
+                }
+            }
+        }
+    }
+    else // [오른쪽]으로 대시 (dir == -1)
+    {
+        float targetX = pos.x + maxDashDist;
+        finalX = targetX;
+
+        for (auto& wall : coll.m_Walls)
+        {
+            // Y축 겹침 확인
+            if (m_rc.bottom > wall.top && m_rc.top < wall.bottom)
+            {
+                // 벽이 내 오른쪽에 있고(wall.left > m_rc.right)
+                // 원래 목표보다 가깝다면(wall.left < targetX)
+                if (wall.left >= m_rc.right && wall.left < targetX)
+                {
+                    finalX = (float)wall.left - 60.0f; // 벽 바로 왼쪽(앞)
+                    targetX = finalX;
+                }
+            }
+        }
+    }
+
+    // 🌟 계산된 'finalX' 위치에 이펙트 생성!
+    // (살짝 위치 보정을 위해 dir에 따라 offset 추가)
+    EFFECT->Play(EF_DASH_DUST, finalX + (dir == 1 ? 40 : -40), pos.y, dir);
 
     // 공중에서 썼다면 기회 소진
     if (!grounded) canAirDash = false;
@@ -606,6 +667,7 @@ void Knight::AttackStart()
     if (!grounded && isLookdown) attackType = 2; // 하단
     else if (isLookup) attackType = 1;           // 상단
     else attackType = 0;                         // 측면
+    SOUND->PlayEffect(SND_EFF_ATTACK);
 
     // =======================================================
     // 2. [버그 수정] 이펙트는 무조건 attackType을 기준으로 여기서 스폰!
@@ -625,7 +687,6 @@ bool Knight::TakeDamage(int damage, int hitDir)
     if (isInvincible || isDead) return false;
 
     hp -= damage;
-
     // 사망 처리
     if (hp <= 0) {
         hp = 0;
@@ -635,6 +696,7 @@ bool Knight::TakeDamage(int damage, int hitDir)
 
         deadTime = TIMEMGR->GetGameTime();
         realDeadTime = GetTickCount();
+        SOUND->PlayEffect(SND_EFF_HERO_DIE);
 
         isAttacking = false;
         isAttackHit = false;
@@ -645,6 +707,7 @@ bool Knight::TakeDamage(int damage, int hitDir)
 
         return true; // 죽었을 때도 '맞은 건 맞으니까' true 반환
     }
+    SOUND->PlayEffect(SND_EFF_HIT);
 
     // 일반 피격 처리
     isInvincible = true;

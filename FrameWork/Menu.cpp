@@ -69,6 +69,7 @@ void Menu::Draw()
 	//m_BtnExit.Draw(m_rtExit.left, m_rtExit.top);
 	m_BtnExit.Render(m_rtExit.left, m_rtExit.top, 0, menuScale, menuScale);
 
+	SOUND->PlayBGM(SND_BGM_HK);
 	//if (GetTickCount() - AlTime > 100)
 	//{
 	//	alpha++;
