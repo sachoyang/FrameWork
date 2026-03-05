@@ -56,14 +56,14 @@ void Ending::OnMessage(MSG* msg)
 	{
 		if (LOWORD(msg->wParam) == ID_BTN_THANKS)
 		{
-			INT_PTR result = (INT_PTR)ShellExecute(NULL, "open", "./Thanks.html", NULL, NULL, SW_SHOWNORMAL);
+			INT_PTR result = (INT_PTR)ShellExecute(NULL, "open", "./resource/ending/Thanks.html", NULL, NULL, SW_SHOWNORMAL);
 
 			if (result <= 32) {
 				// 실패 시 메시지 박스로 알려줌 (디버깅용)
 				MessageBox(NULL, "Thanks.html 파일을 찾을 수 없습니다!", "오류", MB_OK);
 			}
 
-			// 2. 🌟 [핵심] 메뉴로 가기 전에 버튼을 숨겨야 합니다!
+			// 2. 메뉴로 가기 전에 버튼을 숨겨야 합니다!
 			ShowWindow(m_hBtn, SW_HIDE);
 
 			// 3. 씬 전환

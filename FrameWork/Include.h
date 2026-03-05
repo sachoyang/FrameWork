@@ -8,11 +8,11 @@
 
 //////////////////////////////////////////////////////
 -----------------------------------------------------*/
-
+#define _CRT_SECURE_NO_WARNINGS
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")
 #pragma comment(lib,"dsound.lib")
-
+#pragma comment(lib, "legacy_stdio_definitions.lib")
 // 데이타 베이스///////////////////
 //#include <my_global.h>
 #include <winsock2.h>

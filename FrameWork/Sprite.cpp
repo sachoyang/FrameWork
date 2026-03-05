@@ -138,7 +138,10 @@ void Sprite::Render( float x , float y , float radian, float sx, float sy, int p
     D3DXMatrixScaling(&scale , sx ,sy ,1) ;
     D3DXMatrixRotationZ( &rot , radian ) ;
     D3DXMatrixTranslation( &trans , x , y , 1.0f ) ;
-    pSprite->SetTransform( &( scale * rot * trans ) ) ;
+
+	D3DXMATRIX matWorld = scale * rot * trans;
+
+    pSprite->SetTransform( &matWorld) ;
 
     dv_font.Sprite->Begin(D3DXSPRITE_ALPHABLEND) ;
     pSprite->Draw( Texture , &Rect, &center, NULL , color ) ;
@@ -176,8 +179,8 @@ void Sprite::RenderDraw( float x , float y , float sx , float sy , float sw , fl
 	D3DXMatrixScaling(&scale , sl ,st ,1) ;
 	D3DXMatrixRotationZ( &rot , radian ) ;
 	D3DXMatrixTranslation( &trans , x , y , 1.0f ) ;
-	pSprite->SetTransform( &( scale * rot * trans ) ) ;
-
+	D3DXMATRIX matWorld = scale * rot * trans;
+	pSprite->SetTransform(&matWorld);
 	dv_font.Sprite->Begin(D3DXSPRITE_ALPHABLEND) ;
 	pSprite->Draw( Texture , &Rect, &center, NULL , 0xFFFFFFFF ) ;
 	pSprite->Flush() ;

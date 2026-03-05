@@ -1291,7 +1291,7 @@ void MapManager::Draw()
 	}
 }
 
-char* MapManager::GetStateName(int state)
+const char* MapManager::GetStateName(int state)
 {
 	switch (state)
 	{
