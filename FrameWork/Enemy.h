@@ -8,6 +8,9 @@ public:
 	int m_ID;          // 몬스터 고유 ID (필요하면 사용)
     bool isCorpseFixed;
 
+    int m_iSoundChannel; // 현재 재생 중인 몬스터 소리 채널 (없으면 -1)
+    void StopMonsterSound(); // 소리 끄기 함수
+
     int type;           // 1: 지상, 2: 비행
     D3DXVECTOR2 pos;    // 현재 위치
     RECT m_rc;          // 피격 박스 (몸체)
@@ -27,7 +30,7 @@ public:
     int aniCount;
     DWORD aniTime;
 
-    Enemy() : hp(3), isDead(false), isHit(false), dir(1), gravity(0), type(1), aniCount(0), aniTime(0) {}    virtual ~Enemy() {}
+    Enemy() : hp(3), isDead(false), isHit(false), dir(1), gravity(0), type(1), aniCount(0), aniTime(0), m_iSoundChannel(-1) {}    virtual ~Enemy() {}
 
     virtual void Init(float x, float y) = 0; // 자식들이 각자 구현할 초기화
     virtual void Update() = 0;               // 각자의 행동 패턴

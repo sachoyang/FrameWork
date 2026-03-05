@@ -17,12 +17,24 @@ void Enemy::TakeDamage(int damage, int hitDir)
         isDead = true;
         aniCount = 0; // 시체 프레임 시작
         gravity = -5.0f; // 죽을 때도 살짝 위로 튀며 사망
+        // 🌟 [핵심] 죽는 순간, 반복 재생되던 몬스터 소리를 끕니다!
+        StopMonsterSound();
+        SOUND->PlayEffect(SND_EFF_MONSTER_DIE);
+
+
     }
     else 
     {
         // 타격감 2번: 통통 튀어오르는 넉백!
         velocity.x = hitDir * 5.0f; // 맞은 방향으로 밀려남
         gravity = -7.0f;            // 위로 튀어오름
+    }
+}
+
+void Enemy::StopMonsterSound() {
+    if (m_iSoundChannel != -1) {
+        SOUND->StopSound(m_iSoundChannel);
+        m_iSoundChannel = -1;
     }
 }
 
@@ -71,6 +83,9 @@ void GroundEnemy::Init(float x, float y)
     for (int i = 0; i < 3; i++) { sprintf_s(FileName, "./resource/Img/monster/ground%02d.png", i + 1); img[i].Create(FileName, false, 0); }
     for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/ground_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
     SetRect(&m_rc, pos.x - 30, pos.y - 40, pos.x + 30, pos.y + 40);
+    if (m_iSoundChannel == -1) {
+        m_iSoundChannel = SOUND->PlayEffect(SND_EFT_CRAWLER);
+    }
 }
 
 void GroundEnemy::Update()
@@ -139,6 +154,9 @@ void FlyEnemy::Init(float x, float y)
     char FileName[256];
     for (int i = 0; i < 4; i++) { sprintf_s(FileName, "./resource/Img/monster/fly%02d.png", i + 1); img[i].Create(FileName, false, 0); }
     for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/fly_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
+    if (m_iSoundChannel == -1) {
+        m_iSoundChannel = SOUND->PlayEffect(SND_EFT_FLYER);
+    }
 }
 
 void FlyEnemy::Update()
