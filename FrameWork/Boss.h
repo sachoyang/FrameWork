@@ -22,6 +22,8 @@ public:
     int bossID; // 1번, 2번, 3번 보스 식별용 (누가 깨어날지 결정)
     int state;
     DWORD stateStartTime;
+
+    int m_RollSoundChannel; // 채널 ID
     DWORD m_dwSoundTime; // 마지막 사운드 재생 시간 저장용
     // 추가 변수 (탱탱볼 바운스 카운트 등 추후 사용)
     int bounceCount;

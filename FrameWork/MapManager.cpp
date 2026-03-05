@@ -998,7 +998,7 @@ void MapManager::Update(double frame)
 				m_GameClearTime = GetTickCount();
 				TIMEMGR->SetTimeSlow(0.3f, 3000); // 3초간 슬로우
 			}
-			SOUND->PlayBGM(SND_EFF_BOSS_DIE);
+			SOUND->PlayBGM(SND_BGM_CLEAR);
 		}
 	}
 

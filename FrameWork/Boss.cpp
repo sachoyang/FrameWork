@@ -8,7 +8,13 @@ BossEnemy::BossEnemy(int id)
     state = B_STATE_SLEEP; // 처음엔 무조건 잠들어 있음
 }
 
-BossEnemy::~BossEnemy() {}
+BossEnemy::~BossEnemy() 
+{
+    // 보스가 사라질 때 혹시 구르는 소리가 나고 있다면 꺼줍니다.
+    if (m_RollSoundChannel != -1) {
+        SOUND->StopSound(m_RollSoundChannel);
+    }
+}
 
 void BossEnemy::Init(float x, float y)
 {
@@ -68,6 +74,7 @@ void BossEnemy::Init(float x, float y)
         sprintf_s(FileName, "./resource/Img/boss/die%02d.png", i + 1); // 파일명 확인 (die01.png)
         dieImg[i].Create(FileName, false, 0);
     }
+    m_RollSoundChannel = -1; // 채널 ID 초기화
     m_dwSoundTime = 0;
     // 히트박스 갱신
     BossSetRect();
@@ -94,22 +101,47 @@ void BossEnemy::TakeDamage(int damage, int hitDir)
 
 void BossEnemy::ChangeState(int newState)
 {
+    // 구르기 상태에서 다른 상태로 바뀔 때 -> 소리를 끈다!
+    if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE)
+    {
+        // 다음 상태가 또 구르기라면 끄지 않고 유지할 수도 있음 (자연스러운 연결 위해)
+        // 하지만 여기선 확실하게 끄고 다시 켜는 방식으로 구현 (끊김 방지하려면 조건 추가 가능)
+        if (newState != B_STATE_ROLL_DASH && newState != B_STATE_ROLL_BOUNCE)
+        {
+            if (m_RollSoundChannel != -1) {
+                SOUND->StopSound(m_RollSoundChannel);
+
+                m_RollSoundChannel = -1; // 초기화
+            }
+        }
+    }
+
     state = newState;
     stateStartTime = GetTickCount();
     aniCount = 0;
     aniTime = GetTickCount(); // 애니메이션 타이머 초기화
+
     if (newState == B_STATE_AWAKE_ROAR)
     {
         SOUND->PlayEffect(SND_EFF_BOSS_ROAR);
     }
-    else if ((newState == B_STATE_ROLL_DASH)||(newState == B_STATE_ROLL_BOUNCE))
+    else if (newState == B_STATE_ROLL_DASH)
     {
-		SOUND->PlayEffect(SND_EFF_BOSS_ROLL);
+        // 이미 소리가 나고 있지 않을 때만 재생 (중복 방지)
+        if (m_RollSoundChannel == -1) {
+            m_RollSoundChannel = SOUND->PlayEffect(SND_EFF_BOSS_ROLL);
+        }
     }
-	else if (newState == B_STATE_DIE)
+	else if (newState == B_STATE_ROLL_BOUNCE)
     {
-
+        if (m_RollSoundChannel == -1) {
+            m_RollSoundChannel = SOUND->PlayEffect(SND_EFF_BOSS_ROLL_SKY);
+        }
     }
+    else if (newState == B_STATE_DIE)
+    {
+        SOUND->PlayEffect(SND_EFF_BOSS_DIE);
+	}
 }
 
 bool BossEnemy::CanDealDamage()
@@ -488,11 +520,11 @@ void BossEnemy::Draw()
     else if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE) 
     { 
         currentImg = &rollImg[aniCount]; 
-        if (GetTickCount() - m_dwSoundTime > 1500)
-        {
-            SOUND->PlayEffect(SND_EFF_BOSS_ROLL); // Loop 아님, 1회 재생
-            m_dwSoundTime = GetTickCount();
-        }
+        //if (GetTickCount() - m_dwSoundTime > 1500)
+        //{
+        //    SOUND->PlayEffect(SND_EFF_BOSS_ROLL); // Loop 아님, 1회 재생
+        //    m_dwSoundTime = GetTickCount();
+        //}
     }
     else if (state == B_STATE_DIE) currentImg = &dieImg[aniCount];
 

@@ -34,6 +34,7 @@ void Sound::Init()
 	m_SoundIDs[SND_BGM_FIGHT] = AddSoundFile("./resource/Sound/Stage_Theme.wav", true);
 	m_SoundIDs[SND_BGM_BOSS] = AddSoundFile("./resource/Sound/watcher/Boss Battle 1.wav", true);
 	m_SoundIDs[SND_BGM_HK] = AddSoundFile("./resource/Sound/Hollow Knight.wav", true);
+	m_SoundIDs[SND_BGM_CLEAR] = AddSoundFile("./resource/Sound/Clear.wav", false);
 
 	// 2. 효과음 (반복 = false)
 	m_SoundIDs[SND_EFF_JUMP] = AddSoundFile("./resource/Sound/hero sound/Jump.wav", false);
@@ -48,7 +49,7 @@ void Sound::Init()
 	m_SoundIDs[SND_EFF_BOSS_ROLL] = AddSoundFile("./resource/Sound/watcher/spinground2.wav", true);
 	m_SoundIDs[SND_EFF_BOSS_ROLL_SKY] = AddSoundFile("./resource/Sound/watcher/spinair3.wav", true);
 	m_SoundIDs[SND_EFF_HERO_DIE] = AddSoundFile("./resource/Sound/watcher/Boss Defeat.wav", false);
-	m_SoundIDs[SND_EFF_BOSS_DIE] = AddSoundFile("./resource/Sound/Clear.wav", false);
+	m_SoundIDs[SND_EFF_BOSS_DIE] = AddSoundFile("./resource/Sound/boss_explode.wav", false);
 	m_SoundIDs[SND_EFF_BOSS_ATTACK1] = AddSoundFile("./resource/Sound/watcher/BossAttack.wav", false);
 	m_SoundIDs[SND_EFF_BOSS_ATTACK2] = AddSoundFile("./resource/Sound/watcher/BossAttack.wav", false);
 

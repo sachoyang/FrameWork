@@ -8,6 +8,7 @@ enum SoundType {
 	SND_BGM_FIGHT,
 	SND_BGM_BOSS,
 	SND_BGM_HK,
+	SND_BGM_CLEAR,
 
 	// --- 효과음 (SFX) ---
 	SND_EFF_JUMP,
