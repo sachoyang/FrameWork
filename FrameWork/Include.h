@@ -62,9 +62,6 @@
 // =========================================
 // 2단계: 게임 엔티티 (실제로 화면에 등장하는 애들)
 // =========================================
-//#include "Player.h"
-//#include "Player2.h"
-//#include "Bird.h"
 #include "Enemy.h"  
 #include "Boss.h"
 #include "Knight.h" 

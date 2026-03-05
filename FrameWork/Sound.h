@@ -11,6 +11,8 @@ enum SoundType {
 	SND_EFF_DASH,
 	SND_EFF_ATTACK,
 	SND_EFF_HIT,
+	SND_EFT_CRAWLER,
+	SND_EFT_FLYER,
 	SND_EFF_MONSTER_DIE,
 	SND_EFF_BOSS_ROAR,
 	SND_EFF_BOSS_ATTACK,
@@ -46,7 +48,7 @@ public:
 	// 재생 함수
 	void PlayBGM(SoundType type);   // 배경음 재생 (Loop)
 	void PlayEffect(SoundType type); // 효과음 재생 (Once)
-
+	void StopEffect(SoundType type);
 	// 제어 함수
 	void StopBGM();
 	void VolUp();
