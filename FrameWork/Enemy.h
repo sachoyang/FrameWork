@@ -50,7 +50,7 @@ public:
         // 1. [ChangeState 대체] 애니메이션 직접 지정
         // deadImg는 2장(0, 1)이므로 마지막인 1번으로 고정
         aniCount = 1;
-        //StopMonsterSound();
+        StopMonsterSound();
         // 2. [증발 버그 해결] 물리 변수 강제 초기화!
         // 이 값이 쓰레기 값이면 isRestingCorpse가 false가 되어 저 멀리 날아갑니다.
         velocity = D3DXVECTOR2(0.0f, 0.0f);

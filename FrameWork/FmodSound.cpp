@@ -25,7 +25,7 @@ public:
 	{
 		System_Create(&m_pSystem);
 		// init(채널 최대설정값, 초기화 시점 , 추가로 넣을 보조 드라이버 );
-		m_pSystem->init(32, FMOD_INIT_NORMAL, 0);
+		m_pSystem->init(120, FMOD_INIT_NORMAL, 0);
 
 		m_pSystem->getMasterChannelGroup(&m_pMasterGroup);
 
@@ -77,6 +77,22 @@ public:
 		m_SoundList.insert(std::make_pair(m_Index, pSound));
 
 		return m_Index++;
+	}
+
+	// 해당 채널이 재생 중인지 검사
+	bool IsPlaying(int _ChannelIndex)
+	{
+		if (_ChannelIndex < 0) return false;
+
+		Channel* pChannel = nullptr;
+		m_pSystem->getChannel(_ChannelIndex, &pChannel);
+
+		bool isPlaying = false;
+		if (pChannel)
+		{
+			pChannel->isPlaying(&isPlaying);
+		}
+		return isPlaying;
 	}
 
 	// 이펙트 플레이
@@ -229,4 +245,9 @@ void SetMasterVolume(float vol)
 void StopAllEffects()
 {
 	g_SoundMgr.StopAllEffects();
+}
+
+bool IsPlaying(int _ChannelIndex)
+{
+	return g_SoundMgr.IsPlaying(_ChannelIndex);
 }

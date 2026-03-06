@@ -408,6 +408,11 @@ void BossEnemy::Update()
                 ChangeState(B_STATE_IDLE); // 일단 대기 상태로 빼서 멈춤 애니메이션은 나중에 다듬기
             }
         }
+        // 🌟 [추가] 구르는 중인데 소리가 안 나면 다시 켠다! (끊김 방지)
+        if (m_RollSoundChannel == -1 || !SOUND->IsPlaying(m_RollSoundChannel))
+        {
+            m_RollSoundChannel = SOUND->PlayEffect(SND_EFF_BOSS_ROLL);
+        }
         break;
 
     case B_STATE_ROLL_BOUNCE:
@@ -465,6 +470,10 @@ void BossEnemy::Update()
                 velocity.x = targetV;
                 dir = (velocity.x < 0) ? 1 : -1;
             }
+        }
+        if (m_RollSoundChannel == -1 || !SOUND->IsPlaying(m_RollSoundChannel))
+        {
+            m_RollSoundChannel = SOUND->PlayEffect(SND_EFF_BOSS_ROLL_SKY);
         }
         break;
 

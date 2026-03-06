@@ -83,9 +83,8 @@ void GroundEnemy::Init(float x, float y)
     for (int i = 0; i < 3; i++) { sprintf_s(FileName, "./resource/Img/monster/ground%02d.png", i + 1); img[i].Create(FileName, false, 0); }
     for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/ground_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
     SetRect(&m_rc, pos.x - 30, pos.y - 40, pos.x + 30, pos.y + 40);
-    if (hp>0 && m_iSoundChannel == -1) {
-        m_iSoundChannel = SOUND->PlayEffect(SND_EFT_CRAWLER);
-    }
+    
+    m_iSoundChannel = -1;
 }
 
 void GroundEnemy::Update()
@@ -95,6 +94,26 @@ void GroundEnemy::Update()
         if (isDead) { if (aniCount > 1) aniCount = 1; }
         else { if (aniCount > 2) aniCount = 0; }
         aniTime = GetTickCount();
+    }
+
+    // ======================================================== =
+    // 🔊 [스마트 사운드 로직] 죽으면 끄고, 살아있으면 켠다!
+    // =========================================================
+    if (isDead)
+    {
+        // 죽었는데 소리가 나고 있다면? -> 끈다!
+        if (m_iSoundChannel != -1) {
+            SOUND->StopSound(m_iSoundChannel);
+            m_iSoundChannel = -1;
+        }
+    }
+    else
+    {
+        // 살아있는데 소리가 끊겼다면? (피격 효과음에 밀렸거나, 맵 이동 후 복귀 등)
+        if (m_iSoundChannel == -1 || !SOUND->IsPlaying(m_iSoundChannel))
+        {
+            m_iSoundChannel = SOUND->PlayEffect(SND_EFT_CRAWLER);
+        }
     }
 
     // 허공 정점(gravity=0)에서 얼지 않도록, '바닥에 닿아 속도가 0.0f가 된 순간'만 동결!
@@ -154,9 +173,7 @@ void FlyEnemy::Init(float x, float y)
     char FileName[256];
     for (int i = 0; i < 4; i++) { sprintf_s(FileName, "./resource/Img/monster/fly%02d.png", i + 1); img[i].Create(FileName, false, 0); }
     for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/fly_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
-    if (hp > 0 && m_iSoundChannel == -1) {
-        m_iSoundChannel = SOUND->PlayEffect(SND_EFT_FLYER);
-    }
+	m_iSoundChannel = -1;
 }
 
 void FlyEnemy::Update()
@@ -167,7 +184,24 @@ void FlyEnemy::Update()
         else { if (aniCount > 3) aniCount = 0; }
         aniTime = GetTickCount();
     }
-
+    // =========================================================
+    // 🔊 [스마트 사운드 로직]
+    // =========================================================
+    if (isDead)
+    {
+        if (m_iSoundChannel != -1) {
+            SOUND->StopSound(m_iSoundChannel);
+            m_iSoundChannel = -1;
+        }
+    }
+    else
+    {
+        // 날아다니는 소리 유지
+        if (m_iSoundChannel == -1 || !SOUND->IsPlaying(m_iSoundChannel))
+        {
+            m_iSoundChannel = SOUND->PlayEffect(SND_EFT_FLYER);
+        }
+    }
     bool isRestingCorpse = (isDead && velocity.x == 0.0f);
 
     if (isDead || isHit) {

@@ -12,3 +12,4 @@ void	BGStop();
 void    StopSound(int _ChannelIndex);
 void    StopAllEffects();
 void	SetMasterVolume(float vol);
+bool	IsPlaying(int _ChannelIndex);

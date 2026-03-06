@@ -62,6 +62,8 @@ public:
 	void PlayBGM(SoundType type);   // 배경음 재생 (Loop)
 	int PlayEffect(SoundType type);
 	void StopEffect(SoundType type);
+	bool IsPlaying(int channel);
+
 	// 제어 함수
 	void StopBGM();
 	void VolUp();
