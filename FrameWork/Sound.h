@@ -57,7 +57,7 @@ public:
 
 //int m_Select;
 	void Init();
-
+	void Update();
 	// 재생 함수
 	void PlayBGM(SoundType type);   // 배경음 재생 (Loop)
 	int PlayEffect(SoundType type);
@@ -70,6 +70,7 @@ public:
 	void VolDown();
 	void StopSound(int channel);    // 특정 채널의 소리 끄기
 	void SetMasterVolume(float vol);
+
 };
 
 //extern Sound sound;

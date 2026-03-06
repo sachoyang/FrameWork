@@ -428,7 +428,6 @@ void BossEnemy::Update()
             if (aniCount > 4 || aniCount < 1) aniCount = 1;
             aniTime = GetTickCount();
         }
-        //SOUND->PlayEffect(SND_EFF_BOSS_ROLL_SKY);
 
         // 2. 당구공처럼 벽에 튕기기!
         if (dir == 1 && pos.x <= 150.0f) {
@@ -454,8 +453,6 @@ void BossEnemy::Update()
                 velocity.x = 0;
             }
             else {
-                //SOUND->PlayEffect(SND_EFF_BOSS_ROLL_SKY);
-
                 // 🌟 바닥에 닿자마자 기사 위치를 스캔하여 궤도를 수정하며 다시 솟구침!
                 gravity = -25.0f;
 

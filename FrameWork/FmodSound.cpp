@@ -189,6 +189,13 @@ public:
 			m_pMasterGroup->setVolume(m_vloum);
 		}
 	}
+	void Update()
+	{
+		if (m_pSystem)
+		{
+			m_pSystem->update(); // 🌟 FMOD 엔진 갱신 (필수!)
+		}
+	}
 };
 
 static FmodSound g_SoundMgr;
@@ -250,4 +257,9 @@ void StopAllEffects()
 bool IsPlaying(int _ChannelIndex)
 {
 	return g_SoundMgr.IsPlaying(_ChannelIndex);
+}
+
+void Update()
+{
+	g_SoundMgr.Update();
 }
