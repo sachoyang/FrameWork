@@ -21,7 +21,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdL
 	wc.style = CS_CLASSDC ;
 	wc.cbClsExtra = NULL ;
 	wc.cbWndExtra = NULL ;
-	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH) ;
+	wc.hbrBackground = NULL;//(HBRUSH)GetStockObject(WHITE_BRUSH);
 	//wc.hCursor = LoadCursor( wc.hInstance, IDC_ARROW ) ;
 	wc.hCursor = (HCURSOR)LoadImage(
 		NULL,                           // 파일에서 로드할 때는 NULL
@@ -203,6 +203,8 @@ LRESULT CALLBACK WndProc( HWND g_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	switch( uMsg )
 	{
+	case WM_ERASEBKGND:
+		return 1;
 	case WM_COMMAND:
 		if (g_Mng.chap[g_Mng.n_Chap] != NULL)
 		{
