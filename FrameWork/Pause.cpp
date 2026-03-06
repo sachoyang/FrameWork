@@ -91,6 +91,10 @@ void Pause::Render()
 	m_PauseBg.Render(SCREEN_WITH/2, SCREEN_HEIGHT/2, 0, 2, 2, 1);
 	m_PauseBg2.Render(SCREEN_WITH / 2, SCREEN_HEIGHT / 2, 0, 1, 1, 1);
 
+	char volume[256];
+	sprintf_s(volume, "Volume");
+	dv_font.DrawString(volume, 330, 280, D3DCOLOR_ARGB(255, 255, 255, 255));
+
 	// 2. 슬라이더
 	int barX = 640; int barY = 300;
 	m_SliderBar.Render(barX, barY, 0, 1.4, 1, 1);

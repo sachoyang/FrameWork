@@ -199,22 +199,22 @@ void Knight::Update()
                 if (attackType == 0) // 측면 공격
                 {
                     if (dir == -1) { // 오른쪽
-                        attackBox.left = pos.x + 10; attackBox.right = pos.x + 160;
+                        attackBox.left = pos.x + 10; attackBox.right = pos.x + 170;
                     }
                     else {         // 왼쪽 (dir == 1)
-                        attackBox.left = pos.x - 160; attackBox.right = pos.x - 10;
+                        attackBox.left = pos.x - 170; attackBox.right = pos.x - 10;
                     }
                     attackBox.top = pos.y - 70; attackBox.bottom = pos.y + 30;
                 }
                 else if (attackType == 1) // 상단 공격
                 {
                     attackBox.left = pos.x - 60; attackBox.right = pos.x + 60;
-                    attackBox.top = pos.y - 160; attackBox.bottom = pos.y - 10; // 머리 위로 길게
+                    attackBox.top = pos.y - 170; attackBox.bottom = pos.y - 10; // 머리 위로 길게
                 }
                 else if (attackType == 2) // 하단 공격
                 {
                     attackBox.left = pos.x - 60; attackBox.right = pos.x + 60;
-                    attackBox.top = pos.y + 10; attackBox.bottom = pos.y + 150; // 발 밑으로 길게
+                    attackBox.top = pos.y + 10; attackBox.bottom = pos.y + 170; // 발 밑으로 길게
                 }
 
                 // [포고 점프] 하단 찍기 중에 무언가(적/오브젝트)를 맞췄다면?
@@ -434,6 +434,7 @@ void Knight::Draw()
         // 🌟 [추가] 컷신 중이면 무조건 도전(bossstart) 애니메이션만 그림!
         if (isCutscene)
         {
+            dir = -1;
             float drawingOffsetY = 20.0f; // 필요시 발바닥 높이 조절
             bossStartImg[m_StartAniCount].Render(pos.x - CAM->GetX(), pos.y - CAM->GetY() + drawingOffsetY, 0, dir, 1, 1);
         }
@@ -592,7 +593,7 @@ void Knight::DashStart()
     SOUND->PlayEffect(SND_EFF_DASH);
 
     // =================================================================
-    // 🌟 [핵심 로직] 벽을 뚫지 않는 "최종 도착 지점" 계산
+    // [핵심 로직] 벽을 뚫지 않는 "최종 도착 지점" 계산
     // =================================================================
 
     float maxDashDist = 200.0f; // 최대 대시 거리
