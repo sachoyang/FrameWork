@@ -83,7 +83,7 @@ void GroundEnemy::Init(float x, float y)
     for (int i = 0; i < 3; i++) { sprintf_s(FileName, "./resource/Img/monster/ground%02d.png", i + 1); img[i].Create(FileName, false, 0); }
     for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/ground_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
     SetRect(&m_rc, pos.x - 30, pos.y - 40, pos.x + 30, pos.y + 40);
-    if (m_iSoundChannel == -1) {
+    if (hp>0 && m_iSoundChannel == -1) {
         m_iSoundChannel = SOUND->PlayEffect(SND_EFT_CRAWLER);
     }
 }
@@ -154,7 +154,7 @@ void FlyEnemy::Init(float x, float y)
     char FileName[256];
     for (int i = 0; i < 4; i++) { sprintf_s(FileName, "./resource/Img/monster/fly%02d.png", i + 1); img[i].Create(FileName, false, 0); }
     for (int i = 0; i < 2; i++) { sprintf_s(FileName, "./resource/Img/monster/fly_dead%02d.png", i + 1); deadImg[i].Create(FileName, false, 0); }
-    if (m_iSoundChannel == -1) {
+    if (hp > 0 && m_iSoundChannel == -1) {
         m_iSoundChannel = SOUND->PlayEffect(SND_EFT_FLYER);
     }
 }

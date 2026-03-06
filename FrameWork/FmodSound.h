@@ -10,5 +10,5 @@ void	VolumUp();
 void	VolumDown();
 void	BGStop();
 void    StopSound(int _ChannelIndex);
-
+void    StopAllEffects();
 void	SetMasterVolume(float vol);
