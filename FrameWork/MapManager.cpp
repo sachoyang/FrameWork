@@ -1034,7 +1034,7 @@ void MapManager::Draw()
 		m_pCurrentMapChunk->bgLayer[i].Render(0 - CAM->GetX(), 0 - CAM->GetY(), 0, 1, 1);
 	}
 
-	// 🌟 [타일 렌더링 시스템]
+	// [타일 렌더링 시스템]
 	int pID = m_pCurrentMapChunk->prefabID;
 	if (pID > 0)
 	{

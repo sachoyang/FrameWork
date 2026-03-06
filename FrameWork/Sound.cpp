@@ -111,7 +111,10 @@ void Sound::StopEffect(SoundType type)
 	if (type < 0 || type >= SND_END || m_SoundIDs[type] == -1) return;
 
 }
-
+void Sound::SetMasterVolume(float vol)
+{
+	::SetMasterVolume(vol); // FmodSound 전역 함수 호출
+}
 // 사용법
 //배경음 재생(MapManager::ChangeMap 등)
 //

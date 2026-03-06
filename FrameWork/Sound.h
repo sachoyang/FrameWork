@@ -67,6 +67,7 @@ public:
 	void VolUp();
 	void VolDown();
 	void StopSound(int channel);    // 특정 채널의 소리 끄기
+	void SetMasterVolume(float vol);
 };
 
 //extern Sound sound;

@@ -13,6 +13,8 @@ class FmodSound
 	System* m_pSystem;
 	int			m_Index;
 	Channel* m_pBGChannel;
+
+	ChannelGroup* m_pMasterGroup;
 	float       m_vloum;
 
 public:
@@ -24,6 +26,8 @@ public:
 		System_Create(&m_pSystem);
 		// init(채널 최대설정값, 초기화 시점 , 추가로 넣을 보조 드라이버 );
 		m_pSystem->init(32, FMOD_INIT_NORMAL, 0);
+
+		m_pSystem->getMasterChannelGroup(&m_pMasterGroup);
 
 		m_Index = 0;
 		m_vloum = 1.0f;
@@ -142,6 +146,18 @@ public:
 			pChannel->stop();
 		}
 	}
+
+	void SetMasterVolume(float vol)
+	{
+		m_vloum = vol;
+		if (m_vloum < 0.0f) m_vloum = 0.0f;
+		if (m_vloum > 1.0f) m_vloum = 1.0f;
+
+		if (m_pMasterGroup)
+		{
+			m_pMasterGroup->setVolume(m_vloum);
+		}
+	}
 };
 
 static FmodSound g_SoundMgr;
@@ -188,4 +204,9 @@ void BGStop()
 void StopSound(int _ChannelIndex)
 {
 	g_SoundMgr.StopSound(_ChannelIndex);
+}
+
+void SetMasterVolume(float vol)
+{
+	g_SoundMgr.SetMasterVolume(vol);
 }

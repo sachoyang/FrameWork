@@ -58,6 +58,9 @@
     <Filter Include="소스 파일\Ending">
       <UniqueIdentifier>{60c419e7-6792-4240-be6a-11bca4f7ceed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Pause">
+      <UniqueIdentifier>{88fb37e8-1abc-40bf-95ee-88e9b3732212}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Define.h">
@@ -138,6 +141,9 @@
     <ClInclude Include="Include.h">
       <Filter>D3D Core\코어 헤더파일</Filter>
     </ClInclude>
+    <ClInclude Include="Pause.h">
+      <Filter>소스 파일\Pause</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="key.cpp">
@@ -211,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="Ending.cpp">
       <Filter>소스 파일\Ending</Filter>
+    </ClCompile>
+    <ClCompile Include="Pause.cpp">
+      <Filter>소스 파일\Pause</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,4 +9,6 @@ void	BGPlay(int _SoundNum);
 void	VolumUp();
 void	VolumDown();
 void	BGStop();
-void    StopSound(int _ChannelIndex); // [추가] 특정 채널 멈추기
+void    StopSound(int _ChannelIndex);
+
+void	SetMasterVolume(float vol);

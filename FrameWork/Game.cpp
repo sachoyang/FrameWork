@@ -1,11 +1,12 @@
 ﻿#include "Include.h"
 
-Game::Game()
+Game::Game() : m_pPause(nullptr), m_bPaused(false)
 {
 }
 
 Game::~Game()
 {
+	if (m_pPause) delete m_pPause;
 }
 
 void Game::Init()
@@ -19,6 +20,12 @@ void Game::Init()
 	Gmanager.Init();
 	EFFECT->Init();
 	uiMng.Init();
+
+	m_pPause = new Pause();
+	m_pPause->Init();
+	m_bPaused = false;
+
+	m_TutorialImg.Create("./resource/Img/UI/Tutorial_Key.png", false, 0);
 	// 데이타 베이스///////////////////
 	// sql.Init();
 }
@@ -31,6 +38,23 @@ void Game::Draw()
 	coll.Draw();
 	Gmanager.Draw();
 	uiMng.Draw();
+
+	// =========================================================
+	// 🌟 튜토리얼 텍스트 (1번 맵일 때만!)
+	// =========================================================
+	if (mapMng.m_pCurrentMapChunk && mapMng.m_pCurrentMapChunk->id == 1)
+	{
+		// 배경 적절한 위치에 출력
+		m_TutorialImg.Render(300 - CAM->GetX(), 300 - CAM->GetY(), 0, 1, 1, 1);
+	}
+
+	// =========================================================
+	// ⏸️ 일시정지 화면 그리기 (Pause 객체에게 위임)
+	// =========================================================
+	if (m_bPaused && m_pPause)
+	{
+		m_pPause->Render();
+	}
 	// 데이타 베이스///////////////////
 	// sql.Draw();
 }
@@ -55,6 +79,29 @@ void Game::Update(double frame)
 		}		
 
 		key.Update();
+
+		if (m_bPaused)
+		{
+			if (m_pPause)
+			{
+				PAUSE_RESULT result = m_pPause->Update();
+
+				if (result == PAUSE_RESUME)
+				{
+					m_bPaused = false; // 게임 재개
+				}
+				else if (result == PAUSE_TO_MENU)
+				{
+					m_bPaused = false;
+					g_Mng.n_Chap = MENU; // 메뉴로 이동
+				}
+				// PAUSE_KEEP이면 아무것도 안 함 (계속 멈춤)
+			}
+
+			a = GetTickCount64();
+			return;
+		}
+
 		uiMng.Update(); // UI업데이트
 
 		TIMEMGR->UpdateTime();
@@ -96,8 +143,8 @@ void Game::OnMessage( MSG* msg )
 		switch (msg->wParam)
 		{
 		case VK_ESCAPE:
-			// 메뉴로 돌아가기 예시
-			g_Mng.n_Chap = MENU;
+			// ESC 누르면 일시정지 토글!
+			m_bPaused = !m_bPaused;
 			break;
 
 		case '1':
