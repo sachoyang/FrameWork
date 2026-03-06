@@ -17,7 +17,7 @@
 * **Language:** C++ (STL, WinAPI)
 * **Graphics:** DirectX 9 (d3d9, d3dx9, Sprite Rendering)
 * **Audio:** FMOD Sound System (Custom Wrapper)
-* **IDE:** Visual Studio 2019+
+* **IDE:** Visual Studio 2022
 * **Data:** Custom Prefab Structure, Hardcoded Game Data
 
 ---
