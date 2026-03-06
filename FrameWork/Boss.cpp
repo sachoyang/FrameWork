@@ -33,7 +33,8 @@ void BossEnemy::Init(float x, float y)
     isDead = false;
     isHit = false;
     aniCount = 0;
-
+    m_bSoundPlayed_Attack1 = false;
+    m_bSoundPlayed_Attack2 = false;
     char FileName[256];
 
     // 0. 대기 이미지 로드
@@ -101,18 +102,29 @@ void BossEnemy::TakeDamage(int damage, int hitDir)
 
 void BossEnemy::ChangeState(int newState)
 {
-    // 구르기 상태에서 다른 상태로 바뀔 때 -> 소리를 끈다!
+    //// 구르기 상태에서 다른 상태로 바뀔 때 -> 소리를 끈다!
+    //if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE)
+    //{
+    //    // 다음 상태가 또 구르기라면 끄지 않고 유지할 수도 있음 (자연스러운 연결 위해)
+    //    // 하지만 여기선 확실하게 끄고 다시 켜는 방식으로 구현 (끊김 방지하려면 조건 추가 가능)
+    //    if (newState != B_STATE_ROLL_DASH && newState != B_STATE_ROLL_BOUNCE)
+    //    {
+    //        if (m_RollSoundChannel != -1) {
+    //            SOUND->StopSound(m_RollSoundChannel);
+
+    //            m_RollSoundChannel = -1; // 초기화
+    //        }
+    //    }
+    //}
+
+    // 1. 이전 상태 정리 (Clean Up)
+    // 만약 이전에 구르기 상태였다면, 무조건 소리를 끈다.
     if (state == B_STATE_ROLL_DASH || state == B_STATE_ROLL_BOUNCE)
     {
-        // 다음 상태가 또 구르기라면 끄지 않고 유지할 수도 있음 (자연스러운 연결 위해)
-        // 하지만 여기선 확실하게 끄고 다시 켜는 방식으로 구현 (끊김 방지하려면 조건 추가 가능)
-        if (newState != B_STATE_ROLL_DASH && newState != B_STATE_ROLL_BOUNCE)
+        if (m_RollSoundChannel != -1)
         {
-            if (m_RollSoundChannel != -1) {
-                SOUND->StopSound(m_RollSoundChannel);
-
-                m_RollSoundChannel = -1; // 초기화
-            }
+            SOUND->StopSound(m_RollSoundChannel);
+            m_RollSoundChannel = -1; // 채널 초기화 필수!
         }
     }
 
@@ -120,6 +132,8 @@ void BossEnemy::ChangeState(int newState)
     stateStartTime = GetTickCount();
     aniCount = 0;
     aniTime = GetTickCount(); // 애니메이션 타이머 초기화
+    m_bSoundPlayed_Attack1 = false;
+    m_bSoundPlayed_Attack2 = false;
 
     if (newState == B_STATE_AWAKE_ROAR)
     {
@@ -348,7 +362,10 @@ void BossEnemy::Update()
 
             // 1. 가로 베기 구간 (옆으로 쫙 길게! 위아래는 얇게)
             if (aniCount >= 2 && aniCount <= 4) {
-                SOUND->PlayEffect(SND_EFF_BOSS_ATTACK1);
+                if (!m_bSoundPlayed_Attack1) {
+                    SOUND->PlayEffect(SND_EFF_BOSS_ATTACK1);
+                    m_bSoundPlayed_Attack1 = true; // 소리 냈음 체크
+                }
                 isAttacking = true;
                 if (dir == 1) { // 왼쪽 보고 칠 때 (X를 왼쪽으로 길게 -300)
                     SetRect(&attackBox, pos.x - 300, pos.y - 50, pos.x + 50, pos.y + 50);
@@ -360,7 +377,11 @@ void BossEnemy::Update()
 
             // 2. 세로 베기 구간 (위로 아주 높게! X 폭은 적당히)
             else if (aniCount >= 7 && aniCount <= 9) {
-                SOUND->PlayEffect(SND_EFF_BOSS_ATTACK2);
+                // 🌟 [수정] 플래그 체크
+                if (!m_bSoundPlayed_Attack2) {
+                    SOUND->PlayEffect(SND_EFF_BOSS_ATTACK2);
+                    m_bSoundPlayed_Attack2 = true;
+                }
                 isAttacking = true;
                 if (dir == 1) { // 왼쪽 (Y를 위로 엄청 높게 -250)
                     SetRect(&attackBox, pos.x - 200, pos.y - 200, pos.x + 50, pos.y + 120);
@@ -406,6 +427,7 @@ void BossEnemy::Update()
                 // 튕겨 나가면서 멈춤 애니메이션(5, 6) 재생 상태로 전환
                 velocity.x = (dir == 1) ? 10.0f : -10.0f; // 반대로 튕김
                 ChangeState(B_STATE_IDLE); // 일단 대기 상태로 빼서 멈춤 애니메이션은 나중에 다듬기
+                return;
             }
         }
         // 🌟 [추가] 구르는 중인데 소리가 안 나면 다시 켠다! (끊김 방지)
@@ -451,6 +473,7 @@ void BossEnemy::Update()
                 // 🌟 3번 통통 튀겼으면 멈추고 일어납니다.
                 ChangeState(B_STATE_IDLE);
                 velocity.x = 0;
+                return;
             }
             else {
                 // 🌟 바닥에 닿자마자 기사 위치를 스캔하여 궤도를 수정하며 다시 솟구침!

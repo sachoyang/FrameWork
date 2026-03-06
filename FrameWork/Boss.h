@@ -50,7 +50,8 @@ public:
     void Update() override;
     void Draw() override;
     void TakeDamage(int damage, int hitDir) override;
-
+    bool m_bSoundPlayed_Attack1; // 가로 베기 소리 냈니?
+    bool m_bSoundPlayed_Attack2; // 세로 베기 소리 냈니?
     // 상태를 안전하게 변경하는 헬퍼 함수
     void ChangeState(int newState);
 
